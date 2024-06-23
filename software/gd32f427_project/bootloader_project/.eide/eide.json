@@ -1,0 +1,85 @@
+{
+  "name": "NanoPlatformBootloader",
+  "type": "ARM",
+  "dependenceList": [],
+  "srcDirs": [
+    "../CMSIS",
+    "../GD32F4xx_standard_peripheral",
+    "../bootloader"
+  ],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [],
+    "folders": [
+      {
+        "name": "link_script",
+        "files": [
+          {
+            "path": "GD32F4xx_bootloader.ld"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "start_code",
+        "files": [
+          {
+            "path": "startup_gd32f407_427.s"
+          }
+        ],
+        "folders": []
+      }
+    ]
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "8a757dfcce39070a98818927a0f57b1a"
+  },
+  "targets": {
+    "Debug": {
+      "excludeList": [],
+      "toolchain": "GCC",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "GD32F4xx_bootloader.ld",
+        "useCustomScatterFile": true,
+        "storageLayout": {
+          "RAM": [],
+          "ROM": []
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "null",
+          "cpuName": "null"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "../CMSIS",
+          "../CMSIS/GD/GD32F4xx/Include",
+          "../GD32F4xx_standard_peripheral/Include",
+          "../bootloader"
+        ],
+        "libList": [],
+        "defineList": [
+          "USE_STDPERIPH_DRIVER",
+          "GD32F427"
+        ]
+      }
+    }
+  },
+  "version": "3.4"
+}
