@@ -31,7 +31,7 @@ SECTIONS
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >BOOTLOADER_FLASH
+  } >APP_FLASH
 
   /* 代码段 */
   .text :
@@ -48,7 +48,7 @@ SECTIONS
 
     . = ALIGN(4);
     _etext = .;        /* define a global symbols at end of code */
-  } >BOOTLOADER_FLASH
+  } >APP_FLASH
 
   /* 直读数据段 */
   .rodata :
@@ -57,15 +57,15 @@ SECTIONS
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
     . = ALIGN(4);
-  } >BOOTLOADER_FLASH
+  } >APP_FLASH
 
   /* 一堆和链接有关的表之类的，可能是目标文件的重定向表????? */
-  .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >BOOTLOADER_FLASH
+  .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >APP_FLASH
   .ARM : {
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
-  } >BOOTLOADER_FLASH
+  } >APP_FLASH
 
   /*这里感觉像需要预加载的一些全局变量啥的 加载域??*/
   .preinit_array     :
@@ -73,21 +73,21 @@ SECTIONS
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } >BOOTLOADER_FLASH
+  } >APP_FLASH
   .init_array :
   {
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } >BOOTLOADER_FLASH
+  } >APP_FLASH
   .fini_array :
   {
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } >BOOTLOADER_FLASH
+  } >APP_FLASH
 
   /* _sidata -> 标识.data段的加载地址，用于指示启动文件应当从flash的何处将.data段的数据拷贝到ram中 */
   /* 即，.data段初始值在flash中的位置(加载地址) */
@@ -104,7 +104,7 @@ SECTIONS
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
-  } >RAM AT> BOOTLOADER_FLASH
+  } >RAM AT> APP_FLASH
 
   /* CCM-RAM section 
   * 
@@ -123,7 +123,7 @@ SECTIONS
     
     . = ALIGN(4);
     _eccmram = .;       /* create a global symbol at ccmram end */
-  } >CCMRAM AT> BOOTLOADER_FLASH
+  } >CCMRAM AT> APP_FLASH
 
   
   /* Uninitialized data section */

@@ -15,17 +15,7 @@
 #
 ##########################################################################################
 
-version: '1.0'
-
-#
-# for source files with filesystem paths
-#
+version: "1.0"
 files:
-#   './test/**/*.c': --c99
-
-#
-# for source files with virtual paths
-#
-virtualPathFiles:
-#   'virtual_folder/**/*.c': --c99
-
+    target/bootloader/startup_gd32f407_427.s: -D TARGET_BOOTLOADER
+virtualPathFiles: null

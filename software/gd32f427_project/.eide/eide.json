@@ -1,0 +1,113 @@
+{
+  "name": "NanoPlatform",
+  "type": "ARM",
+  "dependenceList": [],
+  "srcDirs": [
+    "CMSIS",
+    "GD32F4xx_standard_peripheral",
+    "target"
+  ],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [],
+    "folders": []
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "a2a6a4fbb9675b06009e35b43b8f1731"
+  },
+  "targets": {
+    "app": {
+      "excludeList": [
+        "target/bootloader"
+      ],
+      "toolchain": "GCC",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "target\\app\\GD32F4xx.ld",
+        "useCustomScatterFile": true,
+        "storageLayout": {
+          "RAM": [],
+          "ROM": []
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "null",
+          "cpuName": "null"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "CMSIS",
+          "CMSIS/GD/GD32F4xx/Include",
+          "GD32F4xx_standard_peripheral/Include",
+          "target/app"
+        ],
+        "libList": [],
+        "defineList": [
+          "GD32F427",
+          "USE_STDPERIPH_DRIVER"
+        ]
+      }
+    },
+    "bootlaoder": {
+      "excludeList": [
+        "target/app"
+      ],
+      "toolchain": "GCC",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "target\\bootloader\\GD32F4xx.ld",
+        "useCustomScatterFile": true,
+        "storageLayout": {
+          "RAM": [],
+          "ROM": []
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "null",
+          "cpuName": "null"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "CMSIS",
+          "CMSIS/GD/GD32F4xx/Include",
+          "GD32F4xx_standard_peripheral/Include",
+          "target/bootloader"
+        ],
+        "libList": [],
+        "defineList": [
+          "GD32F427",
+          "USE_STDPERIPH_DRIVER",
+          "TARGET_BOOTLOADER"
+        ]
+      }
+    }
+  },
+  "version": "3.4"
+}

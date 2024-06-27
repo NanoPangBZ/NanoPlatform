@@ -33,7 +33,6 @@ OF SUCH DAMAGE.
 */
 
 #include "gd32f4xx_it.h"
-#include "main.h"
 
 /*!
     \brief      this function handles NMI exception
