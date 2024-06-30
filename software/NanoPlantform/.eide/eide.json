@@ -3,9 +3,8 @@
   "type": "ARM",
   "dependenceList": [],
   "srcDirs": [
-    "CMSIS",
-    "GD32F4xx_standard_peripheral",
-    "target"
+    "target",
+    "plantform"
   ],
   "virtualFolder": {
     "name": "<virtual_root>",
@@ -21,7 +20,8 @@
   "targets": {
     "app": {
       "excludeList": [
-        "target/bootloader"
+        "target/bootloader",
+        "plantform/bsp/NanoPlantform_Board/GD32F4xx_usb_library"
       ],
       "toolchain": "GCC",
       "compileConfig": {
@@ -51,10 +51,13 @@
       "custom_dep": {
         "name": "default",
         "incList": [
-          "CMSIS",
-          "CMSIS/GD/GD32F4xx/Include",
-          "GD32F4xx_standard_peripheral/Include",
-          "target/app"
+          "plantform/bsp/NanoPlantform_Board/CMSIS/GD/GD32F4xx/Include",
+          "plantform/bsp/NanoPlantform_Board/GD32F4xx_standard_peripheral/Include",
+          "plantform/bsp/NanoPlantform_Board/CMSIS",
+          "target/app",
+          "plantform/core",
+          "plantform",
+          "plantform/bsp"
         ],
         "libList": [],
         "defineList": [
