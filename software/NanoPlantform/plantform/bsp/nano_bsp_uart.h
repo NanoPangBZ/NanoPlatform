@@ -13,6 +13,12 @@ typedef uint8_t nano_uart_index_t;
 /****************************初始化相关***********************************************/
 
 /**
+ * @brief 初始化bsp串口板级支持包
+ * @return 0:成功 其他:见nano_err_e枚举
+*/
+nano_err_t nano_uart_bsp_init(void);
+
+/**
  * @brief 初始化bsp串口
  * @param index 串口索引
  * @param bound 波特率

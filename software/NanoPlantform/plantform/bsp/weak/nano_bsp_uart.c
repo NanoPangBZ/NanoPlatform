@@ -1,5 +1,10 @@
 #include "nano_bsp_uart.h"
 
+nano_err_t __attribute__((weak)) nano_uart_bsp_init(void)
+{
+    return NANO_NO_IMPL;
+}
+
 nano_err_t __attribute__((weak)) nano_uart_init(nano_uart_index_t index,uint32_t bound)
 {
     return NANO_NO_IMPL;

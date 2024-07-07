@@ -10,13 +10,13 @@
 
 static void test_demo(void)
 {
-    nano_bsp_pre_init();
+    nano_bsp_init();
 
     nano_gpio_init( DEBUG_LED_PIN_INDEX , NANO_GPIO_OUTPUT , NANO_GPIO_PULL_FLOAT , NANO_GPIO_PP );
 
     nano_uart_init( DEBUG_UART_INDEX , 921600 );
     nano_uart_set_io_mode( DEBUG_UART_INDEX , NANO_IO_WRITE , NANO_NIO );
-    nano_uart_write( DEBUG_UART_INDEX , "HelloWorld!\r\n" , strlen("HelloWorld!\r\n") );
+    nano_uart_write( DEBUG_UART_INDEX , (uint8_t*)"HelloWorld!\r\n" , strlen("HelloWorld!\r\n") );
 
     nano_plantform_init();
 
