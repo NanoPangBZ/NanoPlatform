@@ -17,22 +17,21 @@ const static uint8_t gpio_pull_mode_remap[] = {GPIO_PUPD_NONE,GPIO_PUPD_PULLUP,G
 
 /**
  * @brief Get the gpio desc object
- * 
- * @param pin 
+ * @param index 
  * @return const gpio_desc_t* 
  */
-static const gpio_desc_t* get_gpio_desc(nano_gpio_index_t pin)
+static const gpio_desc_t* get_gpio_desc(nano_gpio_index_t index)
 {
-    if( pin > sizeof(gpio_remap) / sizeof(gpio_desc_t) )
+    if( index > sizeof(gpio_remap) / sizeof(gpio_desc_t) )
     {
         return NULL;
     }
-    return &gpio_remap[pin];
+    return &gpio_remap[index];
 }
 
-nano_err_t nano_gpio_init(nano_gpio_index_t pin , nano_gpio_mode_t dir , nano_gpio_pull_t pull , nano_gpio_push_t push)
+nano_err_t nano_gpio_init(nano_gpio_index_t index , nano_gpio_mode_t dir , nano_gpio_pull_t pull , nano_gpio_push_t push)
 {
-    const gpio_desc_t* desc = get_gpio_desc(pin);
+    const gpio_desc_t* desc = get_gpio_desc(index);
 
     if( desc == NULL )
     {
@@ -54,19 +53,19 @@ nano_err_t nano_gpio_init(nano_gpio_index_t pin , nano_gpio_mode_t dir , nano_gp
     return NANO_OK;
 }
 
-nano_err_t nano_gpio_deinit(nano_gpio_index_t pin)
+nano_err_t nano_gpio_deinit(nano_gpio_index_t index)
 {
     return NANO_NO_IMPL;
 }
 
-uint8_t nano_gpio_read(nano_gpio_index_t pin)
+uint8_t nano_gpio_read(nano_gpio_index_t index)
 {
-    return gpio_input_bit_get( gpio_remap[pin].gpio_periph , gpio_remap[pin].gpio_pin );
+    return gpio_input_bit_get( gpio_remap[index].gpio_periph , gpio_remap[index].gpio_pin );
 }
 
-nano_err_t nano_gpio_write(nano_gpio_index_t pin,uint8_t bit)
+nano_err_t nano_gpio_write(nano_gpio_index_t index,uint8_t bit)
 {
-    const gpio_desc_t* desc = get_gpio_desc(pin);
+    const gpio_desc_t* desc = get_gpio_desc(index);
     if( desc == NULL )
     {
         return NANO_ILLEG_OBJ;
@@ -80,9 +79,9 @@ nano_err_t nano_gpio_write(nano_gpio_index_t pin,uint8_t bit)
     return NANO_OK;
 }
 
-nano_err_t nano_gpio_toggle(nano_gpio_index_t pin)
+nano_err_t nano_gpio_toggle(nano_gpio_index_t index)
 {
-    const gpio_desc_t* desc = get_gpio_desc(pin);
+    const gpio_desc_t* desc = get_gpio_desc(index);
     if( desc == NULL )
     {
         return NANO_ILLEG_OBJ;
@@ -93,22 +92,22 @@ nano_err_t nano_gpio_toggle(nano_gpio_index_t pin)
     return NANO_OK;
 }
 
-nano_err_t nano_gpio_interrupt_enable(nano_gpio_index_t pin)
+nano_err_t nano_gpio_interrupt_enable(nano_gpio_index_t index)
 {
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_gpio_interrupt_disable(nano_gpio_index_t pin)
+nano_err_t nano_gpio_interrupt_disable(nano_gpio_index_t index)
 {
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_gpio_interrupt_config(nano_gpio_index_t pin,nano_gpio_edge_t edge)
+nano_err_t nano_gpio_interrupt_config(nano_gpio_index_t index,nano_gpio_edge_t edge)
 {
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_gpio_interrupt_cb_set(nano_gpio_index_t pin,nano_gpio_intr_cb_t cb,void* ctx)
+nano_err_t nano_gpio_interrupt_cb_set(nano_gpio_index_t index,nano_gpio_intr_cb_t cb,void* ctx)
 {
     return NANO_NO_IMPL;
 }

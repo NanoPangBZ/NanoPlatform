@@ -20,15 +20,15 @@
   "targets": {
     "app": {
       "excludeList": [
-        "target/bootloader",
         "plantform/bsp/arch/gd32f4xx/GD32F4xx_usb_library",
-        "plantform/bsp/board/NanoPlantform_Board"
+        "plantform/bsp/board/NanoPlantform_Board",
+        "target/bootloader"
       ],
       "toolchain": "GCC",
       "compileConfig": {
         "cpuType": "Cortex-M4",
         "floatingPointHardware": "single",
-        "scatterFilePath": "target\\app\\GD32F4xx.ld",
+        "scatterFilePath": ".\\plantform\\bsp\\board\\GD32F427V-START-V1.0\\GD32F4xx.ld",
         "useCustomScatterFile": true,
         "storageLayout": {
           "RAM": [],
@@ -41,14 +41,43 @@
         "bin": "",
         "baseAddr": "",
         "cpuInfo": {
-          "vendor": "null",
-          "cpuName": "null"
+          "vendor": "GigaDevice",
+          "cpuName": "GD32F427VK"
         },
         "proType": 1,
         "speed": 8000,
         "otherCmds": ""
       },
-      "uploadConfigMap": {},
+      "uploadConfigMap": {
+        "JLink": {
+          "bin": "",
+          "baseAddr": "",
+          "cpuInfo": {
+            "vendor": "GigaDevice",
+            "cpuName": "GD32F427RG"
+          },
+          "proType": 1,
+          "speed": 8000,
+          "otherCmds": ""
+        },
+        "OpenOCD": {
+          "bin": "",
+          "target": "stm32f1x",
+          "interface": "jlink_swd_interface",
+          "baseAddr": "0x08000000"
+        },
+        "STLink": {
+          "bin": "",
+          "proType": "SWD",
+          "resetMode": "default",
+          "runAfterProgram": true,
+          "speed": 4000,
+          "address": "0x08000000",
+          "elFile": "None",
+          "optionBytes": ".eide/app.st.option.bytes.ini",
+          "otherCmds": ""
+        }
+      },
       "custom_dep": {
         "name": "default",
         "incList": [

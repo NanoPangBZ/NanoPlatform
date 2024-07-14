@@ -10,6 +10,7 @@ extern "C"
 /**
  * @brief 初始化bsp板级支持包
  * @return 0:成功 其他:见nano_err_e枚举
+ * @note bsp层最先调用，用于初始化bsp层的代码，而非硬件
 */
 nano_err_t nano_bsp_init(void);
 
