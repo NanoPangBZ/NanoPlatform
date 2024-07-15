@@ -32,8 +32,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#include "gd32f4xx_it.h"
-
 /*!
     \brief      this function handles NMI exception
     \param[in]  none
@@ -138,12 +136,3 @@ void PendSV_Handler(void)
     }
 }
 
-/*!
-    \brief    this function handles SysTick exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void SysTick_Handler(void)
-{
-}

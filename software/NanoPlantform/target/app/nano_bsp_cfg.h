@@ -1,6 +1,6 @@
 #pragma once
 
-#define GPIO_DESC_REMAP_CONFIG    { { GPIOA , GPIO_PIN_0 , RCU_GPIOA}, \
+#define GPIO_DESC_REMAP_CONFIG    { { GPIOC , GPIO_PIN_6 , RCU_GPIOC}, \
                                     { GPIOA , GPIO_PIN_1 , RCU_GPIOA} }
 
 #define UART_DESC_REMAP_CONFIG  { { USART1 , RCU_USART1 , { 1, RCU_GPIOA , GPIOA , GPIO_PIN_3 , GPIO_AF_7 } , GPIO_AF_UNUSE_DESC } , \
