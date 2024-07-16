@@ -38,6 +38,8 @@ typedef enum{
     NANO_GPIO_RISE_AND_FALL,
 }nano_gpio_edge_t;
 
+nano_err_t nano_gpio_bsp_init(void);
+
 nano_err_t nano_gpio_init(nano_gpio_index_t index , nano_gpio_mode_t dir , nano_gpio_pull_t pull , nano_gpio_push_t push);
 nano_err_t nano_gpio_deinit(nano_gpio_index_t index);
 

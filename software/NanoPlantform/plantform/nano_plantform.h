@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -34,8 +35,9 @@ typedef uint8_t nano_io_mode_t;
 
 //io操作类型
 typedef enum{
-    NANO_IO_READ,
-    NANO_IO_WRITE,
+    NANO_IO_READ = 0x01 << 0,
+    NANO_IO_WRITE = 0x01 << 1,
+    NANO_IO_READ_WRITE = NANO_IO_READ | NANO_IO_WRITE,
 }nano_io_opt_type_e;
 typedef uint8_t nano_io_opt_type_t;
 

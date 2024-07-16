@@ -60,6 +60,17 @@ SECTIONS
     . = ALIGN(4);
   } >BOOTLOADER_FLASH
 
+  .bsp_init_func :
+  {
+    . = ALIGN(4);
+    _bsp_init_func_start = .;        /* create a global symbol at bsp_init_func start */
+    *(.bsp_init_func)           /* .bsp_init_func sections */
+    *(.bsp_init_func*)          /* .bsp_init_func* sections */
+
+    . = ALIGN(4);
+    _bsp_init_func_end = .;        /* define a global symbol at bsp_init_func end */
+  } >BOOTLOADER_FLASH
+
   /* 一堆和链接有关的表之类的，可能是目标文件的重定向表????? */
   .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >BOOTLOADER_FLASH
   .ARM : {
