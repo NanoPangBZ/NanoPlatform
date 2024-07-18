@@ -2,18 +2,20 @@
 
 #include "nano_bsp_cfg.h"
 #include "nano_bsp_gpio.h"
-#include "nano_func_auto_call.h"
+#include "nano_func_manager.h"
 
-static nano_err_t demo_func(void* ctx)
+static nano_err_t func_demo(void* args)
 {
     return NANO_NO_IMPL;
 }
 
-// const __attribute__((section(".bsp_init_func"))) func_info_t demo = { "demo_func" , NULL , demo_func };
+static nano_err_t func_demo_2(void* args)
+{
+    return NANO_NO_IMPL;
+}
 
-#define BSP_AUTO_INIT(func_name)    static const __attribute__((section(".bsp_init_func"))) func_info_t func_name ## _info = { #func_name , NULL , func_name }
-
-BSP_AUTO_INIT(demo_func);
+LOAD_FUNC_TO_FUNC_MANAGER(func_demo,NANO_BSP_INIT_FUNC_GROUP);
+LOAD_FUNC_TO_FUNC_MANAGER(func_demo_2,NANO_BSP_INIT_FUNC_GROUP);
 
 static void test_demo(void)
 {

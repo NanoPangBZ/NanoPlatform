@@ -29,11 +29,6 @@ static const gpio_desc_t* get_gpio_desc(nano_gpio_index_t index)
     return &gpio_remap[index];
 }
 
-nano_err_t nano_gpio_bsp_init(void)
-{
-    return NANO_OK;
-}
-
 nano_err_t nano_gpio_init(nano_gpio_index_t index , nano_gpio_mode_t dir , nano_gpio_pull_t pull , nano_gpio_push_t push)
 {
     const gpio_desc_t* desc = get_gpio_desc(index);

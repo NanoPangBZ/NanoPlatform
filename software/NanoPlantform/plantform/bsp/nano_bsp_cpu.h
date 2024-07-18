@@ -10,12 +10,6 @@ extern "C"
 #endif  //__cplusplus
 
 /**
- * @brief 初始化cpu
- * @return 0:成功 其他:见nano_err_e枚举
-*/
-nano_err_t nano_bsp_cpu_init(void);
-
-/**
  * @brief 注册nano平台的系统心跳回调
  * @return 0:成功 其他:见nano_err_e枚举
 */

@@ -60,15 +60,16 @@ SECTIONS
     . = ALIGN(4);
   } >BOOTLOADER_FLASH
 
-  .bsp_init_func :
+  .func_manager_list :
   {
     . = ALIGN(4);
-    _bsp_init_func_start = .;        /* create a global symbol at bsp_init_func start */
-    *(.bsp_init_func)           /* .bsp_init_func sections */
-    *(.bsp_init_func*)          /* .bsp_init_func* sections */
+    _func_manager_list_start = .;        /* create a global symbol at func_manager_list start */
+    KEEP (*(.func_manager_list*))   /* KEEP 命令告诉链接器，即使这些节没有被显式引用也要保留它们 */
+    *(.func_manager_list)           /* .func_manager_list sections */
+    *(.func_manager_list*)          /* .func_manager_list* sections */
 
     . = ALIGN(4);
-    _bsp_init_func_end = .;        /* define a global symbol at bsp_init_func end */
+    _func_manager_list_end = .;        /* define a global symbol at func_manager_list end */
   } >BOOTLOADER_FLASH
 
   /* 一堆和链接有关的表之类的，可能是目标文件的重定向表????? */

@@ -2,6 +2,7 @@
 #include "nano_core.h"
 #include "nano_heap.h"
 #include "nano_bsp_cpu.h"
+#include "nano_func_manager.h"
 
 static uint32_t sys_tick = 0;
 
@@ -10,9 +11,10 @@ static void nano_plantform_systick_handler(void)
     sys_tick++;
 }
 
-static nano_err_t nano_plantform_bsp_init(void)
+static nano_err_t nano_plantform_systick_init(void)
 {
-    nano_bsp_cpu_init();
+    nano_call_func_group(NANO_BSP_INIT_FUNC_GROUP);
+
     nano_bsp_interrupt_disable();
 
     nano_bsp_set_systick_fre( 1000 );
@@ -26,8 +28,8 @@ static nano_err_t nano_plantform_bsp_init(void)
 
 nano_err_t nano_plantform_init(void)
 {
-    nano_heap_init();
-    nano_plantform_bsp_init();
+    nano_call_func_group(NANO_BSP_INIT_FUNC_GROUP);
+    nano_plantform_systick_init();
 
     nano_core_init();
     return NANO_OK;
