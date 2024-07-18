@@ -1,5 +1,6 @@
 #include "nano_plantform.h"
 #include "nano_core.h"
+#include "nano_heap.h"
 #include "nano_bsp_cpu.h"
 
 static uint32_t sys_tick = 0;
@@ -25,6 +26,7 @@ static nano_err_t nano_plantform_bsp_init(void)
 
 nano_err_t nano_plantform_init(void)
 {
+    nano_heap_init();
     nano_plantform_bsp_init();
 
     nano_core_init();
