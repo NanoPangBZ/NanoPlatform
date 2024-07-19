@@ -58,7 +58,6 @@ typedef uint8_t nano_cpu_mode_t;
 typedef void (*nano_aio_callback_t)(void* ctx,nano_err_t opt_ret,nano_cpu_mode_t cpu_mode);
 
 nano_err_t nano_plantform_init(void);
-uint32_t nano_sys_time_ms(void);
 
 #ifdef __cplusplus
 }

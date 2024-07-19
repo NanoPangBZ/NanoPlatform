@@ -12,19 +12,6 @@ typedef struct{
 static heap_mem_pool_t heap_mem_pool;
 
 static __attribute__((aligned(4))) uint8_t main_heap[MAIN_HEAP_SIZE];
-// static uint8_t main_heap_map[ MAIN_HEAP_SIZE / 32 + 1 ];
-
-nano_err_t nano_heap_init(void)
-{
-    if( heap_mem_pool.init_flag )   return NANO_OK;
-
-    heap_mem_pool.init_flag = 1;
-    heap_mem_pool.mem_addr = (void*)main_heap;
-    heap_mem_pool.size = sizeof(main_heap);
-    heap_mem_pool.use_ofs = 0;
-
-    return NANO_OK;
-}
 
 void* nano_heap_malloc(uint32_t size)
 {
@@ -45,3 +32,20 @@ void nano_heap_free(void* ptr)
     (void)ptr;
     return;
 }
+
+static nano_err_t nano_heap_init(void* args)
+{
+    (void)args;
+    if( heap_mem_pool.init_flag )   return NANO_OK;
+
+    heap_mem_pool.init_flag = 1;
+    heap_mem_pool.mem_addr = (void*)main_heap;
+    heap_mem_pool.size = sizeof(main_heap);
+    heap_mem_pool.use_ofs = 0;
+
+    return NANO_OK;
+}
+
+#include "nano_func_manager.h"
+
+LOAD_FUNC_TO_FUNC_MANAGER(nano_heap_init,NANO_PLTFM_PRE_INIT_FUNC_GROUP);

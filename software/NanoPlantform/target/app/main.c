@@ -3,19 +3,7 @@
 #include "nano_bsp_cfg.h"
 #include "nano_bsp_gpio.h"
 #include "nano_func_manager.h"
-
-static nano_err_t func_demo(void* args)
-{
-    return NANO_NO_IMPL;
-}
-
-static nano_err_t func_demo_2(void* args)
-{
-    return NANO_NO_IMPL;
-}
-
-LOAD_FUNC_TO_FUNC_MANAGER(func_demo,NANO_BSP_INIT_FUNC_GROUP);
-LOAD_FUNC_TO_FUNC_MANAGER(func_demo_2,NANO_BSP_INIT_FUNC_GROUP);
+#include "nano_time.h"
 
 static void test_demo(void)
 {

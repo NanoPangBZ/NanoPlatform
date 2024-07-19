@@ -7,8 +7,7 @@ extern "C"
 {
 #endif  //__cpulspuls
 
-void* nano_heap_malloc(uint32_t size);
-void nano_heap_free(void* ptr);
+uint32_t nano_sys_time_ms(void);
 
 #ifdef __cplusplus
 }
