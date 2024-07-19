@@ -17,10 +17,11 @@ typedef enum{
     NANO_NO_IMPL = -5,      //未实现
     NANO_ILLEG_OBJ = -6,    //非法的对象
     NANO_ILLEG_PARAM = -7,  //非法的参数
-    NANO_BUFF_FULL = -8,    //缓存区满
-    NANO_NO_SUPPORT = -9,   //不支持的操作
-    NANO_ERR = -9,          //错误
-    NANO_UNKOWN_ERR = -10,  //未知错误
+    NANO_NO_INSTANCE = -8,  //不存在实体
+    NANO_BUFF_FULL = -9,    //缓存区满
+    NANO_NO_SUPPORT = -10,  //不支持的操作
+    NANO_ERR = -11,         //错误
+    NANO_UNKOWN_ERR = -12,  //未知错误
 }nano_err_e;
 typedef int32_t nano_err_t;
 

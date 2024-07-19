@@ -13,8 +13,6 @@ static void nano_plantform_systick_handler(void)
 
 static nano_err_t nano_plantform_systick_init(void)
 {
-    nano_call_func_group(NANO_BSP_INIT_FUNC_GROUP);
-
     nano_bsp_interrupt_disable();
 
     nano_bsp_set_systick_fre( 1000 );
@@ -28,7 +26,7 @@ static nano_err_t nano_plantform_systick_init(void)
 
 nano_err_t nano_plantform_init(void)
 {
-    nano_call_func_group(NANO_BSP_INIT_FUNC_GROUP);
+    nano_call_func_group(NANO_BSP_INIT_FUNC_GROUP,NULL);
     nano_plantform_systick_init();
 
     nano_core_init();
