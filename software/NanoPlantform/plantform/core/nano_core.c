@@ -1,17 +1,16 @@
 #include "nano_core.h"
 #include "nano_plantform.h"
 
+#define NANO_PLANTFORM_MAIN_VERSION     (0)
+#define NANO_PLANTFORM_SUB_VERSION      (0)
+#define NANO_PALNTFORM_PATCH_VERSION    (0)
+
+#define NANO_PLANTFORM_VERSION  ( (uint8_t)NANO_PLANTFORM_MAIN_VERSION ||\
+                                  (uint8_t)(NANO_PLANTFORM_SUB_VERSION<<8) ||\
+                                  (uint8_t)(NANO_PALNTFORM_PATCH_VERSION<<16) )
+
 static uint8_t __attribute__((section(".nano"))) nano_section[1024];
 #define NANO_SECTION_CRC_VALUE_ADDR     (nano_section + sizeof(nano_section) - 4)
-
-#pragma pack(1)
-
-typedef struct{
-    uint32_t core_version;
-    uint32_t core_cfg;
-}nano_core_ctx_t;
-
-#pragma pack()
 
 static uint32_t cali_nano_section_crc(void)
 {
@@ -46,3 +45,7 @@ nano_err_t nano_core_init(void)
     return check_nano_section_verify();
 }
 
+uint32_t nano_core_version(void)
+{
+    return NANO_PLANTFORM_VERSION;
+}

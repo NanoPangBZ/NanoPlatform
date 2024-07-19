@@ -33,9 +33,8 @@ void nano_heap_free(void* ptr)
     return;
 }
 
-static nano_err_t nano_heap_init(void* args)
+nano_err_t nano_heap_init(void)
 {
-    (void)args;
     if( heap_mem_pool.init_flag )   return NANO_OK;
 
     heap_mem_pool.init_flag = 1;
@@ -45,7 +44,3 @@ static nano_err_t nano_heap_init(void* args)
 
     return NANO_OK;
 }
-
-#include "nano_func_manager.h"
-
-LOAD_FUNC_TO_FUNC_MANAGER(nano_heap_init,NANO_PLTFM_PRE_INIT_FUNC_GROUP);

@@ -4,12 +4,14 @@
 
 typedef enum{
     NANO_UNDEFINE_FUNC_GROUP = 0x00,                    //未定义的函数分组
-    NANO_BSP_INIT_FUNC_GROUP = 0x01<<0,                 //板级支持包初始化函数分组
-    NANO_PLTFM_PRE_INIT_FUNC_GROUP = 0x01<<1,           //平台预初始化函数分组
-    NANO_PLTFM_CORE_INIT_FUNC_GROUP = 0x01<<2,          //平台核心初始化函数分组
-    NANO_PLTFM_INIT_FUNC_GROUP = 0x01<<3,               //平台初始化函数分组
-    NANO_PLTFM_SVC_ENTER_FUNC_GRUOP = 0x01<<4,          //平台服务组件入口函数分组
-    NANO_PLTFM_APP_ENTER_FUNC_GRUOP = 0x01<<5,  
+    NANO_BSP_PRE_INIT_FUNC_GROUP = 0x01<<0,             //板级支持包预初始化函数分组
+    NANO_BSP_INIT_FUNC_GROUP = 0x01<<1,                 //板级支持包初始化函数分组
+    NANO_PLTFM_PRE_INIT_FUNC_GROUP = 0x01<<2,           //平台预初始化函数分组
+    NANO_PLTFM_CORE_INIT_FUNC_GROUP = 0x01<<3,          //平台核心初始化函数分组
+    NANO_PLTFM_INIT_FUNC_GROUP = 0x01<<4,               //平台初始化函数分组
+    NANO_PLTFM_BSP_REG_FUNC_GRUOP = 0x01<<5,            //需要依赖平台动态注册的板级支持包初始化函数分组
+    NANO_PLTFM_SVC_ENTER_FUNC_GRUOP = 0x01<<6,          //平台服务组件入口函数分组
+    NANO_PLTFM_APP_ENTER_FUNC_GRUOP = 0x01<<7,          //平台应用程序启动函数分组
 }nano_func_group_e;
 typedef uint32_t nano_func_group_t;
 
