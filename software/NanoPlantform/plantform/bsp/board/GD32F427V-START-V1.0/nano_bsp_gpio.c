@@ -147,8 +147,7 @@ static nano_err_t led_io_device_registe(void* args)
     opt.read = NULL;
     opt.flush = NULL;
 
-    const nano_gpio_index_t debug_led_index = DEBUG_LED_PIN_INDEX;
-
+    static const nano_gpio_index_t debug_led_index = DEBUG_LED_PIN_INDEX;
     nano_register_io_device( "debug led" , (void*)&debug_led_index , &opt );
 
     return NANO_OK;
