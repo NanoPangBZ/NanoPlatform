@@ -50,7 +50,7 @@ nano_err_t nano_uart_set_io_mode(nano_uart_index_t index,nano_io_opt_type_t type
  * @param index 串口索引
  * @return 见nano_io_mode_e枚举
 */
-nano_io_mode_t nano_uart_get_io_mode(nano_uart_index_t index);
+nano_io_mode_t nano_uart_get_io_mode(nano_uart_index_t index,nano_io_opt_type_t type);
 
 /**
  * @brief 查询bsp串口的io操作类型是否支持io模型

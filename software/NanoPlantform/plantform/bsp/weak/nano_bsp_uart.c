@@ -25,7 +25,7 @@ nano_err_t __attribute__((weak)) nano_uart_set_io_mode(nano_uart_index_t index,n
     return NANO_NO_IMPL;
 }
 
-nano_io_mode_t __attribute__((weak)) nano_uart_get_io_mode(nano_uart_index_t index)
+nano_io_mode_t __attribute__((weak)) nano_uart_get_io_mode(nano_uart_index_t index,nano_io_opt_type_t type)
 {
     return NANO_NO_IMPL;
 }

@@ -78,7 +78,6 @@ nano_io_dev_handle_t nano_io_device_open(const char* name,nano_io_opt_type_t opt
         curr_node = curr_node->next_node == NULL ? curr_node : curr_node->next_node;
     }while( curr_node->next_node != NULL );
 
-
     return NULL;
 }
 

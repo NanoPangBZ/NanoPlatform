@@ -116,12 +116,15 @@ nano_err_t nano_gpio_interrupt_cb_set(nano_gpio_index_t index,nano_gpio_intr_cb_
 /******************************************************************************************/
 #include "nano_bsp_helper.h"
 
+static nano_err_t debug_led_init(void* args)
+{
+    return nano_gpio_init( DEBUG_LED_PIN_INDEX , NANO_GPIO_OUTPUT , NANO_GPIO_PULL_FLOAT , NANO_GPIO_PP );
+}
+
 static void* led_io_device_open(void* desc,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode)
 {
-    nano_gpio_index_t gpio_index = *(nano_gpio_index_t*)desc;
-
-    nano_gpio_init( gpio_index , NANO_GPIO_OUTPUT , NANO_GPIO_PULL_FLOAT , NANO_GPIO_PP );
-
+    (void)opt_type;
+    (void)io_mode;
     return desc;
 }
 
@@ -151,4 +154,6 @@ static nano_err_t led_io_device_registe(void* args)
     return NANO_OK;
 }
 
+BSP_INIT_FUNC(debug_led_init);
 BSP_NANO_PLTFM_REG_FUNC(led_io_device_registe);
+

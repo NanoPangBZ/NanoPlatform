@@ -3,6 +3,9 @@
 #include "nano_plantform.h"
 #include "nano_func_manager.h"
 #include "nano_io_device.h"
+#include "nano_heap.h"
+
+#define BSP_HEAP_MALLOC(size)           nano_heap_malloc(size)
 
 #define BSP_PRE_INIT_FUNC(func)         LOAD_FUNC_TO_FUNC_MANAGER(func,NANO_BSP_PRE_INIT_FUNC_GROUP)
 #define BSP_INIT_FUNC(func)             LOAD_FUNC_TO_FUNC_MANAGER(func,NANO_BSP_INIT_FUNC_GROUP)
