@@ -8,7 +8,10 @@ static nano_io_dev_handle_t led_dev = NULL;
 static nano_err_t nano_tick_led_init(void* args)
 {
     (void)args;
-    led_dev = nano_io_device_open( "debug led" , NANO_IO_READ_WRITE , NANO_BIO );
+    if( NANO_OK != nano_io_device_open( "debug led" , NANO_IO_READ_WRITE , NANO_BIO , &led_dev ) )
+    {
+        led_dev = NULL;
+    }
     return led_dev ? NANO_OK : NANO_NO_INSTANCE;
 }
 

@@ -121,11 +121,12 @@ static nano_err_t debug_led_init(void* args)
     return nano_gpio_init( DEBUG_LED_PIN_INDEX , NANO_GPIO_OUTPUT , NANO_GPIO_PULL_FLOAT , NANO_GPIO_PP );
 }
 
-static void* led_io_device_open(void* desc,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode)
+static nano_err_t led_io_device_open(void* desc,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode,void** instance)
 {
     (void)opt_type;
     (void)io_mode;
-    return desc;
+    *instance = desc;
+    return NANO_OK;
 }
 
 static nano_err_t led_io_write(void *instance, uint8_t *data, uint16_t len, uint16_t *writed_len)
@@ -139,15 +140,14 @@ static nano_err_t led_io_write(void *instance, uint8_t *data, uint16_t len, uint
 
 static nano_err_t led_io_device_registe(void* args)
 {
-    nano_io_device_opt_t opt;
-
-    opt.open = led_io_device_open;
-    opt.close = NULL;
-    opt.write = led_io_write;
-    opt.read = NULL;
-    opt.flush = NULL;
-
-    static const nano_gpio_index_t debug_led_index = DEBUG_LED_PIN_INDEX;
+    const static nano_io_device_opt_t opt = {
+        .open = led_io_device_open,
+        .close = NULL,
+        .write = led_io_write,
+        .read = NULL,
+        .flush = NULL
+    };
+    const static nano_gpio_index_t debug_led_index = DEBUG_LED_PIN_INDEX;
     nano_register_io_device( "debug led" , (void*)&debug_led_index , &opt );
 
     return NANO_OK;
