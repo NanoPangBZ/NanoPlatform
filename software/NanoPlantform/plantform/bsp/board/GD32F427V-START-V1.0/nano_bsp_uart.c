@@ -35,7 +35,9 @@ typedef struct{
     nano_io_mode_t tx_run_io_mode;
     nano_io_mode_t rx_run_io_mode;
     uint8_t* rx_buf;
+    uint8_t* rx_buf_end;
     uint8_t* tx_buf;
+    uint8_t* tx_buf_end;
 }uart_instance_t;
 
 //配置描述列表、映射
@@ -103,6 +105,8 @@ nano_err_t nano_uart_init(nano_uart_index_t index,uint32_t bound)
         if( desc->io_func_desc.tx_support_io_mode && ( NANO_AIO | NANO_NIO) )
         {
             instance->tx_buf = BSP_HEAP_MALLOC( desc->io_func_desc.tx_buf_size );
+            instance->tx_buf_head = instance->tx_buf;
+            instance->tx_buf_end = instance->tx_buf;
         }
         if( desc->io_func_desc.rx_support_io_mode && (NANO_AIO | NANO_NIO) )
         {
@@ -171,4 +175,9 @@ int32_t nano_uart_write(nano_uart_index_t index,uint8_t* data,uint16_t len)
     if( instanc->desc == NULL ) return NANO_NO_INIT;
 
     return NANO_NO_IMPL;
+}
+
+void USART1_IRQHandler(void)
+{
+
 }
