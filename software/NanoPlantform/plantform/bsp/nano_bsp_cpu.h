@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nano_plantform.h"
+#include "nano_core.h"
 
 typedef void (*nano_systick_cb_t)(void);
 
@@ -38,6 +39,13 @@ nano_err_t nano_bsp_interrupt_enable(void);
  * @return 0:成功 其他:见nano_err_e枚举
 */
 nano_err_t nano_bsp_interrupt_disable(void);
+
+/**
+ * @brief 应用程序跳转指针跳转
+ * @param source 目标源 见nano_core_source_e枚举
+ * @return 失败
+*/
+nano_err_t nano_bsp_app_jump(nano_core_source_t source);
 
 #ifdef __cplusplus
 }

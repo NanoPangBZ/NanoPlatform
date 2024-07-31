@@ -39,3 +39,7 @@ nano_err_t nano_bsp_interrupt_disable(void)
     return NANO_NO_IMPL;
 }
 
+nano_err_t nano_bsp_app_jump(nano_core_source_t source)
+{
+    return NANO_NO_IMPL;
+}
