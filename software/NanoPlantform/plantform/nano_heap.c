@@ -13,6 +13,11 @@ static heap_mem_pool_t heap_mem_pool;
 
 static __attribute__((aligned(4))) uint8_t main_heap[MAIN_HEAP_SIZE];
 
+/**
+ * @brief 向nano堆申请一块空间
+ * @param size 大小
+ * @return 内存指针
+*/
 void* nano_heap_malloc(uint32_t size)
 {
     uint32_t free_size = heap_mem_pool.size - heap_mem_pool.use_ofs;
@@ -27,12 +32,20 @@ void* nano_heap_malloc(uint32_t size)
     return NULL;
 }
 
+/**
+ * @brief 释放nano堆内存
+ * @param ptr 堆内地址
+*/
 void nano_heap_free(void* ptr)
 {
     (void)ptr;
     return;
 }
 
+/**
+ * @brief 初始化nano堆内存
+ * @return NANO_OK:成功 其他:失败
+*/
 nano_err_t nano_heap_init(void)
 {
     if( heap_mem_pool.init_flag )   return NANO_OK;

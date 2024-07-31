@@ -4,6 +4,12 @@
 extern const uint8_t _func_manager_list_start[];
 extern const uint8_t _func_manager_list_end[];
 
+/**
+ * @brief 调用函数管理器中所有组别为gruop的函数
+ * @param gruop 组别 见nano_func_group_e枚举
+ * @param args 要传入函数的参数
+ * @return 组中有一个返回不为NANO_OK则返回NANO_ERR
+*/
 nano_err_t nano_call_func_group(nano_func_group_t gruop , void* args)
 {
     nano_err_t err_code = 0;
@@ -28,6 +34,12 @@ nano_err_t nano_call_func_group(nano_func_group_t gruop , void* args)
     return err_flag;
 }
 
+/**
+ * @brief 在函数管理器中查找名函数的信息
+ * @param func_name 函数名
+ * @param info 函数信息
+ * @return NANO_OK:成功 其他:失败
+*/
 nano_err_t nano_get_func_info(const char* func_name,nano_func_info_t* info)
 {
     uint32_t cur_addr = (uint32_t)_func_manager_list_start;

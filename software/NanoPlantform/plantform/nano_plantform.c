@@ -2,6 +2,10 @@
 #include "nano_heap.h"
 #include "nano_func_manager.h"
 
+/**
+ * @brief nano平台初始化
+ * @return NANO_OK:成功 其他:失败
+*/
 nano_err_t nano_plantform_init(void)
 {
     nano_heap_init();

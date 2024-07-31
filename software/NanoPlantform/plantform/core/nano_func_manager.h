@@ -12,6 +12,7 @@ typedef enum{
     NANO_PLTFM_BSP_REG_FUNC_GRUOP = 0x01<<5,            //需要依赖平台动态注册的板级支持包初始化函数分组
     NANO_PLTFM_SVC_ENTER_FUNC_GRUOP = 0x01<<6,          //平台服务组件入口函数分组
     NANO_PLTFM_APP_ENTER_FUNC_GRUOP = 0x01<<7,          //平台应用程序启动函数分组
+    NANO_PLTFM_EXPORT_FUNC_GRUOP = 0x01<<8,             //平台导出给插件用的函数分组
 }nano_func_group_e;
 typedef uint32_t nano_func_group_t;
 
@@ -23,6 +24,12 @@ typedef struct{
     nano_func_group_t group;
 }nano_func_info_t;
 
+/**
+ * @brief 声明一个函数到函数管理器中
+ * @param func 函数
+ * @param func_gruop 组别
+ * @note 可在代码域外使用这个宏
+*/
 #define LOAD_FUNC_TO_FUNC_MANAGER( func , func_gruop ) static const __attribute__( ( section(".func_manager_list") , used , aligned(1) ) ) nano_func_info_t func ## _info = { #func , func , func_gruop}
 
 #ifdef __cpluspuls
