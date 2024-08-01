@@ -1,6 +1,7 @@
 #include "nano_core.h"
 #include "nano_plantform.h"
 #include "nano_bsp_cpu.h"
+#include "nano_func_manager.h"
 #include <string.h>
 
 #define NANO_PLANTFORM_MAIN_VERSION     (0)
@@ -123,3 +124,10 @@ nano_core_source_t nano_core_get_from_source(void)
 {
     return nano_core->from_source;
 }
+
+nano_err_t nano_core_auto_init(void* args)
+{
+    return nano_core_init();
+}
+
+LOAD_FUNC_TO_FUNC_MANAGER( nano_core_auto_init , NANO_PLTFM_PRE_INIT_FUNC_GROUP );

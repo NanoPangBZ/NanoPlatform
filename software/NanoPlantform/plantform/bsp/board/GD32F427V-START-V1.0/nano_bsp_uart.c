@@ -105,7 +105,6 @@ nano_err_t nano_uart_init(nano_uart_index_t index,uint32_t bound)
         if( desc->io_func_desc.tx_support_io_mode && ( NANO_AIO | NANO_NIO) )
         {
             instance->tx_buf = BSP_HEAP_MALLOC( desc->io_func_desc.tx_buf_size );
-            instance->tx_buf_head = instance->tx_buf;
             instance->tx_buf_end = instance->tx_buf;
         }
         if( desc->io_func_desc.rx_support_io_mode && (NANO_AIO | NANO_NIO) )

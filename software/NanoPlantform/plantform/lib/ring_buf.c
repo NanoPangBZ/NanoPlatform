@@ -12,43 +12,43 @@ struct ring_buf_t{
     uint8_t* buf_data_end;
 };
 
-ring_buf_handle_t ring_buf_create(uint16_t size)
+ring_buf_t ring_buf_create(uint16_t size)
 {
-    ring_buf_handle_t handle = (ring_buf_handle_t)MALLOC( sizeof(ring_buf_handle_t) );
+    ring_buf_t ring_buf = (ring_buf_t)MALLOC( sizeof(struct ring_buf_t) );
 
-    if( handle == NULL )    return NULL;
+    if( ring_buf == NULL )    return NULL;
 
-    handle->buf_start = (uint8_t*)MALLOC(size);
-    handle->buf_end = handle->buf_start + size;
-    handle->buf_data_start = handle->buf_start;
-    handle->buf_data_end = handle->buf_start;
+    ring_buf->buf_start = (uint8_t*)MALLOC(size);
+    ring_buf->buf_end = ring_buf->buf_start + size;
+    ring_buf->buf_data_start = ring_buf->buf_start;
+    ring_buf->buf_data_end = ring_buf->buf_start;
 
-    return handle;
+    return ring_buf;
 }
 
-uint16_t ring_buf_push(ring_buf_handle_t handle,uint8_t* data,uint16_t len)
+uint16_t ring_buf_push(ring_buf_t ring_buf,uint8_t* data,uint16_t len)
 {
 
 }
 
-uint16_t ring_buf_pop(ring_buf_handle_t handle,uint8_t* buf,uint16_t len)
+uint16_t ring_buf_pop(ring_buf_t ring_buf,uint8_t* buf,uint16_t len)
 {
-    if( handle->buf_data_end > handle->buf_data_start )
+    if( ring_buf->buf_data_end > ring_buf->buf_data_start )
     {
-        uint16_t pop_len = handle->buf_data_end - handle->buf_data_start > len ? len : handle->buf_data_end - handle->buf_data_start;
-        memcpy( buf , handle->buf_data_start , pop_len );
-        handle->buf_data_start += pop_len;
+        uint16_t pop_len = ring_buf->buf_data_end - ring_buf->buf_data_start > len ? len : ring_buf->buf_data_end - ring_buf->buf_data_start;
+        memcpy( buf , ring_buf->buf_data_start , pop_len );
+        ring_buf->buf_data_start += pop_len;
 
-        if( handle->buf_data_start == handle->buf_data_start )
+        if( ring_buf->buf_data_start == ring_buf->buf_data_start )
         {
-            handle->buf_data_start = handle->buf_start;
-            handle->buf_data_end = handle->buf_start;
+            ring_buf->buf_data_start = ring_buf->buf_start;
+            ring_buf->buf_data_end = ring_buf->buf_start;
         }
 
         return pop_len;
     }
     else
     {
-        uint16_t pop_len = handle->buf_data_end - handle->buf_data_start > len ? len : handle->buf_data_end - handle->buf_data_start;
+        uint16_t pop_len = ring_buf->buf_data_end - ring_buf->buf_data_start > len ? len : ring_buf->buf_data_end - ring_buf->buf_data_start;
     }
 }
