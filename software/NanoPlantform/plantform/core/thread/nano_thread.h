@@ -82,10 +82,36 @@ nano_err_t nano_thread_wait_notify(uint32_t* notify_value);
 */
 void* nano_thread_get_ctx(uint32_t* size);
 
+/**
+ * @brief 创建一个互斥量
+ * @param mutex 互斥量控制句柄
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
 nano_err_t nano_mutex_create( nano_mutex_t* mutex );
+/**
+ * @brief 销毁一个互斥量
+ * @param mutex 互斥量控制句柄
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
 nano_err_t nano_mutex_detroyed( nano_mutex_t* mutex );
+/**
+ * @brief 互斥量上锁
+ * @param mutex 互斥量控制句柄
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
 nano_err_t nano_mutex_lock( nano_mutex_t mutex );
+/**
+ * @brief 互斥量解锁
+ * @param mutex 互斥量控制句柄
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
 nano_err_t nano_mutex_unlock( nano_mutex_t mutex );
+/**
+ * @brief 互斥量尝试解锁
+ * @param mutex 互斥量控制句柄
+ * @param timeout_ms 最长等待时间(单位:毫秒)
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
 nano_err_t nano_mutex_try_lock( nano_mutex_t mutex , uint32_t timeout_ms );
 
 #ifdef __cplusplus
