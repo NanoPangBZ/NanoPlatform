@@ -3,6 +3,7 @@
 #include "nano_bsp_helper.h"
 #include "gd32f4xx_usart.h"
 #include "gd32f4xx_rcu.h"
+#include <string.h>
 
 #define GPIO_AF_UNUSE_DESC  { 0 , 0 , 0 , 0 , 0 }
 #define UART_IO_DEFAULT_IO_FUNC_DESC    { NANO_NIO , NANO_NIO , 1024 , 1024 }
@@ -16,8 +17,8 @@ typedef struct{
 }gpio_af_desc_t;
 
 typedef struct{
-    nano_io_mode_t rx_support_io_mode;
-    nano_io_mode_t tx_support_io_mode;
+    nano_io_mode_t rx_io_mode;
+    nano_io_mode_t tx_io_mode;
     uint32_t tx_buf_size;
     uint32_t rx_buf_size;
 }gpio_io_func_desc_t;
@@ -30,10 +31,15 @@ typedef struct{
     gpio_io_func_desc_t io_func_desc;
 }uart_desc_t;
 
+typedef enum{
+    UART_TX_BUSY_MASK = 0x01 << 0,
+}uart_flag_mask_e;
+
 typedef struct{
     const uart_desc_t* desc;
     nano_io_mode_t tx_run_io_mode;
     nano_io_mode_t rx_run_io_mode;
+    uint8_t flag;
     uint8_t* rx_buf;
     uint8_t* rx_buf_end;
     uint8_t* tx_buf;
@@ -102,17 +108,19 @@ nano_err_t nano_uart_init(nano_uart_index_t index,uint32_t bound)
     if( instance->desc == NULL )
     {
         instance->desc = desc;
-        if( desc->io_func_desc.tx_support_io_mode && ( NANO_AIO | NANO_NIO) )
+        if( desc->io_func_desc.tx_io_mode == NANO_AIO ||
+            desc->io_func_desc.tx_io_mode == NANO_NIO )
         {
             instance->tx_buf = BSP_HEAP_MALLOC( desc->io_func_desc.tx_buf_size );
             instance->tx_buf_end = instance->tx_buf;
         }
-        if( desc->io_func_desc.rx_support_io_mode && (NANO_AIO | NANO_NIO) )
+        if( desc->io_func_desc.rx_io_mode == NANO_AIO ||
+            desc->io_func_desc.rx_io_mode == NANO_NIO )
         {
             instance->rx_buf = BSP_HEAP_MALLOC( desc->io_func_desc.rx_buf_size );
         }
-        instance->rx_run_io_mode = NANO_UNDEFINE_IO;
-        instance->tx_run_io_mode = NANO_UNDEFINE_IO;
+        instance->rx_run_io_mode = desc->io_func_desc.rx_io_mode;
+        instance->tx_run_io_mode = desc->io_func_desc.rx_io_mode;
     }
 
     return NANO_OK;
@@ -151,19 +159,7 @@ nano_err_t nano_uart_set_io_mode(nano_uart_index_t index,nano_io_opt_type_t type
     if( instanc == NULL )       return NANO_NO_INSTANCE;
     if( instanc->desc == NULL ) return NANO_NO_INIT;
 
-    if( type == NANO_IO_READ && \
-        instanc->desc->io_func_desc.rx_support_io_mode & mode)
-    {
-        return NANO_NO_SUPPORT;
-    }
-
-    if( type == NANO_IO_WRITE && \
-        instanc->desc->io_func_desc.tx_support_io_mode & mode)
-    {
-        return NANO_NO_SUPPORT;
-    }
-
-    return NANO_NO_IMPL;
+    return NANO_NO_SUPPORT;
 }
 
 int32_t nano_uart_write(nano_uart_index_t index,uint8_t* data,uint16_t len)
@@ -173,10 +169,24 @@ int32_t nano_uart_write(nano_uart_index_t index,uint8_t* data,uint16_t len)
     if( instanc == NULL )       return NANO_NO_INSTANCE;
     if( instanc->desc == NULL ) return NANO_NO_INIT;
 
+    if( instanc->flag & UART_TX_BUSY_MASK )
+    {
+        return NANO_BUSY;
+    }
+
+    if( len > instanc->desc->tx_gpio_af_desc )
+    {
+        return NANO_NO_MEM;
+    }
+
+    instanc->flag |= UART_TX_BUSY_MASK;
+    memcpy( instanc->tx_buf , data , len );
+    usart_data_transmit( instanc->desc->usart_periph , instanc->tx_buf[0] );
+
     return NANO_NO_IMPL;
 }
 
 void USART1_IRQHandler(void)
 {
-
+    
 }
