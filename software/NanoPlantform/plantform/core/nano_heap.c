@@ -35,6 +35,7 @@ void* nano_heap_malloc(uint32_t size)
 /**
  * @brief 释放nano堆内存
  * @param ptr 堆内地址
+ * @note 未实现
 */
 void nano_heap_free(void* ptr)
 {

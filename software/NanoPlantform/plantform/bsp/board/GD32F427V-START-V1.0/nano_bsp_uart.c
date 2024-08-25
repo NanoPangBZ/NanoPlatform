@@ -174,7 +174,7 @@ int32_t nano_uart_write(nano_uart_index_t index,uint8_t* data,uint16_t len)
         return NANO_BUSY;
     }
 
-    if( len > instanc->desc->tx_gpio_af_desc )
+    if( len > instanc->desc->io_func_desc.tx_buf_size )
     {
         return NANO_NO_MEM;
     }

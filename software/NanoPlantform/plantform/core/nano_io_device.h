@@ -1,5 +1,7 @@
 #pragma once
 
+//@todo 添加device锁
+
 #include "nano_plantform.h"
 
 typedef void* nano_io_dev_handle_t;
@@ -17,7 +19,7 @@ extern "C"
 {
 #endif  //__cpulspuls
 
-nano_err_t nano_register_io_device(const char* name,void* desc,const nano_io_device_opt_t* opt);
+nano_err_t nano_register_io_device(const char* name,const void* desc,const nano_io_device_opt_t* opt);
 nano_err_t nano_remove_io_device(const char* name);
 
 nano_err_t nano_io_device_open(const char* name,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode,nano_io_dev_handle_t* handle);

@@ -31,6 +31,7 @@ typedef enum{
     NANO_NIO,               //非阻塞式IO - 不阻塞cpu，调用read/write时读/写内容拷贝到用户/底层缓冲区后立刻返回，底层读/写结果不通知用户
     NANO_AIO,               //异步IO - 不阻塞cpu，调用read/write时不拷贝读/写数据到用户/底层缓冲区，调用后立刻返回，读/写完成后通过回调函数通知用户
     NANO_IO_MAP,            //内存映射 - 不阻塞cpu，通过对指定的read/write内存段进行操作完成读写，调用read/write后的行为不确定，由实现模块自由决定
+    NANO_DEFAULT_IO_MODE,   //默认IO模型
 }nano_io_mode_e;
 typedef uint8_t nano_io_mode_t;
 
