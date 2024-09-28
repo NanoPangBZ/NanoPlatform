@@ -22,7 +22,87 @@
       "excludeList": [
         "plantform/bsp/arch/gd32f4xx/GD32F4xx_usb_library",
         "plantform/bsp/board/NanoPlantform_Board",
-        "target/bootloader"
+        "target/bootloader",
+        "plantform/scheduler/freertos/examples",
+        "plantform/scheduler/freertos/portable/ARMClang",
+        "plantform/scheduler/freertos/portable/ARMv8M",
+        "plantform/scheduler/freertos/portable/BCC",
+        "plantform/scheduler/freertos/portable/CCS",
+        "plantform/scheduler/freertos/portable/CodeWarrior",
+        "plantform/scheduler/freertos/portable/Common",
+        "plantform/scheduler/freertos/portable/IAR",
+        "plantform/scheduler/freertos/portable/Keil",
+        "plantform/scheduler/freertos/portable/MikroC",
+        "plantform/scheduler/freertos/portable/MPLAB",
+        "plantform/scheduler/freertos/portable/MSVC-MingW",
+        "plantform/scheduler/freertos/portable/oWatcom",
+        "plantform/scheduler/freertos/portable/Paradigm",
+        "plantform/scheduler/freertos/portable/Renesas",
+        "plantform/scheduler/freertos/portable/Rowley",
+        "plantform/scheduler/freertos/portable/RVDS",
+        "plantform/scheduler/freertos/portable/SDCC",
+        "plantform/scheduler/freertos/portable/Softune",
+        "plantform/scheduler/freertos/portable/Tasking",
+        "plantform/scheduler/freertos/portable/template",
+        "plantform/scheduler/freertos/portable/ThirdParty",
+        "plantform/scheduler/freertos/portable/MemMang/heap_5.c",
+        "plantform/scheduler/freertos/portable/MemMang/heap_3.c",
+        "plantform/scheduler/freertos/portable/MemMang/heap_2.c",
+        "plantform/scheduler/freertos/portable/MemMang/heap_1.c",
+        "plantform/scheduler/freertos/portable/GCC/ARM7_AT91FR40008",
+        "plantform/scheduler/freertos/portable/GCC/ARM7_AT91SAM7S",
+        "plantform/scheduler/freertos/portable/GCC/ARM7_LPC2000",
+        "plantform/scheduler/freertos/portable/GCC/ARM7_LPC23xx",
+        "plantform/scheduler/freertos/portable/GCC/ARM_AARCH64_SRE",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CA53_64_BIT",
+        "plantform/scheduler/freertos/portable/GCC/ARM_AARCH64",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CA53_64_BIT_SRE",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CA9",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM0",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM23",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM23_NTZ",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM3",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM33",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM33_NTZ",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM3_MPU",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM35P_NTZ",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM35P",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM4_MPU",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM55",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM55_NTZ",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM7",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM85",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CM85_NTZ",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CR5",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CRx_MPU",
+        "plantform/scheduler/freertos/portable/GCC/ARM_CRx_No_GIC",
+        "plantform/scheduler/freertos/portable/GCC/ATMega323",
+        "plantform/scheduler/freertos/portable/GCC/AVR32_UC3",
+        "plantform/scheduler/freertos/portable/GCC/AVR_AVRDx",
+        "plantform/scheduler/freertos/portable/GCC/AVR_Mega0",
+        "plantform/scheduler/freertos/portable/GCC/ColdFire_V2",
+        "plantform/scheduler/freertos/portable/GCC/CORTUS_APS3",
+        "plantform/scheduler/freertos/portable/GCC/H8S2329",
+        "plantform/scheduler/freertos/portable/GCC/HCS12",
+        "plantform/scheduler/freertos/portable/GCC/IA32_flat",
+        "plantform/scheduler/freertos/portable/GCC/MCF5235",
+        "plantform/scheduler/freertos/portable/GCC/MicroBlaze",
+        "plantform/scheduler/freertos/portable/GCC/MicroBlazeV8",
+        "plantform/scheduler/freertos/portable/GCC/MicroBlazeV9",
+        "plantform/scheduler/freertos/portable/GCC/MSP430F449",
+        "plantform/scheduler/freertos/portable/GCC/NiosII",
+        "plantform/scheduler/freertos/portable/GCC/PPC405_Xilinx",
+        "plantform/scheduler/freertos/portable/GCC/PPC440_Xilinx",
+        "plantform/scheduler/freertos/portable/GCC/RISC-V",
+        "plantform/scheduler/freertos/portable/GCC/RL78",
+        "plantform/scheduler/freertos/portable/GCC/RX100",
+        "plantform/scheduler/freertos/portable/GCC/RX200",
+        "plantform/scheduler/freertos/portable/GCC/RX600",
+        "plantform/scheduler/freertos/portable/GCC/TriCore_1782",
+        "plantform/scheduler/freertos/portable/GCC/STR75x",
+        "plantform/scheduler/freertos/portable/GCC/RX700v3_DPFPU",
+        "plantform/scheduler/freertos/portable/GCC/RX600v2",
+        "plantform/scheduler/freertos/portable/WizC"
       ],
       "toolchain": "GCC",
       "compileConfig": {
@@ -87,13 +167,42 @@
           "plantform/bsp",
           "plantform/bsp/arch/gd32f4xx/CMSIS/GD/GD32F4xx/Include",
           "plantform/bsp/arch/gd32f4xx/GD32F4xx_standard_peripheral/Include",
-          "plantform/bsp/arch/gd32f4xx/CMSIS"
+          "plantform/bsp/arch/gd32f4xx/CMSIS",
+          "plantform/scheduler/freertos/include",
+          "plantform/scheduler/freertos/portable/GCC/ARM_CM4F"
         ],
         "libList": [],
         "defineList": [
           "GD32F427",
           "USE_STDPERIPH_DRIVER"
         ]
+      },
+      "builderOptions": {
+        "GCC": {
+          "version": 5,
+          "beforeBuildTasks": [],
+          "afterBuildTasks": [],
+          "global": {
+            "$float-abi-type": "softfp",
+            "output-debug-info": "enable",
+            "misc-control": "--specs=nosys.specs --specs=nano.specs"
+          },
+          "c/cpp-compiler": {
+            "language-c": "c11",
+            "language-cpp": "c++11",
+            "optimization": "level-0",
+            "warnings": "all-warnings",
+            "one-elf-section-per-function": true,
+            "one-elf-section-per-data": true
+          },
+          "asm-compiler": {},
+          "linker": {
+            "output-format": "elf",
+            "remove-unused-input-sections": true,
+            "LIB_FLAGS": "-lm",
+            "$toolName": "auto"
+          }
+        }
       }
     },
     "bootlaoder": {
@@ -139,8 +248,39 @@
           "USE_STDPERIPH_DRIVER",
           "TARGET_BOOTLOADER"
         ]
+      },
+      "builderOptions": {
+        "GCC": {
+          "version": 5,
+          "beforeBuildTasks": [],
+          "afterBuildTasks": [],
+          "global": {
+            "$float-abi-type": "softfp",
+            "output-debug-info": "enable",
+            "misc-control": "--specs=nosys.specs --specs=nano.specs"
+          },
+          "c/cpp-compiler": {
+            "language-c": "c11",
+            "language-cpp": "c++11",
+            "optimization": "level-debug",
+            "warnings": "all-warnings",
+            "one-elf-section-per-function": true,
+            "one-elf-section-per-data": true,
+            "C_FLAGS": "",
+            "CXX_FLAGS": ""
+          },
+          "asm-compiler": {
+            "ASM_FLAGS": ""
+          },
+          "linker": {
+            "output-format": "elf",
+            "remove-unused-input-sections": true,
+            "LD_FLAGS": "",
+            "LIB_FLAGS": "-lm"
+          }
+        }
       }
     }
   },
-  "version": "3.4"
+  "version": "3.5"
 }

@@ -2,6 +2,7 @@
 #include "nano_time.h"
 #include "nano_bsp_uart.h"
 #include <string.h>
+#include "FreeRTOS.h"
 
 static void uart_bsp_test_demo(void)
 {
