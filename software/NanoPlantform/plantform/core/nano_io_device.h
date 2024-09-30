@@ -7,7 +7,7 @@
 typedef void* nano_io_dev_handle_t;
 
 typedef struct{
-    nano_err_t (*open)(void* desc,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode,void** instance);
+    nano_err_t (*open)(const void* desc,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode,void** instance);
     nano_err_t (*close)(void* instance);
     nano_err_t (*write)(void* instance,uint8_t* data,uint16_t len,uint16_t* writed_len);
     nano_err_t (*read)(void* instance,uint8_t* data,uint16_t len,uint16_t* read_len);

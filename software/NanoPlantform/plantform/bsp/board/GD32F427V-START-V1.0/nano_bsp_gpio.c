@@ -121,11 +121,12 @@ static nano_err_t debug_led_init(void* args)
     return nano_gpio_init( DEBUG_LED_PIN_INDEX , NANO_GPIO_OUTPUT , NANO_GPIO_PULL_FLOAT , NANO_GPIO_PP );
 }
 
-static nano_err_t led_io_device_open(void* desc,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode,void** instance)
+static nano_err_t led_io_device_open(const void* desc,nano_io_opt_type_t opt_type,nano_io_mode_t io_mode,void** instance)
 {
+    (void)desc;
     (void)opt_type;
     (void)io_mode;
-    *instance = desc;
+    *instance = (void*)desc;
     return NANO_OK;
 }
 

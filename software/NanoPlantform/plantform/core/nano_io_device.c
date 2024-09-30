@@ -4,7 +4,7 @@
 
 typedef struct{
     const char* name;
-    void* desc;
+    const void* desc;
     void* instance;
     const nano_io_device_opt_t* opt;
 }nano_io_device_t;
