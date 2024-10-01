@@ -3,11 +3,9 @@
 #include "nano_plantform.h"
 
 /*线程控制句柄*/
-typedef struct nano_thread_t* nano_thread_t;
+typedef void* nano_thread_t;
 /*线程运行函数*/
-typedef void (*nano_thread_run_func_t)(void* args);
-/*线程用户资源回收函数*/
-typedef void (*nano_thread_recycle_func_t)(void* args);
+typedef void (*nano_thread_func_t)(void* args);
 /*互斥量控制句柄*/
 typedef struct nano_mutex_t* nano_mutex_t;
 
@@ -22,10 +20,36 @@ typedef enum{
 }nano_thread_priority_e;
 typedef uint8_t nano_thread_priority_t;
 
+typedef enum{
+    NANO_THREAD_MINI_STACK_SIZE,        //线程迷你栈
+    NANO_THREAD_SMALL_STACK_SIZE,       //线程小栈
+    NANO_THREAD_MID_STACK_SIZE,         //线程中栈
+    NANO_THREAD_BIG_STACK_SIZE,         //线程大栈
+    NANO_THREAD_LARGE_STACK_SIZE,       //线程超大栈
+}nano_thread_stack_size_e;
+typedef uint8_t nano_thread_stack_size_t;
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif  //__cplusplus
+
+/**
+ * @brief 线程函数
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
+nano_err_t nano_thread_shceduler_init(void);
+/**
+ * @brief 线程调度器启动
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+ * @note   调度器启动后不应该返回，
+*/
+nano_err_t nano_thread_scheduler_start(void);
+/**
+ * @brief 线程调度器停止
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
+nano_err_t nano_thread_scheduler_stop(void);
 
 /**
  * @brief 创建一个线程
@@ -34,8 +58,7 @@ extern "C"
  * @param func 线程函数
  * @param param 传入线程函数的参数
  * @param prio 线程优先级 见nano_thread_priority_e枚举
- * @param stack_size 线程栈大小
- * @param thread_ctx_size 线程私有上下文大小
+ * @param stack_size 线程栈大小 见nano_thread_stack_size_e枚举
  * @return NANO_OK:成功 其他:见nano_err_e枚举
 */
 nano_err_t nano_thread_create( nano_thread_t* thread , \
@@ -43,8 +66,7 @@ nano_err_t nano_thread_create( nano_thread_t* thread , \
                                nano_thread_func_t func, \
                                void* param, \
                                nano_thread_priority_t prio, \
-                               uint32_t stack_size,
-                               uint32_t thread_ctx_size);
+                               nano_thread_stack_size_t stack_size);
 /**
  * @brief 杀死指定线程
  * @param thread 线程控制句柄指针，为NULL时将杀死自身线程
@@ -77,12 +99,9 @@ nano_err_t nano_thread_notify(nano_thread_t* thread,uint32_t notify_value);
  * @return NANO_OK:成功 其他:见nano_err_e枚举
 */
 nano_err_t nano_thread_wait_notify(uint32_t* notify_value);
-/**
- * @brief 获取当前线程上下文内存地址
- * @param size 内存大小
- * @return 线程上下文地址
-*/
-void* nano_thread_get_ctx(uint32_t* size);
+
+
+
 
 /**
  * @brief 创建一个互斥量

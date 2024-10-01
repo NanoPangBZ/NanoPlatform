@@ -197,7 +197,8 @@
           "plantform/bsp/arch/gd32f4xx/GD32F4xx_standard_peripheral/Include",
           "plantform/bsp/arch/gd32f4xx/CMSIS",
           "plantform/core/scheduler/freertos/include",
-          "plantform/core/scheduler/freertos/portable/GCC/ARM_CM4F"
+          "plantform/core/scheduler/freertos/portable/GCC/ARM_CM4F",
+          "plantform/core/scheduler"
         ],
         "libList": [],
         "defineList": [
