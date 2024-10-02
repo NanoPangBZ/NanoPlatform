@@ -1,3 +1,4 @@
+#include "nano_bsp_cpu.h"
 #include "nano_scheduler.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -20,6 +21,14 @@ const static uint32_t prio_remap[] = {
 
 nano_err_t nano_thread_shceduler_init(void)
 {
+    extern void xPortPendSVHandler( void );
+    extern void xPortSysTickHandler( void );
+    extern void vPortSVCHandler( void );
+
+    nano_bsp_register_svc_cb( vPortSVCHandler );
+    nano_bsp_register_pending_svc_cb( xPortPendSVHandler );
+    nano_bsp_register_systick_isr_cb( xPortSysTickHandler );
+
     return NANO_OK;
 }
 
@@ -47,7 +56,7 @@ nano_err_t nano_thread_create( nano_thread_t* thread , \
                  stack_size_remap[ stack_size ] ,
                  param ,
                  prio_remap[prio],
-                 *thread);
+                 (TaskHandle_t *const)thread);
     return NANO_NO_IMPL;
 }
 

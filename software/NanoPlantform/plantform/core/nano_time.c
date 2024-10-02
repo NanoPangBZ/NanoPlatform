@@ -42,6 +42,8 @@ static void nano_plantform_systick_handler(void)
 {
     nano_tick_led_run();
     sys_tick++;
+    extern void xPortSysTickHandler( void );
+    xPortSysTickHandler();
 }
 
 static nano_err_t nano_plantform_systick_init(void* args)
@@ -51,7 +53,7 @@ static nano_err_t nano_plantform_systick_init(void* args)
     nano_bsp_interrupt_disable();
 
     nano_bsp_set_systick_fre( 1000 );
-    nano_bsp_register_systick_cb(nano_plantform_systick_handler);
+    nano_bsp_register_systick_isr_cb(nano_plantform_systick_handler);
     nano_bsp_systick_start();
 
     nano_bsp_interrupt_enable();

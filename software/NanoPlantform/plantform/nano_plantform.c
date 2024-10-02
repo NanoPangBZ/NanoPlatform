@@ -1,6 +1,7 @@
 #include "nano_plantform.h"
 #include "nano_heap.h"
 #include "nano_func_manager.h"
+#include "nano_bsp_cpu.h"
 
 /**
  * @brief nano平台初始化
@@ -8,6 +9,7 @@
 */
 nano_err_t nano_plantform_init(void)
 {
+    nano_bsp_cpu_init();
     nano_heap_init();
     nano_call_func_group(NANO_BSP_PRE_INIT_FUNC_GROUP,NULL);
     nano_call_func_group(NANO_BSP_INIT_FUNC_GROUP,NULL);

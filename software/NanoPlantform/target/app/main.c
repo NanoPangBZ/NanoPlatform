@@ -2,7 +2,7 @@
 #include "nano_time.h"
 #include "nano_bsp_uart.h"
 #include <string.h>
-#include "FreeRTOS.h"
+#include "nano_scheduler.h"
 
 static void uart_bsp_test_demo(void)
 {
@@ -22,8 +22,24 @@ static void uart_bsp_test_demo(void)
     }
 }
 
+static void thread_func(void* args)
+{
+    while( 1 )
+    {}
+}
+
+static void shecduler_test_demo(void)
+{
+    nano_thread_t thread;
+    nano_plantform_init();
+    nano_thread_shceduler_init();
+    nano_thread_create( &thread , "Test" , thread_func , NULL , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
+    nano_thread_scheduler_start();
+}
+
 int main(void)
 {
-    uart_bsp_test_demo();
+    // uart_bsp_test_demo();
+    shecduler_test_demo();
     return -1;
 }
