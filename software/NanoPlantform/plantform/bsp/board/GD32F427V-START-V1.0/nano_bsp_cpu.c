@@ -1,7 +1,7 @@
 #include "nano_bsp_cpu.h"
 #include "nano_bsp_helper.h"
 #include "gd32f4xx.h"
-#include "core_cm4.h"
+#include "gd32f4xx_misc.h"
 
 static uint32_t bsp_tick = 0;
 static nano_bsp_isr_cb_t nano_systick_cb = NULL;
@@ -26,7 +26,7 @@ void PendSV_Handler(void)
 
 nano_err_t nano_bsp_cpu_init(void)
 {
-    NVIC_SetPriorityGrouping(0x0F);
+    nvic_priority_group_set(NVIC_PRIGROUP_PRE4_SUB0);
     return NANO_OK;
 }
 
