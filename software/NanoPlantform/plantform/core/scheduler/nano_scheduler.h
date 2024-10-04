@@ -10,22 +10,22 @@ typedef void (*nano_thread_func_t)(void* args);
 typedef struct nano_mutex_t* nano_mutex_t;
 
 typedef enum{
-    NANO_THREAD_LOWEST_PRIORITY,        //线程最低优先级
-    NANO_THREAD_VERY_LOW_PRIORITY,      //线程极低优先级
-    NANO_THREAD_LOW_PRIORITY,           //线程较低优先级
-    NANO_THRAD_MID_PRIORITY,            //线程普通优先级
-    NANO_THREAD_HIGH_PRIORITY,          //线程较高优先级
-    NANO_THREAD_VERY_HIGH_PRIORITY,     //线程极高优先级
-    NANO_THREAD_HIGHEST_PRIORITY,       //线程最高优先级
+    NANO_THREAD_LOWEST_PRIORITY = 0,        //线程最低优先级
+    NANO_THREAD_VERY_LOW_PRIORITY = 1,      //线程极低优先级
+    NANO_THREAD_LOW_PRIORITY = 2,           //线程较低优先级
+    NANO_THRAD_MID_PRIORITY = 3,            //线程普通优先级
+    NANO_THREAD_HIGH_PRIORITY = 4,          //线程较高优先级
+    NANO_THREAD_VERY_HIGH_PRIORITY = 5,     //线程极高优先级
+    NANO_THREAD_HIGHEST_PRIORITY = 6,       //线程最高优先级
 }nano_thread_priority_e;
 typedef uint8_t nano_thread_priority_t;
 
 typedef enum{
-    NANO_THREAD_MINI_STACK_SIZE,        //线程迷你栈
-    NANO_THREAD_SMALL_STACK_SIZE,       //线程小栈
-    NANO_THREAD_MID_STACK_SIZE,         //线程中栈
-    NANO_THREAD_BIG_STACK_SIZE,         //线程大栈
-    NANO_THREAD_LARGE_STACK_SIZE,       //线程超大栈
+    NANO_THREAD_MINI_STACK_SIZE = 0,        //线程迷你栈
+    NANO_THREAD_SMALL_STACK_SIZE = 1,       //线程小栈
+    NANO_THREAD_MID_STACK_SIZE = 2,         //线程中栈
+    NANO_THREAD_BIG_STACK_SIZE = 3,         //线程大栈
+    NANO_THREAD_LARGE_STACK_SIZE = 4,       //线程超大栈
 }nano_thread_stack_size_e;
 typedef uint8_t nano_thread_stack_size_t;
 
@@ -99,9 +99,12 @@ nano_err_t nano_thread_notify(nano_thread_t* thread,uint32_t notify_value);
  * @return NANO_OK:成功 其他:见nano_err_e枚举
 */
 nano_err_t nano_thread_wait_notify(uint32_t* notify_value);
-
-
-
+/**
+ * @brief 延时
+ * @param delay_ms 延时时间(单位:毫秒)
+ * @return NANO_OK:成功 其他:见nano_err_e枚举
+*/
+nano_err_t nano_thread_delay(uint32_t delay_ms);
 
 /**
  * @brief 创建一个互斥量

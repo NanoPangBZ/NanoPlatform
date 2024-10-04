@@ -8,6 +8,10 @@ static nano_bsp_isr_cb_t nano_systick_cb = NULL;
 static nano_bsp_isr_cb_t nano_svc_cb = NULL;
 static nano_bsp_isr_cb_t nano_pending_svc_cb = NULL;
 
+extern void xPortPendSVHandler( void );
+extern void xPortSysTickHandler( void );
+extern void vPortSVCHandler( void );
+
 void SysTick_Handler(void)
 {
     bsp_tick++;
