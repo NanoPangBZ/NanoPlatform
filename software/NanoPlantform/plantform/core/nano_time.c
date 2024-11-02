@@ -1,6 +1,7 @@
 #include "nano_time.h"
 #include "nano_bsp_cpu.h"
 #include "nano_io_device.h"
+#include "nano_scheduler.h"
 
 static uint32_t sys_tick = 0;
 static nano_io_dev_handle_t led_dev = NULL;
@@ -42,8 +43,7 @@ static void nano_plantform_systick_handler(void)
 {
     nano_tick_led_run();
     sys_tick++;
-    extern void xPortSysTickHandler( void );
-    xPortSysTickHandler();
+    nano_scheduler_systick_handler();
 }
 
 static nano_err_t nano_plantform_systick_init(void* args)

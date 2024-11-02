@@ -95,7 +95,7 @@
  * the next task to run using a generic C algorithm that works for all FreeRTOS
  * ports.  Not all FreeRTOS ports have this option.  Defaults to 0 if left
  * undefined. */
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION    0
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION    1
 
 /* Set configUSE_TICKLESS_IDLE to 1 to use the low power tickless mode.  Set to
  * 0 to keep the tick interrupt running at all times.  Not all FreeRTOS ports
