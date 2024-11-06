@@ -138,12 +138,6 @@ nano_err_t nano_mutex_unlock( nano_mutex_t mutex );
 */
 nano_err_t nano_mutex_try_lock( nano_mutex_t mutex , uint32_t timeout_ms );
 
-/********************************scheduler-ISR-handler********************************************/
-
-void nano_scheduler_systick_handler(void);
-void nano_scheduler_svc_handler(void);
-void nano_scheduler_pendsv_handler(void);
-
 #ifdef __cplusplus
 }
 #endif  //__cplusplus

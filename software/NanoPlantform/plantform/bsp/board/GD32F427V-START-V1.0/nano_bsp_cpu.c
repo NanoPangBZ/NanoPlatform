@@ -12,18 +12,18 @@ extern void xPortPendSVHandler( void );
 extern void xPortSysTickHandler( void );
 extern void vPortSVCHandler( void );
 
-void SysTick_Handler(void)
+void __attribute__((weak)) SysTick_Handler(void)
 {
     bsp_tick++;
     if( nano_systick_cb )   nano_systick_cb();
 }
 
-void SVC_Handler(void)
+void __attribute__((weak)) SVC_Handler(void)
 {
     if( nano_svc_cb )   nano_svc_cb();
 }
 
-void PendSV_Handler(void)
+void __attribute__((weak)) PendSV_Handler(void)
 {
     if( nano_pending_svc_cb )   nano_pending_svc_cb();
 }

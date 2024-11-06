@@ -19,5 +19,6 @@ nano_err_t nano_plantform_init(void)
     nano_call_func_group(NANO_PLTFM_BSP_REG_FUNC_GRUOP,NULL);
     nano_call_func_group(NANO_PLTFM_SVC_ENTER_FUNC_GRUOP,NULL);
     nano_call_func_group(NANO_PLTFM_APP_ENTER_FUNC_GRUOP,NULL);
+    nano_call_func_group(NANO_PLTFM_LAST_FUNC_GRUOP,NULL);
     return NANO_OK;
 }

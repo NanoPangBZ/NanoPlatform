@@ -1,5 +1,6 @@
 #include "nano_core.h"
 #include "nano_plantform.h"
+#include "nano_scheduler.h"
 #include "nano_bsp_cpu.h"
 #include "nano_func_manager.h"
 #include <string.h>
@@ -15,76 +16,47 @@
 //nano内核私有内存空间
 static uint8_t __attribute__((section(".nano"))) nano_section[1024];
 
-#define NANO_SECTION_HEAD_ADDR              (nano_section)
-#define NANO_SECTION_HEAD_LEN               (2)
-#define NANO_SECTION_CORE_ADDR              (NANO_SECTION_HEAD_ADDR + NANO_SECTION_HEAD_LEN)
-#define NANO_SECTION_CORE_SIZE              (128)
-#define NANO_SECTION_LAST_WORDS_ADDR        (NANO_SECTION_CORE_ADDR + NANO_SECTION_CORE_SIZE)
-#define NANO_SECTION_LAST_WORDS_SIZE        (64)
-#define NANO_SECTION_CRC_VALUE_ADDR         (NANO_SECTION_CORE_ADDR + NANO_SECTION_CORE_SIZE)
-#define NANO_SECTION_CTC_VALUE_SIZE         (4)
-
+//nano内核私有空间的数据结构
 #pragma pack(1)
 typedef struct{
     nano_core_source_t from_source;                                 //来源
     nano_core_source_t run_source;                                  //当前源
-    uint8_t from_source_last_words[NANO_SECTION_LAST_WORDS_SIZE];   //来源最后发出的遗言
-}nano_core_t;
+}nano_core_section_t;
 #pragma pack()
 
-static nano_core_t* nano_core = (nano_core_t*)NANO_SECTION_CORE_ADDR;
+typedef struct{
+    nano_core_section_t*    section;
+    uint32_t                core_tick;
+    nano_core_isr_cb_t      systick_cb;
+    nano_core_isr_cb_t      svc_cb;
+    nano_core_isr_cb_t      pend_sv_cb;
+}nano_core_t;
 
-static void nano_core_reset(void)
-{
-    memset( nano_section , 0 , sizeof(nano_section) );
-    nano_core->from_source = NANO_RS_UNKOWN;
-    nano_core->run_source = NANO_RS_UNKOWN;
-}
+static nano_core_t g_nano_core;
 
-static uint32_t cali_nano_section_crc(void)
+static void nano_core_systick_handler(void)
 {
-    uint32_t crc_value = 0;
-    uint8_t* section_addr = nano_section;
-    uint8_t crc_temp = 0;
-    while( section_addr != NANO_SECTION_CRC_VALUE_ADDR )
+    g_nano_core.core_tick++;
+    if( g_nano_core.systick_cb )
     {
-        crc_value += *section_addr ^ crc_temp;
-        crc_value++;
-        crc_temp++;
-        section_addr++;
+        g_nano_core.systick_cb();
     }
-
-    return crc_value;
 }
 
-static nano_err_t check_nano_section_verify(void)
+static void nano_core_svc_handler(void)
 {
-    return cali_nano_section_crc() == *((uint32_t*)NANO_SECTION_CRC_VALUE_ADDR) ? NANO_OK : NANO_ERR;
-}
-
-static nano_err_t nano_section_verify(void)
-{
-    *((uint32_t*)NANO_SECTION_CRC_VALUE_ADDR) = cali_nano_section_crc();
-    return NANO_OK;
-}
-
-nano_err_t nano_core_init(void)
-{
-    nano_err_t section_ret = check_nano_section_verify();
-
-    if( section_ret == NANO_OK )
+    if( g_nano_core.svc_cb )
     {
-        memcpy( nano_core->from_source_last_words , NANO_SECTION_LAST_WORDS_ADDR , NANO_SECTION_LAST_WORDS_SIZE );
+        g_nano_core.svc_cb();
     }
-    else
+}
+
+static void nano_core_pending_svc_handler(void)
+{
+    if( g_nano_core.pend_sv_cb )
     {
-        nano_core_reset();
+        g_nano_core.pend_sv_cb();
     }
-
-    //清除遗言
-    memset( NANO_SECTION_LAST_WORDS_ADDR , 0 , NANO_SECTION_LAST_WORDS_SIZE );
-
-    return NANO_OK;
 }
 
 uint32_t nano_core_version(void)
@@ -94,40 +66,74 @@ uint32_t nano_core_version(void)
 
 nano_err_t nano_core_set_last_words(uint8_t* last_words , uint16_t len)
 {
-    uint16_t cpy_len = len > NANO_SECTION_LAST_WORDS_SIZE ? NANO_SECTION_LAST_WORDS_SIZE : len;
-    memcpy( NANO_SECTION_LAST_WORDS_ADDR , last_words , cpy_len );
-    return NANO_OK;
+    (void)last_words;
+    (void)len;
+    return -1;
 }
 
 int32_t nano_core_get_form_source_last_words(uint8_t* last_words , uint16_t len)
 {
-    uint16_t cpy_len = len > NANO_SECTION_LAST_WORDS_SIZE ? NANO_SECTION_LAST_WORDS_SIZE : len;
-    memcpy(last_words,nano_core->from_source_last_words,cpy_len);
-    return cpy_len;
+    (void)last_words;
+    (void)len;
+    return -1;
 }
 
 nano_err_t nano_core_jump_to_other_source(nano_core_source_t source)
 {
-    nano_core->from_source = nano_core->run_source;
-    nano_core->run_source = source;
-    nano_section_verify();
+    g_nano_core.section->from_source = g_nano_core.section->run_source;
+    g_nano_core.section->run_source = source;
     nano_bsp_app_jump(source);
     return NANO_ERR;
 }
 
+uint32_t nano_core_time_ms(void)
+{
+    return g_nano_core.core_tick;
+}
+
+nano_err_t nano_core_register_isr_cb(nano_core_isr_cb_t systick_cb , nano_core_isr_cb_t svc_cb , nano_core_isr_cb_t pend_sv_cb)
+{
+    g_nano_core.systick_cb = systick_cb;
+    g_nano_core.svc_cb = svc_cb;
+    g_nano_core.pend_sv_cb = pend_sv_cb;
+    return NANO_OK;
+}
+
 nano_core_source_t nano_core_get_run_source(void)
 {
-    return nano_core->run_source;
+    return g_nano_core.section->run_source;
 }
 
 nano_core_source_t nano_core_get_from_source(void)
 {
-    return nano_core->from_source;
+    return g_nano_core.section->from_source;
 }
 
-nano_err_t nano_core_auto_init(void* args)
+static nano_err_t nano_core_section_init(void* args)
 {
-    return nano_core_init();
+    (void)args;
+    g_nano_core.section = (nano_core_section_t*)nano_section;
+    return NANO_OK;
 }
 
-LOAD_FUNC_TO_FUNC_MANAGER( nano_core_auto_init , NANO_PLTFM_PRE_INIT_FUNC_GROUP );
+static nano_err_t nano_core_isr_cb_init(void* args)
+{
+    (void)args;
+
+    nano_bsp_register_systick_isr_cb( nano_core_systick_handler );
+    nano_bsp_register_svc_cb( nano_core_svc_handler );
+    nano_bsp_register_pending_svc_cb( nano_core_pending_svc_handler );
+
+    return NANO_OK;
+}
+
+uint32_t nano_core_start(void)
+{
+    nano_thread_shceduler_init();
+    nano_thread_scheduler_start();
+    return NANO_OK;
+}
+
+LOAD_FUNC_TO_FUNC_MANAGER( nano_core_section_init , NANO_PLTFM_PRE_INIT_FUNC_GROUP );
+LOAD_FUNC_TO_FUNC_MANAGER( nano_core_isr_cb_init , NANO_PLTFM_PRE_INIT_FUNC_GROUP );
+

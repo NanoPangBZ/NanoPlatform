@@ -79,18 +79,3 @@ nano_err_t __attribute__((weak)) nano_mutex_try_lock( nano_mutex_t mutex , uint3
 {
     return NANO_NO_IMPL;
 }
-
-void __attribute__((weak)) nano_scheduler_systick_handler(void)
-{
-
-}
-
-void __attribute__((weak)) nano_scheduler_svc_handler(void)
-{
-
-}
-
-void __attribute__((weak)) nano_scheduler_pendsv_handler(void)
-{
-
-}

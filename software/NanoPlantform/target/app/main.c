@@ -1,5 +1,4 @@
 #include "nano_plantform.h"
-#include "nano_time.h"
 #include "nano_bsp_uart.h"
 #include <string.h>
 #include "nano_scheduler.h"
@@ -9,7 +8,7 @@ static void thread_func(void* args)
 {
     while(1)
     {
-        // nano_thread_delay(1000);
+        nano_thread_delay(1000);
     }
 }
 
@@ -17,7 +16,7 @@ static void thread_func2(void* args)
 {
     while(1)
     {
-        nano_thread_delay(1000);
+        nano_thread_delay(1800);
     }
 }
 
