@@ -4,11 +4,20 @@
 #include "nano_scheduler.h"
 #include "nano_io_device.h"
 
+static nano_io_dev_handle_t led_handle = NULL;
+
 static void thread_func(void* args)
 {
+    nano_io_dev_handle_t led_handle = (nano_io_dev_handle_t)args;
+    uint8_t led_on = 0;
     while(1)
     {
-        nano_thread_delay(1000);
+        led_on = 1;
+        nano_io_device_write(led_handle,(uint8_t*)&led_on,sizeof(led_on),NULL);
+        nano_thread_delay(200);
+        led_on = 0;
+        nano_io_device_write(led_handle,(uint8_t*)&led_on,sizeof(led_on),NULL);
+        nano_thread_delay(600);
     }
 }
 
@@ -25,7 +34,10 @@ int main(void)
     nano_plantform_init();
 
     nano_thread_shceduler_init();
-    nano_thread_create( NULL , "Test" , thread_func , NULL , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
+
+    nano_io_device_open("debug led",NANO_IO_READ_WRITE,NANO_BIO,&led_handle);
+
+    nano_thread_create( NULL , "Test" , thread_func , (void*)led_handle , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
     nano_thread_create( NULL , "Test" , thread_func2 , NULL , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
     nano_thread_scheduler_start();
     while(1);
