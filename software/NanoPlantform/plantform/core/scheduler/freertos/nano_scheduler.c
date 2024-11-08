@@ -17,7 +17,10 @@ void vPortSVCHandler( void );
 
 void nano_scheduler_systick_handler(void)
 {
-    xPortSysTickHandler();
+    if( xTaskGetSchedulerState() == taskSCHEDULER_RUNNING )
+    {
+        xPortSysTickHandler();
+    }
 }
 
 void nano_scheduler_svc_handler(void)

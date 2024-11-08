@@ -22,3 +22,9 @@ nano_err_t nano_plantform_init(void)
     nano_call_func_group(NANO_PLTFM_LAST_FUNC_GRUOP,NULL);
     return NANO_OK;
 }
+
+nano_err_t nano_plantform_start(void)
+{
+    nano_thread_scheduler_start();
+    return NANO_OK;
+}

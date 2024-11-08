@@ -33,13 +33,11 @@ int main(void)
 {
     nano_plantform_init();
 
-    nano_thread_shceduler_init();
-
     nano_io_device_open("debug led",NANO_IO_READ_WRITE,NANO_BIO,&led_handle);
-
     nano_thread_create( NULL , "Test" , thread_func , (void*)led_handle , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
     nano_thread_create( NULL , "Test" , thread_func2 , NULL , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
-    nano_thread_scheduler_start();
+
+    nano_plantform_start();
     while(1);
     return -1;
 }

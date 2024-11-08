@@ -18,7 +18,6 @@ extern "C"
 {
 #endif  //__cpulspuls
 
-uint32_t nano_core_start(void);
 uint32_t nano_core_version(void);
 nano_core_source_t nano_core_get_run_source(void);
 nano_core_source_t nano_core_get_from_source(void);

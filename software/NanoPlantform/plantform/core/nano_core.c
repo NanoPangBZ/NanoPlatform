@@ -127,13 +127,14 @@ static nano_err_t nano_core_isr_cb_init(void* args)
     return NANO_OK;
 }
 
-uint32_t nano_core_start(void)
+static nano_err_t nano_scheduler_init(void* args)
 {
+    (void)args;
     nano_thread_shceduler_init();
-    nano_thread_scheduler_start();
     return NANO_OK;
 }
 
 LOAD_FUNC_TO_FUNC_MANAGER( nano_core_section_init , NANO_PLTFM_PRE_INIT_FUNC_GROUP );
 LOAD_FUNC_TO_FUNC_MANAGER( nano_core_isr_cb_init , NANO_PLTFM_PRE_INIT_FUNC_GROUP );
+LOAD_FUNC_TO_FUNC_MANAGER( nano_scheduler_init , NANO_PLTFM_CORE_INIT_FUNC_GROUP );
 

@@ -35,7 +35,7 @@ extern "C"
 #endif  //__cplusplus
 
 /**
- * @brief 线程函数
+ * @brief 启动nano平台调度器
  * @return NANO_OK:成功 其他:见nano_err_e枚举
 */
 nano_err_t nano_thread_shceduler_init(void);
