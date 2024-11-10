@@ -67,7 +67,7 @@ nano_err_t              nano_thread_pool_init(void);
 nano_tp_pool_handle_t   nano_tp_pool_create(nano_tp_pool_desc_t* desc);
 nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc);
 nano_tp_task_handle_t   nano_tp_task_create(nano_tp_task_desc_t* desc);
-nano_tp_task_handle_t   nano_tp_static_pool_create(const nano_tp_pool_desc_t* desc);
+nano_tp_pool_handle_t   nano_tp_static_pool_create(const nano_tp_pool_desc_t* desc);
 nano_tp_thread_handle_t nano_tp_static_thread_create(const nano_tp_thread_desc_t* desc);
 nano_tp_task_handle_t   nano_tp_static_task_create(const nano_tp_task_desc_t* desc);
 

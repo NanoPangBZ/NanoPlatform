@@ -26,7 +26,7 @@ static struct nano_io_device_node_t* nano_io_device_head_node = NULL;
 */
 nano_err_t nano_register_io_device(const char* name,const void* desc,const nano_io_device_opt_t* opt)
 {
-    nano_io_device_t* device = (nano_io_device_t*)nano_heap_malloc(sizeof(nano_io_device_t));
+    nano_io_device_t* device = (nano_io_device_t*)nano_heap_malloc(sizeof(nano_io_device_t),NANO_HEAP_ATTR_DEFAULT);
 
     if( device == NULL )
     {
@@ -38,7 +38,7 @@ nano_err_t nano_register_io_device(const char* name,const void* desc,const nano_
     device->name = name;
     device->opt = opt;
 
-    struct nano_io_device_node_t* node = (struct nano_io_device_node_t*)nano_heap_malloc(sizeof(nano_io_device_head_node));
+    struct nano_io_device_node_t* node = (struct nano_io_device_node_t*)nano_heap_malloc(sizeof(nano_io_device_head_node),NANO_HEAP_ATTR_DEFAULT);
 
     if( node == NULL )
     {

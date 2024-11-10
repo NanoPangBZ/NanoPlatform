@@ -10,7 +10,7 @@
  * @param size 大小
  * @return 内存指针
 */
-#define BSP_HEAP_MALLOC(size)           nano_heap_malloc(size)
+#define BSP_HEAP_MALLOC(size)           nano_heap_malloc(size,NANO_HEAP_ATTR_ALIGN_4)
 
 /**
  * @brief 板级支持包预初始化函数声明

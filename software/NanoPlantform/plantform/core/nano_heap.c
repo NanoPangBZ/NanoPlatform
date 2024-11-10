@@ -16,9 +16,10 @@ static __attribute__((aligned(4))) uint8_t main_heap[MAIN_HEAP_SIZE];
 /**
  * @brief 向nano堆申请一块空间
  * @param size 大小
+ * @param attr 属性
  * @return 内存指针
 */
-void* nano_heap_malloc(uint32_t size)
+void* nano_heap_malloc(uint32_t size,nano_heap_attr_t attr)
 {
     uint32_t free_size = heap_mem_pool.size - heap_mem_pool.use_ofs;
 
