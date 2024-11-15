@@ -1,5 +1,15 @@
 #pragma once
 
+/**
+ * @brief 线程池
+ * @note 用于灵活执行多任务，提高cpu利用率，减小线程数量，提高cpu效率和减小内存占用
+ * @note 三种类型的实例 线程池(pool)、线程(thread)、任务(task)
+ * 
+ * @note 一个pool可以绑定多个thread，以并行执行pool中的task
+ * @note 一个thread可以绑定到多个pool上，以执行多个pool中的task
+ * @note 一个task可以加入到多个pool中，以实现更加灵活的交叉分组，减小重要任务因为阻塞导致的delay
+*/
+
 #include "nano_plantform.h"
 
 #ifdef __cplusplus
@@ -63,33 +73,37 @@ typedef struct{
     nano_err_t (*task_func)(void* arg);
 }nano_tp_task_desc_t;
 
+//线程池异常回调
+typedef void (*nano_tp_exception_callback_t)(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread,nano_tp_task_handle_t task,nano_err_t err);
+
 nano_err_t              nano_thread_pool_init(void);
 nano_tp_pool_handle_t   nano_tp_pool_create(nano_tp_pool_desc_t* desc);
 nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc);
 nano_tp_task_handle_t   nano_tp_task_create(nano_tp_task_desc_t* desc);
-nano_tp_pool_handle_t   nano_tp_static_pool_create(const nano_tp_pool_desc_t* desc);
-nano_tp_thread_handle_t nano_tp_static_thread_create(const nano_tp_thread_desc_t* desc);
-nano_tp_task_handle_t   nano_tp_static_task_create(const nano_tp_task_desc_t* desc);
+nano_err_t              nano_tp_pool_destroy(nano_tp_pool_handle_t pool);
+nano_err_t              nano_tp_pool_thread_task_destroy(nano_tp_pool_handle_t pool);
+nano_err_t              nano_tp_thread_destroy(nano_tp_thread_handle_t thread);
+nano_err_t              nano_tp_task_destroy(nano_tp_task_handle_t task);
 
 nano_err_t  nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
 nano_err_t  nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
 nano_err_t  nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task);
-nano_err_t  nano_tp_thread_start(nano_tp_thread_handle_t thread);
-nano_err_t  nano_tp_thread_stop(nano_tp_thread_handle_t thread);
-nano_err_t  nano_tp_pool_all_thread_start(nano_tp_pool_handle_t pool);
-nano_err_t  nano_tp_pool_all_thread_stop(nano_tp_pool_handle_t pool);
+nano_err_t  nano_tp_pool_remove_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task);
+nano_err_t  nano_tp_pool_thread_start(nano_tp_pool_handle_t pool);
+nano_err_t  nano_tp_pool_thread_stop(nano_tp_pool_handle_t pool);
 
-nano_err_t  nano_tp_pool_bind_thread_with_name(const char* pool_name,const char* thread_name);
-nano_err_t  nano_tp_pool_unbind_thread_with_name(const char* pool_name,const char* thread_name);
-nano_err_t  nano_tp_pool_add_task_with_name(const char* pool_name,const char* task_name);
-nano_err_t  nano_tp_thread_start_with_name(const char* thread_name);
-nano_err_t  nano_tp_thread_stop_with_name(const char* thread_name);
-nano_err_t  nano_tp_pool_all_thread_start_with_name(const char* pool_name);
-nano_err_t  nano_tp_pool_all_thread_stop_with_name(const char* pool_name);
+nano_err_t  nano_tp_task_set_cycle(nano_tp_task_handle_t task,uint32_t cycle_ms);
+nano_err_t  nano_tp_task_clear_time_cnt(nano_tp_task_handle_t task);
+nano_err_t  nano_tp_task_run_in_next_pool_ergodic(nano_tp_task_handle_t task);
+nano_err_t  nano_tp_task_run_after_isr_return(nano_tp_task_handle_t task);
+nano_err_t  nano_tp_task_pause(nano_tp_task_handle_t task);
+nano_err_t  nano_tp_task_continue(nano_tp_task_handle_t task);
 
 nano_tp_pool_handle_t nano_tp_pool_get_handle(const char* pool_name);
 nano_tp_thread_handle_t nano_tp_thread_get_handle(const char* thread_name);
 nano_tp_task_handle_t nano_tp_task_get_handle(const char* task_name);
+
+nano_err_t  nano_tp_set_exception_callback(nano_tp_exception_callback_t callback);
 
 #ifdef __cplusplus
 }

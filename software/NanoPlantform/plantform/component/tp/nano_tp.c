@@ -254,51 +254,38 @@ nano_tp_task_handle_t nano_tp_task_create(nano_tp_task_desc_t* desc)
 }
 
 /**
- * @brief 创建静态线程池，desc内存由用户自行维护
- * @param desc 线程池描述
- * @return 线程池句柄
- * @note 创建出的池只能由用户自行释放，并且无法通过name索引(即无法通过_with_name结尾的api函数)
+ * @brief 销毁线程池
+ * @param pool 线程池句柄
+ * @return NANO_OK:成功 其他:失败
+ * @note 该接口不会销毁线程池内的线程和任务
 */
-nano_tp_pool_handle_t nano_tp_static_pool_create(const nano_tp_pool_desc_t* desc)
+nano_err_t nano_tp_pool_destroy(nano_tp_pool_handle_t pool)
 {
-    if( g_nano_tp_is_init == 0 )
-    {
-        return NULL;
-    }
-
-    //创建线程池对象
-    struct nano_tp_pool_t* pool = (struct nano_tp_pool_t*)nano_heap_malloc(sizeof(struct nano_tp_pool_t),NANO_HEAP_ATTR_DEFAULT);
     if( pool == NULL )
     {
-        return NULL;
+        //查询当前是否在线程池中调用的该api
     }
-
-    //不需要分配内存，由用户自行维护desc
-    pool->desc = desc;
-
-    //不生成节点，不加入全局线程池链表
-    // nano_tp_node_t* node = create_node(pool);
-    // if( node == NULL )
-    // {
-    //     nano_heap_free(pool_desc);
-    //     nano_heap_free(pool);
-    //     return NULL;
-    // }
-    // ADD_NODE_TO_LIST(g_tp_pool_list,node);
-
-    return pool;
 }
 
-nano_tp_thread_handle_t nano_tp_static_thread_create(const nano_tp_thread_desc_t* desc)
+/**
+ * @brief 销毁线程池
+ * @param pool 线程池句柄
+ * @return NANO_OK:成功 其他:失败
+ * @note 该接口会销毁仅存在与当前线程池内的所有线程和任务
+*/
+nano_err_t nano_tp_pool_thread_task_destroy(nano_tp_pool_handle_t pool)
 {
-    (void)desc;
-    return NULL;
+
 }
 
-nano_tp_task_handle_t nano_tp_static_task_create(const nano_tp_task_desc_t* desc)
+nano_err_t nano_tp_thread_destroy(nano_tp_thread_handle_t thread)
 {
-    (void)desc;
-    return NULL;
+
+}
+
+nano_err_t nano_tp_task_destroy(nano_tp_task_handle_t task)
+{
+
 }
 
 nano_err_t nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread)
@@ -315,79 +302,66 @@ nano_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_
     return NANO_NO_IMPL;
 }
 
-nano_err_t  nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task)
+nano_err_t nano_tp_pool_remove_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task)
 {
     (void)pool;
     (void)task;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_thread_start(nano_tp_thread_handle_t thread)
+nano_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task)
 {
-    (void)thread;
+    (void)pool;
+    (void)task;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_thread_stop(nano_tp_thread_handle_t thread)
-{
-    (void)thread;
-    return NANO_NO_IMPL;
-}
-
-nano_err_t nano_tp_pool_all_thread_start(nano_tp_pool_handle_t pool)
+nano_err_t nano_tp_pool_thread_start(nano_tp_pool_handle_t pool)
 {
     (void)pool;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_pool_all_thread_stop(nano_tp_pool_handle_t pool)
+nano_err_t nano_tp_pool_thread_stop(nano_tp_pool_handle_t pool)
 {
     (void)pool;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_pool_bind_thread_with_name(const char* pool_name,const char* thread_name)
+nano_err_t nano_tp_task_set_cycle(nano_tp_task_handle_t task,uint32_t cycle_ms)
 {
-    (void)pool_name;
-    (void)thread_name;
+    (void)task;
+    (void)cycle_ms;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_pool_unbind_thread_with_name(const char* pool_name,const char* thread_name)
+nano_err_t nano_tp_task_clear_time_cnt(nano_tp_task_handle_t task)
 {
-    (void)pool_name;
-    (void)thread_name;
+    (void)task;
     return NANO_NO_IMPL;
 }
 
-nano_err_t  nano_tp_pool_add_task_with_name(const char* pool_name,const char* task_name)
+nano_err_t nano_tp_task_run_after_isr_return(nano_tp_task_handle_t task)
 {
-    (void)pool_name;
-    (void)task_name;
+    (void)task;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_thread_start_with_name(const char* thread_name)
+nano_err_t nano_tp_task_run_in_next_pool_ergodic(nano_tp_task_handle_t task)
 {
-    (void)thread_name;
+    (void)task;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_thread_stop_with_name(const char* thread_name)
+nano_err_t nano_tp_task_pause(nano_tp_task_handle_t task)
 {
-    (void)thread_name;
+    (void)task;
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_pool_all_thread_start_with_name(const char* pool_name)
+nano_err_t nano_tp_task_continue(nano_tp_task_handle_t task)
 {
-    (void)pool_name;
-    return NANO_NO_IMPL;
-}
-
-nano_err_t nano_tp_pool_all_thread_stop_with_name(const char* pool_name)
-{
-    (void)pool_name;
+    (void)task;
     return NANO_NO_IMPL;
 }
 
@@ -407,4 +381,10 @@ nano_tp_task_handle_t nano_tp_task_get_handle(const char* task_name)
 {
     (void)task_name;
     return NULL;
+}
+
+nano_err_t  nano_tp_set_exception_callback(nano_tp_exception_callback_t callback)
+{
+    (void)callback;
+    return NANO_NO_IMPL;
 }
