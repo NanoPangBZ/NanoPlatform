@@ -250,7 +250,8 @@
           "plantform/bsp/arch/gd32f4xx/CMSIS",
           "plantform/core/scheduler/freertos/include",
           "plantform/core/scheduler/freertos/portable/GCC/ARM_CM4F",
-          "plantform/core/scheduler"
+          "plantform/core/scheduler",
+          "plantform/component/tp"
         ],
         "libList": [],
         "defineList": [

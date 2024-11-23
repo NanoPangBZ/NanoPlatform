@@ -39,7 +39,7 @@ typedef uint32_t nano_tp_pool_attr_t;
 
 //线程池描述
 typedef struct{
-    const char* name;
+    char* name;
     nano_tp_pool_attr_t pool_attr;
 }nano_tp_pool_desc_t;
 
@@ -56,7 +56,7 @@ typedef uint32_t nano_tp_thread_attr_t;
 
 //线程池线程描述
 typedef struct{
-    const char* name;
+    char* name;
     nano_tp_thread_attr_t thread_attr;
 }nano_tp_thread_desc_t;
 
@@ -68,7 +68,7 @@ typedef uint32_t nano_tp_task_attr_t;
 
 //线程池任务描述
 typedef struct{
-    const char* name;
+    char* name;
     nano_tp_task_attr_t task_attr;
     nano_err_t (*task_func)(void* arg);
 }nano_tp_task_desc_t;
@@ -76,7 +76,7 @@ typedef struct{
 //线程池异常回调
 typedef void (*nano_tp_exception_callback_t)(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread,nano_tp_task_handle_t task,nano_err_t err);
 
-nano_err_t              nano_thread_pool_init(void);
+nano_err_t              nano_tp_init(void);
 nano_tp_pool_handle_t   nano_tp_pool_create(nano_tp_pool_desc_t* desc);
 nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc);
 nano_tp_task_handle_t   nano_tp_task_create(nano_tp_task_desc_t* desc);
