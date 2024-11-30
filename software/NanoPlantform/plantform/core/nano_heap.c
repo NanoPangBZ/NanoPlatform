@@ -27,6 +27,7 @@ void* nano_heap_malloc(uint32_t size,nano_heap_attr_t attr)
     {
         uint8_t* addr = heap_mem_pool.mem_addr + heap_mem_pool.use_ofs;
         heap_mem_pool.use_ofs += size;
+        heap_mem_pool.use_ofs = (heap_mem_pool.use_ofs + 0x03) & ~0x03;
         return (void*)addr;
     }
 

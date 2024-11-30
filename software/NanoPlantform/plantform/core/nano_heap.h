@@ -8,7 +8,7 @@ extern "C"
 #endif  //__cpulspuls
 
 typedef enum{
-    NANO_HEAP_ATTR_DEFAULT = 0x00,              //默认属性
+    NANO_HEAP_ATTR_DEFAULT = 0x01 << 1,          //默认属性 - 即四字节对齐
     NANO_HEAP_ATTR_ALIGN_4 = 0x01 << 1,         //4字节对齐
     NANO_HEAP_ATTR_ALIGN_8 = 0x01 << 2,         //8字节对齐
     NANO_HEAP_ATTR_FAST_ACCESS = 0x01 << 3,     //快速访问
