@@ -81,7 +81,6 @@ nano_tp_pool_handle_t   nano_tp_pool_create(nano_tp_pool_desc_t* desc);
 nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc);
 nano_tp_task_handle_t   nano_tp_task_create(nano_tp_task_desc_t* desc);
 nano_err_t              nano_tp_pool_destroy(nano_tp_pool_handle_t pool);
-nano_err_t              nano_tp_pool_thread_task_destroy(nano_tp_pool_handle_t pool);
 nano_err_t              nano_tp_thread_destroy(nano_tp_thread_handle_t thread);
 nano_err_t              nano_tp_task_destroy(nano_tp_task_handle_t task);
 
@@ -89,13 +88,12 @@ nano_err_t  nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_h
 nano_err_t  nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
 nano_err_t  nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task);
 nano_err_t  nano_tp_pool_remove_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task);
-nano_err_t  nano_tp_pool_thread_start(nano_tp_pool_handle_t pool);
-nano_err_t  nano_tp_pool_thread_stop(nano_tp_pool_handle_t pool);
+nano_err_t  nano_tp_pool_start(nano_tp_pool_handle_t pool);
+nano_err_t  nano_tp_pool_stop(nano_tp_pool_handle_t pool);
 
 nano_err_t  nano_tp_task_set_cycle(nano_tp_task_handle_t task,uint32_t cycle_ms);
 nano_err_t  nano_tp_task_clear_time_cnt(nano_tp_task_handle_t task);
 nano_err_t  nano_tp_task_run_in_next_pool_ergodic(nano_tp_task_handle_t task);
-nano_err_t  nano_tp_task_run_after_isr_return(nano_tp_task_handle_t task);
 nano_err_t  nano_tp_task_pause(nano_tp_task_handle_t task);
 nano_err_t  nano_tp_task_continue(nano_tp_task_handle_t task);
 
