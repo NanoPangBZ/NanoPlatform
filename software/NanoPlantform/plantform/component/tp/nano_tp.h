@@ -7,7 +7,7 @@
  * 
  * @note 一个pool可以绑定多个thread，以并行执行pool中的task
  * @note 一个thread可以绑定到多个pool上，以执行多个pool中的task
- * @note 一个task可以加入到多个pool中，以实现更加灵活的交叉分组，减小重要任务因为阻塞导致的delay
+ * @note 一个task仅允许加入到一个pool上
 */
 
 #include "nano_plantform.h"
@@ -70,6 +70,7 @@ typedef uint32_t nano_tp_task_attr_t;
 typedef struct{
     char* name;
     nano_tp_task_attr_t task_attr;
+    uint16_t  cycle_ms;                              //任务周期
     nano_err_t (*task_func)(void* arg);
 }nano_tp_task_desc_t;
 
@@ -79,15 +80,14 @@ typedef void (*nano_tp_exception_callback_t)(nano_tp_pool_handle_t pool,nano_tp_
 nano_err_t              nano_tp_init(void);
 nano_tp_pool_handle_t   nano_tp_pool_create(nano_tp_pool_desc_t* desc);
 nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc);
-nano_tp_task_handle_t   nano_tp_task_create(nano_tp_task_desc_t* desc);
 nano_err_t              nano_tp_pool_destroy(nano_tp_pool_handle_t pool);
 nano_err_t              nano_tp_thread_destroy(nano_tp_thread_handle_t thread);
-nano_err_t              nano_tp_task_destroy(nano_tp_task_handle_t task);
 
 nano_err_t  nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
 nano_err_t  nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
-nano_err_t  nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task);
-nano_err_t  nano_tp_pool_remove_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task);
+nano_tp_task_handle_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_desc_t* desc);
+nano_err_t nano_tp_remove_task(nano_tp_task_handle_t task);
+
 nano_err_t  nano_tp_pool_start(nano_tp_pool_handle_t pool);
 nano_err_t  nano_tp_pool_stop(nano_tp_pool_handle_t pool);
 

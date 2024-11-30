@@ -3,17 +3,17 @@
 #include <string.h>
 
 typedef enum{
-    NANO_TP_POOL_NODE,
-    NANO_TP_THREAD_NODE,
-    NANO_TP_TASK_NODE,
-    NANO_TP_UNDEFINE_NODE,
-}nano_tp_node_type_e;
-typedef uint8_t nano_tp_node_type_t;
+    NANO_TP_POOL_OBJ,
+    NANO_TP_THREAD_OBJ,
+    NANO_TP_TASK_OBJ,
+    NANO_TP_UNDEFINE_OBJ,
+}nano_tp_obj_type_e;
+typedef uint8_t nano_tp_obj_type_t;
 
 typedef struct{
-    nano_tp_node_type_t type;
     const char*         name;
     void*               obj;
+    nano_tp_obj_type_t  obj_type;
     void*               next_node;
 }nano_tp_node_t;
 
@@ -43,21 +43,27 @@ typedef uint32_t nano_tp_pool_flag_t;
 
 struct nano_tp_pool_t
 {
-    TP_LOCK_TYPE                lock;
-    const nano_tp_pool_desc_t*  desc;
-    nano_tp_pool_flag_t         flag;
-    nano_tp_node_t*             task_list;  //线程池中的任务列表
+    TP_LOCK_TYPE            lock;
+    nano_tp_pool_desc_t     desc;
+    nano_tp_pool_flag_t     flag;
+    nano_tp_node_t*         task_list;  //线程池中的任务列表
 };
 
 struct nano_tp_thread_t
 {
-    const nano_tp_thread_desc_t* desc;
-    nano_tp_node_t               bind_pool_list;     //线程所绑定的线程池列表
+    nano_tp_thread_desc_t   desc;
+    nano_tp_node_t          bind_pool_list; //线程所绑定的线程池列表
 };
+
+typedef enum{
+    NANO_TP_TASK_RUN_FALG = 0x01 << 0,              //任务运行标志
+}nano_tp_task_flag_mask_e;
+typedef uint32_t nano_tp_task_flag_t;
 
 struct nano_tp_task_t
 {
-    const nano_tp_task_desc_t* desc;
+    nano_tp_task_desc_t     desc;
+    nano_tp_pool_handle_t   parant_pool;            //任务所属的线程池
 };
 
 /**
@@ -67,14 +73,14 @@ struct nano_tp_task_t
  * @param obj 节点对象
  * @return 节点指针
 */
-static nano_tp_node_t* create_node(nano_tp_node_type_t type,const char* name,void* obj)
+static nano_tp_node_t* create_node(nano_tp_obj_type_t obj_type,const char* name,void* obj)
 {
     nano_tp_node_t* node = (nano_tp_node_t*)nano_heap_malloc(sizeof(nano_tp_node_t),NANO_HEAP_ATTR_ALIGN_4);
     if( node == NULL )
     {
         return NULL;
     }
-    node->type = type;
+    node->obj_type = obj_type;
     node->name = name;
     node->obj = obj;
     node->next_node = NULL;
@@ -94,6 +100,58 @@ static nano_err_t destroy_node(nano_tp_node_t* node)
     }
     nano_heap_free(node);
     return NANO_OK;
+}
+
+/**
+ * @brief 创建一个nano_tp对象
+ * @param obj_type 对象类型
+ * @param desc 对象描述
+ * @return 对象指针
+*/
+static void* create_nano_tp_obj(nano_tp_obj_type_t obj_type,void* desc)
+{
+    void* obj;
+    uint16_t obj_size;
+    switch( obj_type )
+    {
+        case NANO_TP_POOL_OBJ:
+            obj_size = sizeof(struct nano_tp_pool_t);
+            break;
+        case NANO_TP_THREAD_OBJ:
+            obj_size = sizeof(struct nano_tp_thread_t);
+            break;
+        case NANO_TP_TASK_OBJ:
+            obj_size = sizeof(struct nano_tp_task_t);
+            break;
+
+        //未匹配到的类型直接返回空指针
+        default:
+            return NULL;
+    }
+
+    //为对象分配内存
+    obj = nano_heap_malloc(obj_size,NANO_HEAP_ATTR_ALIGN_4);
+    if( obj == NULL )
+    {
+        return NULL;
+    }
+    memset(obj,0,obj_size);
+
+    //初始化对象
+    switch( obj_type )
+    {
+        case NANO_TP_POOL_OBJ:
+            (nano_tp_pool_handle_t*)obj->desc = *(nano_tp_pool_desc_t*)desc;
+            break;
+        case NANO_TP_THREAD_OBJ:
+            (nano_tp_thread_handle_t*)obj->desc = *(nano_tp_thread_desc_t*)desc;
+            break;
+        case NANO_TP_TASK_OBJ:
+            (nano_tp_task_handle_t*)obj->desc = *(nano_tp_task_desc_t*)desc;
+            break;
+    }
+
+    return NULL;
 }
 
 /**
@@ -195,7 +253,7 @@ nano_tp_pool_handle_t nano_tp_pool_create(nano_tp_pool_desc_t* desc)
     pool->desc = pool_desc;
 
     //生成节点，加入全局线程池链表
-    nano_tp_node_t* node = create_node(NANO_TP_POOL_NODE,pool->desc->name,(void*)pool);
+    nano_tp_node_t* node = create_node(NANO_TP_POOL_OBJ,pool->desc->name,(void*)pool);
     if( node == NULL )
     {
         nano_heap_free(pool_desc->name);
@@ -250,7 +308,7 @@ nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc)
     thread->desc = thread_desc;
 
     //生成节点，加入全局线程链表
-    nano_tp_node_t* node = create_node(NANO_TP_THREAD_NODE,thread->desc->name,(void*)thread);
+    nano_tp_node_t* node = create_node(NANO_TP_THREAD_OBJ,thread->desc->name,(void*)thread);
     if( node == NULL )
     {
         nano_heap_free(thread->desc->name);
@@ -268,7 +326,7 @@ nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc)
  * @param desc 任务描述
  * @return 任务句柄
 */
-nano_tp_task_handle_t nano_tp_task_create(nano_tp_task_desc_t* desc)
+static nano_tp_task_handle_t nano_tp_task_create(nano_tp_task_desc_t* desc)
 {
     if( g_nano_tp_is_init == 0 )
     {
@@ -305,7 +363,7 @@ nano_tp_task_handle_t nano_tp_task_create(nano_tp_task_desc_t* desc)
     task->desc = task_desc;
 
     //生成节点，加入全局任务链表
-    nano_tp_node_t* node = create_node(NANO_TP_TASK_NODE,task->desc->name,(void*)task);
+    nano_tp_node_t* node = create_node(NANO_TP_TASK_OBJ,task->desc->name,(void*)task);
     if( node == NULL )
     {
         nano_heap_free(task->desc->name);
@@ -362,11 +420,6 @@ nano_err_t nano_tp_thread_destroy(nano_tp_thread_handle_t thread)
 
 }
 
-nano_err_t nano_tp_task_destroy(nano_tp_task_handle_t task)
-{
-
-}
-
 nano_err_t nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread)
 {
     (void)pool;
@@ -381,11 +434,77 @@ nano_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_
     return NANO_NO_IMPL;
 }
 
-nano_err_t nano_tp_pool_remove_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t task)
+/**
+ * @brief 线程池添加任务
+ * @param pool 线程池句柄
+ * @param desc 任务描述
+ * @return 任务句柄
+*/
+nano_tp_task_handle_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_desc_t* desc)
 {
-    (void)pool;
-    (void)task;
-    return NANO_NO_IMPL;
+    if( pool == NULL )
+    {
+        pool = GET_CURR_TP_POOL();
+        if( pool == NULL )
+        {
+            return NULL;
+        }
+    }
+
+    //创建任务
+    nano_tp_task_handle_t task = nano_tp_task_create(desc);
+    if( task == NULL )
+    {
+        goto err_recycle;
+    }
+
+    //创建nano_tp节点
+    nano_tp_node_t* task_node = create_node(NANO_TP_TASK_OBJ,task->desc->name,(void*)task);
+    if( task_node == NULL )
+    {
+        goto err_recycle;
+    }
+
+    //加入线程池任务列表
+    TP_LOCK(pool->lock);
+    ADD_NODE_TO_LIST(pool->task_list,task_node);
+    TP_UNLOCK(pool->lock);
+
+    return task;
+
+err_recycle:
+
+    if( task != NULL )
+    {
+        nano_tp_task_destroy(task);
+    }
+
+    if( task_node != NULL )
+    {
+        destroy_node(task_node);
+    }
+
+
+    return NULL;
+}
+
+/**
+ * @brief 线程池移除任务
+ * @param task 任务句柄
+ * @return NANO_OK:成功 其他:失败
+*/
+nano_err_t nano_tp_remove_task(nano_tp_task_handle_t task)
+{
+    if( task == NULL )
+    {
+        task = GET_CURR_TP_TASK();
+        if( task == NULL )
+        {
+            return NANO_ILLEG_OBJ;
+        }
+    }
+
+    //查找任务所在的线程池
 }
 
 nano_err_t  nano_tp_pool_start(nano_tp_pool_handle_t pool)
@@ -403,7 +522,7 @@ nano_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_
     (void)pool;
     (void)task;
     TP_LOCK(pool->lock);
-    nano_tp_node_t* task_node = create_node(NANO_TP_TASK_NODE,task->desc->name,(void*)task);
+    nano_tp_node_t* task_node = create_node(NANO_TP_TASK_OBJ,task->desc->name,(void*)task);
     if( task_node == NULL )
     {
         return NANO_ERR;
@@ -416,9 +535,8 @@ nano_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_
 
 nano_err_t nano_tp_task_set_cycle(nano_tp_task_handle_t task,uint32_t cycle_ms)
 {
-    (void)task;
-    (void)cycle_ms;
-    return NANO_NO_IMPL;
+    task->desc->cycle_ms = cycle_ms;
+    return NANO_OK;
 }
 
 nano_err_t nano_tp_task_clear_time_cnt(nano_tp_task_handle_t task)
