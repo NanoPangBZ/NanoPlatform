@@ -43,6 +43,7 @@ int main(void)
     nano_tp_pool_desc_t pool_desc;
     nano_tp_thread_desc_t thread_desc;
     nano_tp_task_desc_t task_desc;
+    nano_tp_task_handle_t task_handle;
 
     pool_desc.name = "test";
     thread_desc.name = "test";
@@ -50,8 +51,8 @@ int main(void)
 
     nano_tp_pool_handle_t pool =  nano_tp_pool_create(&pool_desc);
     nano_tp_thread_handle_t thread = nano_tp_thread_create(&thread_desc);
-    nano_tp_task_handle_t task = nano_tp_task_create(&task_desc);
-    nano_tp_pool_add_task( pool , task );
+    nano_tp_pool_bind_thread( pool , thread );
+    nano_tp_pool_add_task( pool , &task_handle , &task_desc );
 
     nano_plantform_start();
     while(1);

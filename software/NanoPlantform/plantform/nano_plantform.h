@@ -60,6 +60,7 @@ typedef void (*nano_aio_callback_t)(void* ctx,nano_err_t opt_ret,nano_cpu_mode_t
 
 nano_err_t nano_plantform_init(void);
 nano_err_t nano_plantform_start(void);
+uint32_t   nano_plantform_sys_time(void);
 
 #ifdef __cplusplus
 }

@@ -2,6 +2,8 @@
 #include "nano_heap.h"
 #include "nano_func_manager.h"
 #include "nano_bsp_cpu.h"
+#include "nano_scheduler.h"
+#include "nano_core.h"
 
 /**
  * @brief nano平台初始化
@@ -27,4 +29,9 @@ nano_err_t nano_plantform_start(void)
 {
     nano_thread_scheduler_start();
     return NANO_OK;
+}
+
+uint32_t nano_plantform_sys_time(void)
+{
+    return nano_core_time_ms();
 }
