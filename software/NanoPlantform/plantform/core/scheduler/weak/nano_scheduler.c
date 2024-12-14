@@ -25,7 +25,7 @@ nano_err_t __attribute__((weak)) nano_thread_create( nano_thread_t* thread , \
     return NANO_NO_IMPL;
 }
 
-nano_err_t __attribute__((weak)) nano_thread_kill(nano_thread_t* thread)
+nano_err_t __attribute__((weak)) nano_thread_kill(nano_thread_t thread)
 {
     return NANO_NO_IMPL;
 }

@@ -78,6 +78,7 @@ typedef struct{
     nano_tp_task_attr_t task_attr;
     uint16_t  cycle_ms;                              //任务周期
     tp_err_t (*task_func)(void* arg);
+    void*     user_ctx;                             //用户上下文，将会传递到task_func中去
 }nano_tp_task_desc_t;
 
 //线程池异常回调

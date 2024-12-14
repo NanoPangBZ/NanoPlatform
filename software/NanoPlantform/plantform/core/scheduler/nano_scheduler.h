@@ -73,7 +73,7 @@ nano_err_t nano_thread_create( nano_thread_t* thread , \
  * @return NANO_OK:成功 其他:见nano_err_e枚举
  * @note 自杀时不会调用create时设置的资源回收函数
 */
-nano_err_t nano_thread_kill(nano_thread_t* thread);
+nano_err_t nano_thread_kill(nano_thread_t thread);
 /**
  * @brief 挂起指定线程
  * @param thread 线程控制句柄，为NULL时将挂起自身线程

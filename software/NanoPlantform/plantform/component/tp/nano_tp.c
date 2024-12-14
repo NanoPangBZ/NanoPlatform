@@ -1,4 +1,5 @@
 #include "nano_tp.h"
+#include "nano_tp_thread.h"
 #include "nano_tp_private.h"
 #include "nano_tp_impl.h"
 #include <string.h>
@@ -6,40 +7,6 @@
 static uint8_t g_nano_tp_is_init = 0;
 DEFINE_STATIC_LIST( g_nano_tp_pool_list );
 DEFINE_STATIC_LIST( g_nano_tp_thread_list );
-
-/**
- * @brief 创建一个节点
- * @param type 节点的类型
- * @param name 节点名字指针，内部不分配内存用于存储字符串
- * @param obj 节点对象
- * @return 节点指针
-*/
-static nano_tp_node_t* create_node(void* obj)
-{
-    nano_tp_node_t* node = (nano_tp_node_t*)nano_tp_malloc(sizeof(nano_tp_node_t));
-    if( node == NULL )
-    {
-        return NULL;
-    }
-    node->obj = obj;
-    node->next_node = NULL;
-    return node;
-}
-
-/**
- * @brief 销毁一个节点
- * @param node 节点
- * @return NANO_OK:成功 其他:失败
-*/
-static tp_err_t destroy_node(nano_tp_node_t* node)
-{
-    if( node == NULL )
-    {
-        return NANO_ILLEG_OBJ;
-    }
-    nano_tp_free(node);
-    return NANO_OK;
-}
 
 /**
  * @brief 创建一个nano_tp对象
@@ -70,7 +37,7 @@ static void* create_nano_tp_obj(nano_tp_obj_type_t obj_type,void* desc)
     }
 
     //为对象分配内存
-    obj = nano_tp_malloc(obj_size);
+    obj = nano_tp_impl_malloc(obj_size);
     if( obj == NULL )
     {
         return NULL;
@@ -91,7 +58,7 @@ static void* create_nano_tp_obj(nano_tp_obj_type_t obj_type,void* desc)
             break;
     }
 
-    return NULL;
+    return obj;
 }
 
 /**
@@ -104,7 +71,7 @@ static void* create_nano_tp_obj(nano_tp_obj_type_t obj_type,void* desc)
 static tp_err_t destroy_nano_tp_obj(nano_tp_obj_type_t obj_type,void* obj)
 {
     (void)obj_type;
-    nano_tp_free(obj);
+    nano_tp_impl_free(obj);
     return NANO_OK;
 }
 
@@ -157,7 +124,7 @@ nano_tp_pool_handle_t nano_tp_pool_create(nano_tp_pool_desc_t* desc)
     ADD_NODE_TO_LIST( g_nano_tp_pool_list , node );
 
     //对象的初始化
-    //todo...
+    pool->status.is_pause = 1;
 
     return pool;
 
@@ -208,7 +175,7 @@ nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc)
     ADD_NODE_TO_LIST( g_nano_tp_thread_list , node );
 
     //对象的初始化
-    //todo...
+    nano_tp_impl_thread_create( &thread->thread_impl_handle , nano_tp_thread_func , thread , thread->desc.thread_attr );
 
     return thread;
 
@@ -298,11 +265,31 @@ tp_err_t nano_tp_thread_destroy(nano_tp_thread_handle_t thread)
     return NANO_NO_IMPL;
 }
 
+/**
+ * @brief 线程池绑定线程
+ * @param pool 线程池句柄
+ * @param thread 线程句柄
+ * @return ERR_CODE_OK:成功 其他:失败
+*/
 tp_err_t nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread)
 {
     (void)pool;
     (void)thread;
-    return NANO_NO_IMPL;
+
+    if( pool == NULL )
+    {
+        return ERR_CODE_ILLEG_OBJ;
+    }
+
+    if( thread == NULL )
+    {
+        return ERR_CODE_ILLEG_OBJ;
+    }
+
+    nano_tp_node_t* pool_node = create_node(pool);
+    ADD_NODE_TO_LIST(thread->bind_pool_list,pool_node);
+
+    return ERR_CODE_OK;
 }
 
 tp_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread)
@@ -373,7 +360,7 @@ tp_err_t nano_tp_remove_task(nano_tp_task_handle_t task)
 */
 tp_err_t  nano_tp_pool_start(nano_tp_pool_handle_t pool)
 {
-    pool->status.is_running = 1;
+    pool->status.is_pause = 0;
     return ERR_CODE_OK;
 }
 
@@ -384,7 +371,7 @@ tp_err_t  nano_tp_pool_start(nano_tp_pool_handle_t pool)
 */
 tp_err_t  nano_tp_pool_stop(nano_tp_pool_handle_t pool)
 {
-    pool->status.is_running = 0;
+    pool->status.is_pause = 1;
     return ERR_CODE_OK;
 }
 

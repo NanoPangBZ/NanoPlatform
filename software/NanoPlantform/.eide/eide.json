@@ -271,7 +271,7 @@
             "misc-control": "--specs=nosys.specs --specs=nano.specs"
           },
           "c/cpp-compiler": {
-            "language-c": "gnu90",
+            "language-c": "c99",
             "language-cpp": "c++11",
             "optimization": "level-0",
             "warnings": "all-warnings",

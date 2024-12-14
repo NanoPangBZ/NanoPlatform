@@ -62,7 +62,7 @@ nano_err_t nano_thread_create( nano_thread_t* thread , \
     return NANO_OK;
 }
 
-nano_err_t nano_thread_kill(nano_thread_t* thread)
+nano_err_t nano_thread_kill(nano_thread_t thread)
 {
     return NANO_NO_IMPL;
 }
