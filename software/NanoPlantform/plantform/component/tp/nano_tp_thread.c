@@ -7,7 +7,7 @@ void nano_tp_thread_func(void* args)
     while(1)
     {
         //遍历线程池
-        FOREACH_NODE_IN_LIST(thread->pool_list,pool_node)
+        FOREACH_NODE_IN_LIST(thread->bind_pool_list,pool_node)
         {
             nano_tp_pool_handle_t pool = (nano_tp_pool_handle_t)pool_node->obj;
 
@@ -39,6 +39,7 @@ void nano_tp_thread_func(void* args)
                 {
                     task->desc.task_func( task->desc.user_ctx );
                     task->last_run_time = nano_tp_impl_get_sys_time();
+                    task->status.is_active = 0;
                 }
             }
         }

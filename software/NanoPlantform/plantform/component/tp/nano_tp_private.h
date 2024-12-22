@@ -53,8 +53,7 @@ struct nano_tp_thread_t
 {
     nano_tp_impl_thread_handle_t thread_impl_handle;
     nano_tp_thread_desc_t   desc;
-    nano_tp_node_t*         bind_pool_list; //线程所绑定的线程池列表
-    DEFINE_LIST(pool_list);
+    DEFINE_LIST(bind_pool_list);
 };
 
 
