@@ -7,7 +7,7 @@ typedef void* nano_thread_t;
 /*线程运行函数*/
 typedef void (*nano_thread_func_t)(void* args);
 /*互斥量控制句柄*/
-typedef struct nano_mutex_t* nano_mutex_t;
+typedef void* nano_mutex_t;
 
 typedef enum{
     NANO_THREAD_LOWEST_PRIORITY = 0,        //线程最低优先级

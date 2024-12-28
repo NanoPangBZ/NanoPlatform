@@ -47,27 +47,30 @@ void nano_tp_impl_thread_sleep(uint32_t ms)
 
 void nano_tp_impl_lock_create(nano_tp_impl_lock_handle_t* lock_handle)
 {
-
+    if( nano_mutex_create(lock_handle) != NANO_OK )
+    {
+        *lock_handle = NULL;
+    }
 }
 
 void nano_tp_impl_lock_destroy(nano_tp_impl_lock_handle_t lock_handle)
 {
-
+    nano_mutex_detroyed(lock_handle);
 }
 
 void nano_tp_impl_lock_lock(nano_tp_impl_lock_handle_t lock_handle)
 {
-
+    nano_mutex_lock(lock_handle);
 }
 
 void nano_tp_impl_lock_unlock(nano_tp_impl_lock_handle_t lock_handle)
 {
-
+    nano_mutex_unlock(lock_handle);
 }
 
 void nano_tp_impl_lock_try_lock(nano_tp_impl_lock_handle_t lock_handle, uint32_t timeout_ms)
 {
-    
+    nano_mutex_try_lock(lock_handle,timeout_ms);
 }
 
 #endif  //NANO_TP_USE_NANO_PLTFM
