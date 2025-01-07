@@ -9,6 +9,25 @@ DEFINE_STATIC_LIST( g_nano_tp_pool_list );
 DEFINE_STATIC_LIST( g_nano_tp_thread_list );
 
 /**
+ * @brief 根据名字查找节点
+ * @param list 节点列表
+ * @param name 节点名字
+ * @return 节点指针
+*/
+static nano_tp_node_t* find_node_by_name(nano_tp_node_t* list,const char* name)
+{
+    FOREACH_NODE_IN_LIST(list,node)
+    {
+        nano_tp_pool_handle_t pool = (nano_tp_pool_handle_t)node->obj;
+        if( strcmp(pool->desc.name,name) == 0 )
+        {
+            return node;
+        }
+    }
+    return NULL;
+}
+
+/**
  * @brief 创建一个nano_tp对象
  * @param obj_type 对象类型
  * @param desc 对象描述
@@ -329,7 +348,8 @@ tp_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t*
     //对象的初始化
     //todo...
 
-    *handle = task;
+    if( handle != NULL )
+        *handle = task;
 
     return ERR_CODE_OK;
 
@@ -346,6 +366,47 @@ err_recycle:
     }
 
     return ERR_CODE_FAIL;
+}
+
+/**
+ * @brief 快速添加任务
+ * @param pool_name 线程池名字
+ * @param task_name 任务名字
+ * @param task_attr 任务属性
+ * @param cycle_ms 周期时间
+ * @param task_func 任务函数
+ * @param user_ctx 用户上下文
+ * @return ERR_CODE_OK:成功 其他:失败
+*/
+tp_err_t nano_tp_pool_fast_add_task(const char* pool_name ,
+                                    const char* task_name ,
+                                    nano_tp_task_attr_t task_attr ,
+                                    uint16_t cycle_ms ,
+                                    tp_task_func_t task_func ,
+                                    void* user_ctx)
+{
+    nano_tp_node_t* pool_node = find_node_by_name(g_nano_tp_pool_list,pool_name);
+
+    if( pool_node == NULL )
+    {
+        return ERR_CODE_ILLEG_OBJ;
+    }
+
+    if( pool_node->obj == NULL )
+    {
+        return ERR_CODE_ILLEG_OBJ;
+    }
+
+    nano_tp_pool_handle_t pool = (nano_tp_pool_handle_t)pool_node->obj;
+
+    nano_tp_task_desc_t desc;
+    desc.name = task_name;
+    desc.task_attr = task_attr;
+    desc.cycle_ms = cycle_ms;
+    desc.task_func = task_func;
+    desc.user_ctx = user_ctx;
+
+    nano_tp_pool_add_task(pool,NULL,&desc);
 }
 
 tp_err_t nano_tp_remove_task(nano_tp_task_handle_t task)

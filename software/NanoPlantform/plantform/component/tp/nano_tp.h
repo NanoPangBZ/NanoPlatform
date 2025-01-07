@@ -30,6 +30,8 @@ typedef struct nano_tp_thread_t* nano_tp_thread_handle_t;
 struct nano_tp_task_t;
 typedef struct nano_tp_task_t* nano_tp_task_handle_t;
 
+typedef tp_err_t (*tp_task_func_t)(void* arg);
+
 /***************************属性定义******************************/
 
 //线程池属性
@@ -77,7 +79,7 @@ typedef struct{
     const char* name;
     nano_tp_task_attr_t task_attr;
     uint16_t  cycle_ms;                              //任务周期
-    tp_err_t (*task_func)(void* arg);
+    tp_task_func_t task_func;                        //任务函数
     void*     user_ctx;                             //用户上下文，将会传递到task_func中去
 }nano_tp_task_desc_t;
 
@@ -95,6 +97,12 @@ tp_err_t                nano_tp_thread_destroy(nano_tp_thread_handle_t thread);
 tp_err_t nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
 tp_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
 tp_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t* handle,nano_tp_task_desc_t* desc);
+tp_err_t nano_tp_pool_fast_add_task(const char* pool_name ,
+                                    const char* task_name ,
+                                    nano_tp_task_attr_t task_attr ,
+                                    uint16_t cycle_ms ,
+                                    tp_task_func_t task_func ,
+                                    void* user_ctx);
 tp_err_t nano_tp_remove_task(nano_tp_task_handle_t task);
 
 tp_err_t nano_tp_pool_start(nano_tp_pool_handle_t pool);
