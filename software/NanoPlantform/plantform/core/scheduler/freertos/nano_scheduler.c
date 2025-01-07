@@ -2,6 +2,7 @@
 #include "nano_bsp_cpu.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 
 const uint32_t nano_thread_priority_map[] = {
     0, 1, 2, 3, 4, 5, 6,
@@ -95,7 +96,16 @@ nano_err_t nano_thread_delay(uint32_t delay_ms)
 
 nano_err_t nano_mutex_create( nano_mutex_t* mutex )
 {
-    return NANO_NO_IMPL;
+    SemaphoreHandle_t sem = xSemaphoreCreateBinary();
+    if( sem != NULL )
+    {
+        *mutex = sem;
+        return NANO_OK;
+    }
+    else
+    {
+        return NANO_ERR;
+    }
 }
 
 nano_err_t nano_mutex_detroyed( nano_mutex_t* mutex )
@@ -105,15 +115,54 @@ nano_err_t nano_mutex_detroyed( nano_mutex_t* mutex )
 
 nano_err_t nano_mutex_lock( nano_mutex_t mutex )
 {
-    return NANO_NO_IMPL;
+    if (xPortIsInsideInterrupt())
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xSemaphoreTakeFromISR(mutex, &xHigherPriorityTaskWoken);
+        if(  xHigherPriorityTaskWoken == pdTRUE )
+        {
+            portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+        }
+    }
+    else
+    {
+        xSemaphoreTake(mutex, portMAX_DELAY);
+    }
+
+    return NANO_OK;
 }
 
 nano_err_t nano_mutex_unlock( nano_mutex_t mutex )
 {
-    return NANO_NO_IMPL;
+    if (xPortIsInsideInterrupt())
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xSemaphoreGiveFromISR(mutex, &xHigherPriorityTaskWoken);
+        if(  xHigherPriorityTaskWoken == pdTRUE )
+        {
+            portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+        }
+    }
+    else
+    {
+        xSemaphoreGive(mutex);
+    }
+    return NANO_OK;
 }
 
 nano_err_t nano_mutex_try_lock( nano_mutex_t mutex , uint32_t timeout_ms )
 {
-    return NANO_NO_IMPL;
+    if( xPortIsInsideInterrupt() )
+    {
+        return NANO_BUSY;
+    }
+
+    if( xSemaphoreTake(mutex, timeout_ms / portTICK_PERIOD_MS) == pdTRUE )
+    {
+        return NANO_OK;
+    }
+    else
+    {
+        return NANO_BUSY;
+    }
 }
