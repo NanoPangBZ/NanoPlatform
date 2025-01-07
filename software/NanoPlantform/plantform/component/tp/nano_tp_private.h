@@ -43,9 +43,10 @@ typedef struct{
 //单个任务池上下文
 struct nano_tp_pool_t
 {
-    nano_tp_pool_desc_t     desc;
+    nano_tp_pool_desc_t             desc;
     DEFINE_LIST(task_list);
-    nano_tp_pool_status_t   status;
+    nano_tp_pool_status_t           status;
+    nano_tp_impl_lock_handle_t      lock;
 };
 
 //单个线程上下文

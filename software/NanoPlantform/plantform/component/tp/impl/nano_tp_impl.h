@@ -62,8 +62,9 @@ void nano_tp_impl_lock_destroy(nano_tp_impl_lock_handle_t lock_handle);
 /**
  * @brief 加锁
  * @param lock_handle 锁句柄
+ * @return ERR_CODE_OK:成功 其他:失败
 */
-void nano_tp_impl_lock_lock(nano_tp_impl_lock_handle_t lock_handle);
+tp_err_t nano_tp_impl_lock_lock(nano_tp_impl_lock_handle_t lock_handle);
 
 /**
  * @brief 解锁
@@ -75,5 +76,6 @@ void nano_tp_impl_lock_unlock(nano_tp_impl_lock_handle_t lock_handle);
  * @brief 尝试加锁
  * @param lock_handle 锁句柄
  * @param timeout_ms 超时时间
+ * @return ERR_CODE_OK:成功 其他:失败
 */
-void nano_tp_impl_lock_try_lock(nano_tp_impl_lock_handle_t lock_handle, uint32_t timeout_ms);
+tp_err_t nano_tp_impl_lock_try_lock(nano_tp_impl_lock_handle_t lock_handle, uint32_t timeout_ms);

@@ -1,5 +1,8 @@
 #include "nano_tp_private.h"
 
+#define TAKE_LOCK(lock) nano_tp_impl_lock_lock(lock)
+#define GIVE_LOCK(lock) nano_tp_impl_lock_unlock(lock)
+
 void nano_tp_thread_func(void* args)
 {
     nano_tp_thread_handle_t thread = (nano_tp_thread_handle_t)args;
@@ -22,8 +25,11 @@ void nano_tp_thread_func(void* args)
             {
                 nano_tp_task_handle_t task = (nano_tp_task_handle_t)task_node->obj;
 
+                TAKE_LOCK(pool->lock);
+
                 if( task->status.is_active )
                 {
+                    GIVE_LOCK(pool->lock);
                     continue;
                 }
 
@@ -33,6 +39,7 @@ void nano_tp_thread_func(void* args)
                     task->status.is_active = 1;
                 }
 
+                GIVE_LOCK(pool->lock);
 
                 //执行任务
                 if( task->status.is_active )

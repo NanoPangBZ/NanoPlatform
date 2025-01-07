@@ -58,9 +58,10 @@ void nano_tp_impl_lock_destroy(nano_tp_impl_lock_handle_t lock_handle)
     nano_mutex_detroyed(lock_handle);
 }
 
-void nano_tp_impl_lock_lock(nano_tp_impl_lock_handle_t lock_handle)
+tp_err_t nano_tp_impl_lock_lock(nano_tp_impl_lock_handle_t lock_handle)
 {
     nano_mutex_lock(lock_handle);
+    return ERR_CODE_OK;
 }
 
 void nano_tp_impl_lock_unlock(nano_tp_impl_lock_handle_t lock_handle)
@@ -68,9 +69,9 @@ void nano_tp_impl_lock_unlock(nano_tp_impl_lock_handle_t lock_handle)
     nano_mutex_unlock(lock_handle);
 }
 
-void nano_tp_impl_lock_try_lock(nano_tp_impl_lock_handle_t lock_handle, uint32_t timeout_ms)
+tp_err_t nano_tp_impl_lock_try_lock(nano_tp_impl_lock_handle_t lock_handle, uint32_t timeout_ms)
 {
-    nano_mutex_try_lock(lock_handle,timeout_ms);
+    return nano_mutex_try_lock(lock_handle,timeout_ms) == NANO_OK ? ERR_CODE_OK : ERR_CODE_FAIL;
 }
 
 #endif  //NANO_TP_USE_NANO_PLTFM

@@ -125,6 +125,7 @@ nano_tp_pool_handle_t nano_tp_pool_create(nano_tp_pool_desc_t* desc)
 
     //对象的初始化
     pool->status.is_pause = 1;
+    nano_tp_impl_lock_create( &pool->lock );
 
     return pool;
 
