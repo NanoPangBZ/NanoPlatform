@@ -324,7 +324,7 @@ tp_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_ha
  * @param pool 线程池句柄
  * @param handle 任务句柄指针
  * @param desc 任务描述
- * @return 任务句柄
+ * @return ERR_CODE_OK:成功 其他:失败
 */
 tp_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t* handle,nano_tp_task_desc_t* desc)
 {
@@ -406,7 +406,7 @@ tp_err_t nano_tp_pool_fast_add_task(const char* pool_name ,
     desc.task_func = task_func;
     desc.user_ctx = user_ctx;
 
-    nano_tp_pool_add_task(pool,NULL,&desc);
+    return nano_tp_pool_add_task(pool,NULL,&desc);
 }
 
 tp_err_t nano_tp_remove_task(nano_tp_task_handle_t task)
