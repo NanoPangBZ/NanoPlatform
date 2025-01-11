@@ -26,7 +26,9 @@ static void thread_func2(void* args)
 {
     while(1)
     {
-        nano_thread_delay(1800);
+        nano_thread_delay(5000);
+        nano_thread_kill((nano_thread_t)args);
+        nano_thread_kill(NULL);
     }
 }
 
@@ -35,8 +37,9 @@ static void thread_schudler_test(void)
     nano_plantform_init();
 
     nano_io_device_open("debug led",NANO_IO_READ_WRITE,NANO_BIO,&led_handle);
-    nano_thread_create( NULL , "Test" , thread_func , (void*)led_handle , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
-    nano_thread_create( NULL , "Test" , thread_func2 , NULL , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
+    nano_thread_t thread;
+    nano_thread_create( &thread , "Test" , thread_func , (void*)led_handle , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
+    nano_thread_create( NULL , "Test" , thread_func2 , (void*)thread , NANO_THRAD_MID_PRIORITY , NANO_THREAD_BIG_STACK_SIZE );
 
     nano_plantform_start();
 }
@@ -79,8 +82,8 @@ static void nano_thread_pool_test(void)
 
 int main(void)
 {
-    // thread_schudler_test();
-    nano_thread_pool_test();
+    thread_schudler_test();
+    // nano_thread_pool_test();
     while(1);
     return -1;
 }

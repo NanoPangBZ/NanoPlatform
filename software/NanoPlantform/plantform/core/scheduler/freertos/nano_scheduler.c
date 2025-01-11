@@ -59,13 +59,14 @@ nano_err_t nano_thread_create( nano_thread_t* thread , \
                                nano_thread_priority_t prio, \
                                nano_thread_stack_size_t stack_size)
 {
-    xTaskCreate( (TaskFunction_t)func , thread_name , nano_thread_stack_size_map[stack_size] , param , nano_thread_priority_map[prio] , NULL );
+    xTaskCreate( (TaskFunction_t)func , thread_name , nano_thread_stack_size_map[stack_size] , param , nano_thread_priority_map[prio] , thread );
     return NANO_OK;
 }
 
 nano_err_t nano_thread_kill(nano_thread_t thread)
 {
-    return NANO_NO_IMPL;
+    vTaskDelete( thread );
+    return NANO_OK;
 }
 
 nano_err_t nano_thread_suspend(nano_thread_t thread)
