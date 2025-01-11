@@ -51,6 +51,7 @@ typedef enum{
     NANO_TP_THREAD_ATTR_IMPORTANT = 0x01 << 3,          //重要线程
     NANO_TP_THREAD_ATTR_REALTIME = 0x01 << 4,           //实时线程
     NANO_TP_THREAD_ATTR_LONG_CYCLE = 0x01 << 5,         //长周期线程
+    NANO_TP_THREAD_ATTR_LOW_ACCURACY = 0x01 << 6,       //低精度线程
 }nano_tp_thread_attr_e;
 typedef uint32_t nano_tp_thread_attr_t;
 
