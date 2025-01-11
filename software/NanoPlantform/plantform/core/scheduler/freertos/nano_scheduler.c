@@ -99,6 +99,7 @@ nano_err_t nano_mutex_create( nano_mutex_t* mutex )
     SemaphoreHandle_t sem = xSemaphoreCreateBinary();
     if( sem != NULL )
     {
+        xSemaphoreGive(sem);
         *mutex = sem;
         return NANO_OK;
     }
