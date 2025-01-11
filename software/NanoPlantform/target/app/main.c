@@ -56,11 +56,14 @@ static void nano_thread_pool_test(void)
     nano_tp_thread_desc_t thread_desc;
 
     pool_desc.name = "test";
-    thread_desc.name = "test";
 
     //创建池和线程
     nano_tp_pool_handle_t pool =  nano_tp_pool_create(&pool_desc);
+    thread_desc.name = "thread1";
+    thread_desc.thread_attr = NANO_TP_THREAD_ATTR_DEFAULT;
     nano_tp_thread_handle_t thread = nano_tp_thread_create(&thread_desc);
+    thread_desc.name = "thread2";
+    thread_desc.thread_attr = NANO_TP_THREAD_ATTR_LONG_CYCLE;
     nano_tp_thread_handle_t thread2 = nano_tp_thread_create(&thread_desc);
     nano_tp_pool_bind_thread( pool , thread );
     nano_tp_pool_bind_thread( pool , thread2 );
