@@ -27,12 +27,23 @@ uint32_t nano_tp_impl_get_sys_time(void)
 
 void nano_tp_impl_thread_create(nano_tp_impl_thread_handle_t* thread_handle, void (*thread_func)(void*), void* args, nano_tp_thread_attr_t attr)
 {
+    nano_thread_stack_size_t stack_size = NANO_THREAD_SMALL_STACK_SIZE;
+    
+    if( attr & NANO_TP_THREAD_ATTR_BIG_STACK_SIZE )
+    {
+        stack_size = NANO_THREAD_BIG_STACK_SIZE;
+    }
+    else if( attr & NANO_TP_THREAD_ATTR_LARG_STACK_SIZE )
+    {
+        stack_size = NANO_THREAD_LARGE_STACK_SIZE;
+    }
+
     nano_thread_create( thread_handle,
                         "thread_tp",
                         thread_func,
                         args,
                         NANO_THRAD_MID_PRIORITY,
-                        NANO_THREAD_SMALL_STACK_SIZE);
+                        stack_size);
 }
 
 void nano_tp_impl_thread_destroy(nano_tp_impl_thread_handle_t thread_handle)

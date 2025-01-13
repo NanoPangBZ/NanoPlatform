@@ -54,8 +54,8 @@ void nano_tp_thread_func(void* args)
         uint32_t sleep_time = 0;
         if( thread->desc.thread_attr & NANO_TP_THREAD_ATTR_REALTIME )
         {
-            //250Hz轮询
-            sleep_time = 4;
+            //500Hz轮询
+            sleep_time = 2;
         }
         else if( thread->desc.thread_attr & NANO_TP_THREAD_ATTR_LONG_CYCLE )
         {
