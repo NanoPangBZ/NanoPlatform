@@ -91,7 +91,7 @@ static tp_err_t destroy_nano_tp_obj(nano_tp_obj_type_t obj_type,void* obj)
 {
     (void)obj_type;
     nano_tp_impl_free(obj);
-    return NANO_OK;
+    return ERR_CODE_OK;
 }
 
 /**
@@ -102,12 +102,12 @@ tp_err_t nano_tp_init(void)
 {
     if( g_nano_tp_is_init )
     {
-        return NANO_OK;
+        return ERR_CODE_OK;
     }
 
     g_nano_tp_is_init = 1;
 
-    return NANO_OK;
+    return ERR_CODE_OK;
 }
 
 /**
@@ -272,7 +272,7 @@ tp_err_t nano_tp_pool_destroy(nano_tp_pool_handle_t pool)
 {
     //todo
 
-    return NANO_ERR;
+    return ERR_CODE_FAIL;
 }
 
 /**
@@ -282,7 +282,7 @@ tp_err_t nano_tp_pool_destroy(nano_tp_pool_handle_t pool)
 */
 tp_err_t nano_tp_thread_destroy(nano_tp_thread_handle_t thread)
 {
-    return NANO_NO_IMPL;
+    return ERR_CODE_NO_IMPL;
 }
 
 /**
@@ -316,7 +316,7 @@ tp_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_ha
 {
     (void)pool;
     (void)thread;
-    return NANO_NO_IMPL;
+    return ERR_CODE_NO_IMPL;
 }
 
 /**
@@ -328,15 +328,18 @@ tp_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_ha
 */
 tp_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t* handle,nano_tp_task_desc_t* desc)
 {
+	nano_tp_task_handle_t task = NULL;
+    nano_tp_node_t* task_node = NULL;
+
     //创建任务
-    nano_tp_task_handle_t task = nano_tp_task_create(desc);
+    task = nano_tp_task_create(desc);
     if( task == NULL )
     {
         goto err_recycle;
     }
 
     //创建nano_tp节点
-    nano_tp_node_t* task_node = create_node((void*)task);
+    task_node = create_node((void*)task);
     if( task_node == NULL )
     {
         goto err_recycle;
