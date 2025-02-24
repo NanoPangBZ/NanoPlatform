@@ -25,29 +25,32 @@ void nano_tp_thread_func(void* args)
             {
                 nano_tp_task_handle_t task = (nano_tp_task_handle_t)task_node->obj;
 
+                //当前任务正在活跃(被其他线程执行中)
+                if( task->status.is_active )
+                {
+                    continue;
+                }
+
                 TAKE_LOCK(pool->lock);
 
-                if( task->status.is_active )
+                //判断是否到了执行时间
+                if( nano_tp_impl_get_sys_time() - task->last_run_time > task->desc.cycle_ms &&
+                    !task->status.is_active )
+                {
+                    task->status.is_active = 1;
+                }
+                else
                 {
                     GIVE_LOCK(pool->lock);
                     continue;
                 }
 
-                //判断是否到了执行时间
-                if( nano_tp_impl_get_sys_time() - task->last_run_time > task->desc.cycle_ms )
-                {
-                    task->status.is_active = 1;
-                }
-
                 GIVE_LOCK(pool->lock);
 
                 //执行任务
-                if( task->status.is_active )
-                {
-                    task->desc.task_func( task->desc.user_ctx );
-                    task->last_run_time = nano_tp_impl_get_sys_time();
-                    task->status.is_active = 0;
-                }
+                task->desc.task_func( task->desc.user_ctx );
+                task->last_run_time = nano_tp_impl_get_sys_time();
+                task->status.is_active = 0;
             }
         }
 
