@@ -59,7 +59,12 @@ nano_err_t nano_thread_create( nano_thread_t* thread , \
                                nano_thread_priority_t prio, \
                                nano_thread_stack_size_t stack_size)
 {
-    xTaskCreate( (TaskFunction_t)func , thread_name , nano_thread_stack_size_map[stack_size] , param , nano_thread_priority_map[prio] , thread );
+    TaskHandle_t task_handle;
+    xTaskCreate( (TaskFunction_t)func , thread_name , nano_thread_stack_size_map[stack_size] , param , nano_thread_priority_map[prio] , &task_handle );
+    if( task_handle == NULL )
+        return NANO_ERR;
+    
+    *thread = task_handle;
     return NANO_OK;
 }
 
