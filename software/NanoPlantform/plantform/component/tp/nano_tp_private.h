@@ -99,8 +99,8 @@ static inline tp_err_t destroy_node(nano_tp_node_t* node)
 {
     if( node == NULL )
     {
-        return NANO_ILLEG_OBJ;
+        return ERR_CODE_ILLEG_OBJ;
     }
     nano_tp_impl_free(node);
-    return NANO_OK;
+    return ERR_CODE_OK;
 }
