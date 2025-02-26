@@ -72,8 +72,9 @@ static void nano_thread_pool_test(void)
     nano_tp_pool_bind_thread( pool , thread2 );
 
     //加入任务
-    nano_tp_pool_fast_add_task( "test" , "task1" , NANO_TP_TASK_ATTR_DEFAULT , 1000 , nano_tp_task_func , NULL );
-    nano_tp_pool_fast_add_task( "test" , "task2" , NANO_TP_TASK_ATTR_DEFAULT , 1000 , nano_tp_task_func , NULL );
+    nano_tp_pool_add_task( "test" , "task1" , NANO_TP_TASK_ATTR_DEFAULT , 1000 , nano_tp_task_func , NULL , NULL );
+    nano_tp_pool_add_task( "test" , "task2" , NANO_TP_TASK_ATTR_DEFAULT , 1000 , nano_tp_task_func , NULL , NULL );
+
 
     nano_tp_pool_start(pool);
 
@@ -82,8 +83,8 @@ static void nano_thread_pool_test(void)
 
 int main(void)
 {
-    thread_schudler_test();
-    // nano_thread_pool_test();
+    // thread_schudler_test();
+    nano_thread_pool_test();
     while(1);
     return -1;
 }

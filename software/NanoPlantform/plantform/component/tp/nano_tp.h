@@ -97,13 +97,14 @@ tp_err_t                nano_tp_thread_destroy(nano_tp_thread_handle_t thread);
 
 tp_err_t nano_tp_pool_bind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
 tp_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_handle_t thread);
-tp_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t* handle,nano_tp_task_desc_t* desc);
-tp_err_t nano_tp_pool_fast_add_task(const char* pool_name ,
-                                    const char* task_name ,
-                                    nano_tp_task_attr_t task_attr ,
-                                    uint16_t cycle_ms ,
-                                    tp_task_func_t task_func ,
-                                    void* user_ctx);
+tp_err_t nano_tp_pool_add_task_with_desc(nano_tp_pool_handle_t pool,nano_tp_task_handle_t* handle,nano_tp_task_desc_t* desc);
+tp_err_t nano_tp_pool_add_task( const char* pool_name ,
+                                const char* task_name ,
+                                nano_tp_task_attr_t task_attr ,
+                                uint16_t cycle_ms ,
+                                tp_task_func_t task_func ,
+                                void* user_ctx,
+                                nano_tp_task_handle_t* task_handle);
 tp_err_t nano_tp_remove_task(nano_tp_task_handle_t task);
 
 tp_err_t nano_tp_pool_start(nano_tp_pool_handle_t pool);

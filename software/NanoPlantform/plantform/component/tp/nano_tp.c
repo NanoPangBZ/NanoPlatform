@@ -333,13 +333,13 @@ tp_err_t nano_tp_pool_unbind_thread(nano_tp_pool_handle_t pool,nano_tp_thread_ha
 }
 
 /**
- * @brief 线程池添加任务
+ * @brief 通过线程池句柄和任务描述为线程池添加任务
  * @param pool 线程池句柄
  * @param handle 任务句柄指针
  * @param desc 任务描述
  * @return ERR_CODE_OK:成功 其他:失败
 */
-tp_err_t nano_tp_pool_add_task(nano_tp_pool_handle_t pool,nano_tp_task_handle_t* handle,nano_tp_task_desc_t* desc)
+tp_err_t nano_tp_pool_add_task_with_desc(nano_tp_pool_handle_t pool,nano_tp_task_handle_t* handle,nano_tp_task_desc_t* desc)
 {
 	nano_tp_task_handle_t task = NULL;
     nano_tp_node_t* task_node = NULL;
@@ -385,7 +385,7 @@ err_recycle:
 }
 
 /**
- * @brief 快速添加任务
+ * @brief 为线程池添加一个任务
  * @param pool_name 线程池名字
  * @param task_name 任务名字
  * @param task_attr 任务属性
@@ -394,12 +394,13 @@ err_recycle:
  * @param user_ctx 用户上下文
  * @return ERR_CODE_OK:成功 其他:失败
 */
-tp_err_t nano_tp_pool_fast_add_task(const char* pool_name ,
-                                    const char* task_name ,
-                                    nano_tp_task_attr_t task_attr ,
-                                    uint16_t cycle_ms ,
-                                    tp_task_func_t task_func ,
-                                    void* user_ctx)
+tp_err_t nano_tp_pool_add_task( const char* pool_name ,
+                                const char* task_name ,
+                                nano_tp_task_attr_t task_attr ,
+                                uint16_t cycle_ms ,
+                                tp_task_func_t task_func ,
+                                void* user_ctx,
+                                nano_tp_task_handle_t* task_handle)
 {
     nano_tp_node_t* pool_node = find_pool_node_by_name(g_nano_tp_pool_list,pool_name);
 
@@ -422,7 +423,7 @@ tp_err_t nano_tp_pool_fast_add_task(const char* pool_name ,
     desc.task_func = task_func;
     desc.user_ctx = user_ctx;
 
-    return nano_tp_pool_add_task(pool,NULL,&desc);
+    return nano_tp_pool_add_task_with_desc(pool,task_handle,&desc);
 }
 
 tp_err_t nano_tp_remove_task(nano_tp_task_handle_t task)
