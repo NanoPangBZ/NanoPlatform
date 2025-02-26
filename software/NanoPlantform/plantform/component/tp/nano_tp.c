@@ -9,12 +9,12 @@ DEFINE_STATIC_LIST( g_nano_tp_pool_list );
 DEFINE_STATIC_LIST( g_nano_tp_thread_list );
 
 /**
- * @brief 根据名字查找节点
+ * @brief 根据名字查找pool节点
  * @param list 节点列表
  * @param name 节点名字
  * @return 节点指针
 */
-static nano_tp_node_t* find_node_by_name(nano_tp_node_t* list,const char* name)
+static nano_tp_node_t* find_pool_node_by_name(nano_tp_node_t* list,const char* name)
 {
     FOREACH_NODE_IN_LIST(list,node)
     {
@@ -26,6 +26,19 @@ static nano_tp_node_t* find_node_by_name(nano_tp_node_t* list,const char* name)
     }
     return NULL;
 }
+
+// static nano_tp_node_t* find_thread_node_by_name(nano_tp_node_t* list,const char*name)
+// {
+//     FOREACH_NODE_IN_LIST(list,node)
+//     {
+//         nano_tp_thread_handle_t thread = (nano_tp_pool_handle_t)node->obj;
+//         if( strcmp(thread->desc.name,name) == 0 )
+//         {
+//             return node;
+//         }
+//     }
+//     return NULL;
+// }
 
 /**
  * @brief 创建一个nano_tp对象
@@ -388,7 +401,7 @@ tp_err_t nano_tp_pool_fast_add_task(const char* pool_name ,
                                     tp_task_func_t task_func ,
                                     void* user_ctx)
 {
-    nano_tp_node_t* pool_node = find_node_by_name(g_nano_tp_pool_list,pool_name);
+    nano_tp_node_t* pool_node = find_pool_node_by_name(g_nano_tp_pool_list,pool_name);
 
     if( pool_node == NULL )
     {
