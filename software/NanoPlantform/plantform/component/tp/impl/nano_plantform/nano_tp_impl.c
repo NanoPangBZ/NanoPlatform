@@ -28,21 +28,54 @@ uint32_t nano_tp_impl_get_sys_time(void)
 void nano_tp_impl_thread_create(nano_tp_impl_thread_handle_t* thread_handle, void (*thread_func)(void*), void* args, nano_tp_thread_attr_t attr)
 {
     nano_thread_stack_size_t stack_size = NANO_THREAD_SMALL_STACK_SIZE;
-    
-    if( attr & NANO_TP_THREAD_ATTR_BIG_STACK_SIZE )
+    nano_thread_priority_t prio = NANO_THREAD_LOW_PRIORITY;
+
+    nano_tp_thread_attr_t prio_attr = NANO_TP_THREAD_ATTR_GET_PRIO_ATTR( attr );
+    nano_tp_thread_attr_t stack_size_attr = NANO_TO_THREAD_ATTR_GET_STACK_ATTR( attr );
+
+    switch( stack_size_attr )
     {
-        stack_size = NANO_THREAD_BIG_STACK_SIZE;
+        case NANO_TP_THREAD_ATTR_DEFAULT_STACK_SIZE:
+            stack_size = NANO_THREAD_MID_STACK_SIZE;
+            break;
+        case NANO_TP_THREAD_ATTR_MIN_STACK_SIZE:
+            stack_size = NANO_THREAD_SMALL_STACK_SIZE;
+            break;
+        case NANO_TP_THREAD_ATTR_MID_STACK_SIZE:
+            stack_size = NANO_THREAD_MID_STACK_SIZE;
+            break;
+        case NANO_TP_THREAD_ATTR_BIG_STACK_SIZE:
+            stack_size = NANO_THREAD_BIG_STACK_SIZE;
+            break;
+        default:
+            stack_size = NANO_THREAD_SMALL_STACK_SIZE;
+            break;
     }
-    else if( attr & NANO_TP_THREAD_ATTR_LARG_STACK_SIZE )
+
+    switch( prio_attr )
     {
-        stack_size = NANO_THREAD_LARGE_STACK_SIZE;
+        case NANO_TP_THREAD_ATTR_DEFAULT_PRIO:
+            prio = NANO_THREAD_LOW_PRIORITY;
+            break;
+        case NANO_TP_THREAD_ATTR_LOW_PRIO:
+            prio = NANO_THREAD_VERY_LOW_PRIORITY;
+            break;
+        case NANO_TP_THREAD_ATTR_MID_PRIO:
+            prio = NANO_THRAD_MID_PRIORITY;
+            break;
+        case NANO_TP_THREAD_ATTR_HIGHT_PRIO:
+            prio = NANO_THREAD_VERY_HIGH_PRIORITY;
+            break;
+        default:
+            prio = NANO_THREAD_LOW_PRIORITY;
+            break;
     }
 
     nano_thread_create( thread_handle,
                         "thread_tp",
                         thread_func,
                         args,
-                        NANO_THRAD_MID_PRIORITY,
+                        prio,
                         stack_size);
 }
 

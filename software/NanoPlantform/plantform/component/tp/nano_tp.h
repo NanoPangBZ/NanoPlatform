@@ -43,16 +43,24 @@ typedef enum{
 }nano_tp_pool_attr_e;
 typedef uint32_t nano_tp_pool_attr_t;
 
-//线程池线程属性
-typedef enum{
-    NANO_TP_THREAD_ATTR_DEFAULT = 0x00,                 //默认属性
-    NANO_TP_THREAD_ATTR_BIG_STACK_SIZE = 0x01 << 1,     //大栈
-    NANO_TP_THREAD_ATTR_LARG_STACK_SIZE = 0x01 << 2,    //超大栈
-    NANO_TP_THREAD_ATTR_IMPORTANT = 0x01 << 3,          //重要线程
-    NANO_TP_THREAD_ATTR_REALTIME = 0x01 << 4,           //实时线程
-    NANO_TP_THREAD_ATTR_LONG_CYCLE = 0x01 << 5,         //长周期线程
-    NANO_TP_THREAD_ATTR_LOW_ACCURACY = 0x01 << 6,       //低精度线程
-}nano_tp_thread_attr_e;
+//线程属性栈大小属性
+#define NANO_TP_THREAD_ATTR_DEFAULT_STACK_SIZE      (0x00<<0)
+#define NANO_TP_THREAD_ATTR_MIN_STACK_SIZE          (0x01<<0)
+#define NANO_TP_THREAD_ATTR_MID_STACK_SIZE          (0x02<<0)
+#define NANO_TP_THREAD_ATTR_BIG_STACK_SIZE          (0x03<<0)
+#define NANO_TO_THREAD_ATTR_GET_STACK_ATTR(attr)    ((3u<<0)&attr)
+//线程优先级属性
+#define NANO_TP_THREAD_ATTR_DEFAULT_PRIO        (0x00<<2)
+#define NANO_TP_THREAD_ATTR_LOW_PRIO            (0x01<<2)
+#define NANO_TP_THREAD_ATTR_MID_PRIO            (0x02<<2)
+#define NANO_TP_THREAD_ATTR_HIGHT_PRIO          (0x03<<2)
+#define NANO_TP_THREAD_ATTR_GET_PRIO_ATTR(attr) ((3u<<2)&attr)
+//线程栈内存属性
+#define NANO_TP_THREAD_ATTR_DEFAUT_STACK_MEM        (0x00<<4)
+#define NANO_TP_THREAD_ATTR_STACK_FAST_ACCESS_MEM   (0x01<<4)
+#define NANO_TP_THREAD_ATTR_GET_STACK_MEM(attr)     ((1u<<4)&attr)
+
+#define NANO_TP_THREAD_DEFAULT_ATTR (0)
 typedef uint32_t nano_tp_thread_attr_t;
 
 /***************************描述定义******************************/

@@ -26,31 +26,45 @@ uint32_t nano_tp_impl_get_sys_time(void)
 void nano_tp_impl_thread_create(nano_tp_impl_thread_handle_t* thread_handle, void (*thread_func)(void*), void* args, nano_tp_thread_attr_t attr)
 {
     size_t stack_size = 0;
-    if( attr & NANO_TP_THREAD_ATTR_BIG_STACK_SIZE )
+    UBaseType_t priority = 0;
+    nano_tp_thread_attr_t prio_attr = NANO_TP_THREAD_ATTR_GET_PRIO_ATTR( attr );
+    nano_tp_thread_attr_t stack_size_attr = NANO_TO_THREAD_ATTR_GET_STACK_ATTR( attr );
+
+    switch( stack_size_attr )
     {
-        stack_size = 8 * 1024;
-    }
-    else if( attr & NANO_TP_THREAD_ATTR_LARG_STACK_SIZE )
-    {
-        stack_size = 12 * 1024;
-    }
-    else
-    {
-        stack_size = 4 * 1024;
+        case NANO_TP_THREAD_ATTR_DEFAULT_STACK_SIZE:
+            stack_size = 6 * 1024;
+            break;
+        case NANO_TP_THREAD_ATTR_MIN_STACK_SIZE:
+            stack_size = 4 * 1024;
+            break;
+        case NANO_TP_THREAD_ATTR_MID_STACK_SIZE:
+            stack_size = 8 * 1024;
+            break;
+        case NANO_TP_THREAD_ATTR_BIG_STACK_SIZE:
+            stack_size = 12 * 1024;
+            break;
+        default:
+            stack_size = 6 * 1024;
     }
 
-    UBaseType_t priority = 0;
-    if( attr & NANO_TP_THREAD_ATTR_IMPORTANT )
+    switch( prio_attr )
     {
-        priority = configMAX_PRIORITIES - 1;
-    }
-    else if( attr & NANO_TP_THREAD_ATTR_REALTIME )
-    {
-        priority = configMAX_PRIORITIES * 3 / 4;
-    }
-    else
-    {
-        priority = configMAX_PRIORITIES / 2;
+        case NANO_TP_THREAD_ATTR_DEFAULT_PRIO:
+            priority = configMAX_PRIORITIES  / 2;
+            break;
+        case NANO_TP_THREAD_ATTR_LOW_PRIO:
+            priority = configMAX_PRIORITIES / 4;
+            break;
+        case NANO_TP_THREAD_ATTR_MID_PRIO:
+            priority = configMAX_PRIORITIES / 2 + 1;
+            break;
+        case NANO_TP_THREAD_ATTR_HIGHT_PRIO:
+            priority = configMAX_PRIORITIES * 4 / 5;
+            break;
+        default:
+            priority = configMAX_PRIORITIES / 2;
+            break;
     }
 
     TaskHandle_t rtos_handle;

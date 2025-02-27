@@ -71,8 +71,8 @@ static void thread_pool_init(void)
 
 
     //线程描述和创建
-    nano_tp_thread_desc_t rt_thread_desc = { .name = "rt_thread" , .thread_attr = NANO_TP_THREAD_ATTR_IMPORTANT , .freq = 200 };
-    nano_tp_thread_desc_t app_thread_desc = { .name = "app_thread" , .thread_attr = NANO_TP_THREAD_ATTR_DEFAULT , .freq = 100 };
+    nano_tp_thread_desc_t rt_thread_desc = { .name = "rt_thread" , .thread_attr = NANO_TP_THREAD_DEFAULT_ATTR , .freq = 200 };
+    nano_tp_thread_desc_t app_thread_desc = { .name = "app_thread" , .thread_attr = NANO_TP_THREAD_DEFAULT_ATTR , .freq = 100 };
 
     rt_thread = nano_tp_thread_create( &rt_thread_desc );
     app_thread = nano_tp_thread_create( &app_thread_desc );

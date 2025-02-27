@@ -9,7 +9,7 @@ const uint32_t nano_thread_priority_map[] = {
 };
 
 const uint32_t nano_thread_stack_size_map[] = {
-    512, 1024, 2*1024 , 4*4024, 8*1024,
+    1024, 2*1024, 4*1024 , 8*4024, 16*1024,
 };
 
 void xPortPendSVHandler( void );
