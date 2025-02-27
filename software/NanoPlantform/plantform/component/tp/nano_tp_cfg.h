@@ -7,6 +7,7 @@
 #define NANO_TP_USE_NANO_PLTFM  //使用nano_plantform的api进行实现
 // #define NANO_TP_USE_UNIX_IMPL       //使用UNIX的api进行实现
 // #define NANO_TP_USE_WIN32_IMPL      //使用win32的api进行实现
+// #define NANO_TP_USE_ESP_IDF          //使用esp-idf framework
 
 
 /********************错误类型配置*********************************/
