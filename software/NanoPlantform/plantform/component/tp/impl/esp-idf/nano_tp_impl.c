@@ -4,9 +4,9 @@
 
 #include "nano_tp_impl.h"
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
+#include "freeRTOS/FreeRTOS.h"
+#include "freeRTOS/task.h"
+#include "freeRTOS/semphr.h"
 
 void* nano_tp_impl_malloc(uint32_t size)
 {
@@ -103,7 +103,7 @@ void nano_tp_impl_lock_destroy(nano_tp_impl_lock_handle_t lock_handle)
 tp_err_t nano_tp_impl_lock_lock(nano_tp_impl_lock_handle_t lock_handle)
 {
     SemaphoreHandle_t rtos_handle = (SemaphoreHandle_t)lock_handle;
-    if (xPortIsInsideInterrupt())
+    if (xPortInIsrContext())
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         xSemaphoreGiveFromISR(rtos_handle, &xHigherPriorityTaskWoken);
@@ -122,7 +122,7 @@ tp_err_t nano_tp_impl_lock_lock(nano_tp_impl_lock_handle_t lock_handle)
 void nano_tp_impl_lock_unlock(nano_tp_impl_lock_handle_t lock_handle)
 {
     SemaphoreHandle_t rtos_handle = (SemaphoreHandle_t)lock_handle;
-    if (xPortIsInsideInterrupt())
+    if (xPortInIsrContext())
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         xSemaphoreGiveFromISR(rtos_handle, &xHigherPriorityTaskWoken);
@@ -140,7 +140,7 @@ void nano_tp_impl_lock_unlock(nano_tp_impl_lock_handle_t lock_handle)
 tp_err_t nano_tp_impl_lock_try_lock(nano_tp_impl_lock_handle_t lock_handle, uint32_t timeout_ms)
 {
     SemaphoreHandle_t rtos_handle = (SemaphoreHandle_t)lock_handle;
-    if( xPortIsInsideInterrupt() )
+    if( xPortInIsrContext() )
     {
         return ERR_CODE_FAIL;
     }
