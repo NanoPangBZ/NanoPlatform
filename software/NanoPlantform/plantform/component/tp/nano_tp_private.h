@@ -54,6 +54,7 @@ struct nano_tp_thread_t
 {
     nano_tp_impl_thread_handle_t thread_impl_handle;
     nano_tp_thread_desc_t   desc;
+    uint16_t    cycle_ms;
     DEFINE_LIST(bind_pool_list);
 };
 

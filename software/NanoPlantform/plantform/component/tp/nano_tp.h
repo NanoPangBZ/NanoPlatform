@@ -67,6 +67,7 @@ typedef struct{
 typedef struct{
     const char* name;
     nano_tp_thread_attr_t thread_attr;
+    uint16_t freq;
 }nano_tp_thread_desc_t;
 
 //线程池任务属性

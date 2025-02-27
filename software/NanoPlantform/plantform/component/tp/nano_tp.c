@@ -208,6 +208,7 @@ nano_tp_thread_handle_t nano_tp_thread_create(nano_tp_thread_desc_t* desc)
     ADD_NODE_TO_LIST( g_nano_tp_thread_list , node );
 
     //对象的初始化
+    thread->cycle_ms = 1000 / thread->desc.freq;
     nano_tp_impl_thread_create( &thread->thread_impl_handle , nano_tp_thread_func , thread , thread->desc.thread_attr );
 
     return thread;

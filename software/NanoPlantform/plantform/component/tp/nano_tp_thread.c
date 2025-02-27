@@ -54,28 +54,7 @@ void nano_tp_thread_func(void* args)
             }
         }
 
-        uint32_t sleep_time = 0;
-        if( thread->desc.thread_attr & NANO_TP_THREAD_ATTR_REALTIME )
-        {
-            //500Hz轮询
-            sleep_time = 2;
-        }
-        else if( thread->desc.thread_attr & NANO_TP_THREAD_ATTR_LONG_CYCLE )
-        {
-            //1Hz轮询
-            sleep_time = 1000;
-        }
-        else if( thread->desc.thread_attr & NANO_TP_THREAD_ATTR_LOW_ACCURACY )
-        {
-            //20Hz轮询
-            sleep_time = 50;
-        }
-        else
-        {
-            //100Hz轮询
-            sleep_time = 10;
-        }
-        nano_tp_impl_thread_sleep(sleep_time);
+        nano_tp_impl_thread_sleep(thread->cycle_ms);
     }
 }
 

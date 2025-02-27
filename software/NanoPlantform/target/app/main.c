@@ -49,42 +49,52 @@ static nano_err_t nano_tp_task_func(void* args)
     return NANO_OK;
 }
 
-static void nano_thread_pool_test(void)
-{
-    nano_plantform_init();
 
+static void thread_pool_init(void)
+{
     nano_tp_init();
 
-    nano_tp_pool_desc_t pool_desc;
-    nano_tp_thread_desc_t thread_desc;
+    nano_tp_pool_handle_t drv_pool = NULL;
+    nano_tp_pool_handle_t svc_pool = NULL;
+    nano_tp_pool_handle_t app_pool = NULL;
+    nano_tp_thread_handle_t rt_thread = NULL;
+    nano_tp_thread_handle_t app_thread = NULL;
 
-    pool_desc.name = "test";
+    //线程池描述和创建
+    nano_tp_pool_desc_t driver_pool_desc = { .name = "drv_pool", .pool_attr = NANO_TP_POOL_ATTR_DEFAULT };
+    nano_tp_pool_desc_t service_pool_desc = { .name = "svc_pool", .pool_attr = NANO_TP_POOL_ATTR_DEFAULT };
+    nano_tp_pool_desc_t app_pool_desc = { .name = "app_pool", .pool_attr = NANO_TP_POOL_ATTR_DEFAULT };
 
-    //创建池和线程
-    nano_tp_pool_handle_t pool =  nano_tp_pool_create(&pool_desc);
-    thread_desc.name = "thread1";
-    thread_desc.thread_attr = NANO_TP_THREAD_ATTR_DEFAULT;
-    nano_tp_thread_handle_t thread = nano_tp_thread_create(&thread_desc);
-    thread_desc.name = "thread2";
-    thread_desc.thread_attr = NANO_TP_THREAD_ATTR_LONG_CYCLE;
-    nano_tp_thread_handle_t thread2 = nano_tp_thread_create(&thread_desc);
-    nano_tp_pool_bind_thread( pool , thread );
-    nano_tp_pool_bind_thread( pool , thread2 );
-
-    //加入任务
-    nano_tp_pool_add_task( "test" , "task1" , NANO_TP_TASK_ATTR_DEFAULT , 1000 , nano_tp_task_func , NULL , NULL );
-    nano_tp_pool_add_task( "test" , "task2" , NANO_TP_TASK_ATTR_DEFAULT , 1000 , nano_tp_task_func , NULL , NULL );
+    drv_pool = nano_tp_pool_create( &driver_pool_desc );
+    svc_pool = nano_tp_pool_create( &service_pool_desc );
+    app_pool = nano_tp_pool_create( &app_pool_desc );
 
 
-    nano_tp_pool_start(pool);
+    //线程描述和创建
+    nano_tp_thread_desc_t rt_thread_desc = { .name = "rt_thread" , .thread_attr = NANO_TP_THREAD_ATTR_IMPORTANT , .freq = 200 };
+    nano_tp_thread_desc_t app_thread_desc = { .name = "app_thread" , .thread_attr = NANO_TP_THREAD_ATTR_DEFAULT , .freq = 100 };
 
-    nano_plantform_start();
+    rt_thread = nano_tp_thread_create( &rt_thread_desc );
+    app_thread = nano_tp_thread_create( &app_thread_desc );
+
+    //线程与池的绑定
+    nano_tp_pool_bind_thread( drv_pool , rt_thread );
+    nano_tp_pool_bind_thread( svc_pool , rt_thread );
+    nano_tp_pool_bind_thread( svc_pool , app_thread );
+    nano_tp_pool_bind_thread( app_pool , app_thread );
+
+    //启动线程池
+    nano_tp_pool_start(drv_pool);
+    nano_tp_pool_start(svc_pool);
+    nano_tp_pool_start(app_pool);
 }
 
 int main(void)
 {
     // thread_schudler_test();
-    nano_thread_pool_test();
+    nano_plantform_init();
+    thread_pool_init();
+    nano_plantform_start();
     while(1);
     return -1;
 }
