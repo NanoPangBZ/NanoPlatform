@@ -250,13 +250,6 @@ static nano_tp_task_handle_t nano_tp_task_create(nano_tp_task_desc_t* desc)
         goto err_recycle;
     }
 
-    //创建节点
-    node = create_node( task );
-    if( node == NULL )
-    {
-        goto err_recycle;
-    }
-
     //全局不保存任务节点，由pool对象自行保存
 
     //初始化对象
@@ -268,10 +261,6 @@ err_recycle:
     if( task != NULL )
     {
         destroy_nano_tp_obj( NANO_TP_TASK_OBJ , task );
-    }
-    if( node != NULL )
-    {
-        destroy_node(node);
     }
     return NULL;
 }
