@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "nano_tp.h"
+#include "../nano_tp.h"
 
 typedef void* nano_tp_impl_thread_handle_t;
 typedef void* nano_tp_impl_lock_handle_t;

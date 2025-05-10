@@ -251,8 +251,7 @@
           "plantform/core/scheduler/freertos/include",
           "plantform/core/scheduler/freertos/portable/GCC/ARM_CM4F",
           "plantform/core/scheduler",
-          "plantform/component/tp",
-          "plantform/component/tp/impl"
+          "plantform/component/tp"
         ],
         "libList": [],
         "defineList": [

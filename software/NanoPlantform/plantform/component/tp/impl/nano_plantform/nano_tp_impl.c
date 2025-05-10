@@ -4,7 +4,7 @@
 
 #include "nano_tp.h"
 #include "nano_tp_private.h"
-#include "nano_tp_impl.h"
+#include "../nano_tp_impl.h"
 
 #include "nano_heap.h"
 #include "nano_scheduler.h"
