@@ -32,6 +32,14 @@ CFLAGS += $(TARGET_INC_DIRS)
 LDFLAGS ?=
 LDLIBS ?=
 
+ifeq ($(OS),Windows_NT)
+MKDIR_P = if not exist "$(subst /,\,$(1))" mkdir "$(subst /,\,$(1))"
+RMDIR_R = if exist "$(subst /,\,$(1))" rmdir /S /Q "$(subst /,\,$(1))"
+else
+MKDIR_P = mkdir -p "$(1)"
+RMDIR_R = rm -rf "$(1)"
+endif
+
 .PHONY: all clean print-target
 
 all: $(APP)
@@ -41,12 +49,12 @@ print-target:
 	@echo TARGET_MK=$(TARGET_MK)
 
 $(APP): $(OBJS)
-	@mkdir -p $(dir $@)
+	@$(call MKDIR_P,$(dir $@))
 	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@
 
 $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.c
-	@mkdir -p $(dir $@)
+	@$(call MKDIR_P,$(dir $@))
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) -r $(BUILD_DIR)
+	@$(call RMDIR_R,$(BUILD_DIR))
