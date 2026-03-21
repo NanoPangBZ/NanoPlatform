@@ -11,23 +11,24 @@ $(error Invalid target '$(TARGET)'. Available targets: $(AVAILABLE_TARGETS))
 endif
 
 include $(TARGET_MK)
+include $(PROJECT_SRC_DIR)framework/frmwk.mk
 
 BUILD_DIR ?= $(ROOT_DIR)build/$(TARGET)
 OBJ_DIR := $(BUILD_DIR)/obj
 APP := $(BUILD_DIR)/nano_platform.elf
 
-CORE_SRCS := \
-	$(PROJECT_SRC_DIR)main.c \
-	$(PROJECT_SRC_DIR)framework/impl/nano_framework_core.c \
-	$(PROJECT_SRC_DIR)arch/gd32f4/arch_cpu.c
+MAIN_SRCS := \
+	$(PROJECT_SRC_DIR)main.c
 
-SDK_SRCS += $(PLT_SDK_SRCS)
-SRCS := $(CORE_SRCS) $(SDK_SRCS)
-OBJS := $(patsubst $(PROJECT_SRC_DIR)%.c,$(OBJ_DIR)/%.o,$(SRCS))
+SRCS := $(MAIN_SRCS) $(FRMWK_SRCS) $(TARGET_SRCS)
+OBJS_C := $(patsubst $(PROJECT_SRC_DIR)%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(SRCS)))
+OBJS_S_CAP := $(patsubst $(PROJECT_SRC_DIR)%.S,$(OBJ_DIR)/%.o,$(filter %.S,$(SRCS)))
+OBJS_S_LOW := $(patsubst $(PROJECT_SRC_DIR)%.s,$(OBJ_DIR)/%.o,$(filter %.s,$(SRCS)))
+OBJS := $(OBJS_C) $(OBJS_S_CAP) $(OBJS_S_LOW)
 
 CFLAGS ?= -O0 -g3 -Wall -Wextra -std=c11
-CFLAGS += -I$(PROJECT_SRC_DIR)
-CFLAGS += $(TARGET_INC_DIRS)
+CFLAGS += -I$(PROJECT_SRC_DIR) $(FRMWK_INC_DIRS) $(TARGET_INC_DIRS)
+CFLAGS += $(TARGET_CFLAGS)
 
 LDFLAGS ?=
 LDLIBS ?=
@@ -53,6 +54,14 @@ $(APP): $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@
 
 $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.c
+	@$(call MKDIR_P,$(dir $@))
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.S
+	@$(call MKDIR_P,$(dir $@))
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.s
 	@$(call MKDIR_P,$(dir $@))
 	$(CC) $(CFLAGS) -c $< -o $@
 
