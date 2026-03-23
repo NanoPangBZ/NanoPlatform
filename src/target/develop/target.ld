@@ -65,29 +65,6 @@ SECTIONS
     __exidx_end = .;
   } >FLASH
 
-  /*这里感觉像需要预加载的一些全局变量啥的 加载域??*/
-  .preinit_array     :
-  {
-    PROVIDE_HIDDEN (__preinit_array_start = .);
-    KEEP (*(.preinit_array*))
-    PROVIDE_HIDDEN (__preinit_array_end = .);
-  } >FLASH
-  .init_array :
-  {
-    PROVIDE_HIDDEN (__init_array_start = .);
-    KEEP (*(SORT(.init_array.*)))
-    KEEP (*(.init_array*))
-    PROVIDE_HIDDEN (__init_array_end = .);
-  } >FLASH
-  .fini_array :
-  {
-    PROVIDE_HIDDEN (__fini_array_start = .);
-    KEEP (*(SORT(.fini_array.*)))
-    KEEP (*(.fini_array*))
-    PROVIDE_HIDDEN (__fini_array_end = .);
-  } >FLASH
-
-  /* _sidata相对于一个变量，用于给启动文件初始化这块内存 */
   _sidata = LOADADDR(.data);
 
   /* LMA - > 装载内存地址 */
