@@ -15,7 +15,7 @@ include $(PROJECT_SRC_DIR)framework/frmwk.mk
 
 BUILD_DIR ?= $(ROOT_DIR)build/$(TARGET)
 OBJ_DIR := $(BUILD_DIR)/obj
-APP := $(BUILD_DIR)/nano_platform.elf
+APP := $(BUILD_DIR)/$(TARGET).elf
 BUILD_LOG := $(BUILD_DIR)/.build.log
 BUILD_TIME_FILE := $(BUILD_DIR)/.build.start
 
