@@ -20,7 +20,9 @@ TARGET_INC_DIRS += $(PLT_SDK_INC_DIRS)
 TARGET_SRCS += $(PLT_SDK_SRCS)
 
 # 全局宏定义
+TARGET_CFLAGS += $(PLT_SDK_CFLAGS)
 TARGET_CFLAGS += -DGD32F427
 
 # Use the target-local linker script; nosys.specs provides _exit stub for bare-metal
-LDFLAGS += -T$(TARGET_DIR)target.ld --specs=nosys.specs
+LDFLAGS += $(PLT_SDK_LDFLAGS)
+LDFLAGS += -T$(TARGET_DIR)target.ld
