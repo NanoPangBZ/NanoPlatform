@@ -9,6 +9,9 @@ PLT_SDK_INC_DIRS += -I$(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Include
 #CMSIS-Core
 PLT_SDK_SRCS += $(PLT_SDK_DIR)CMSIS/GD/GD32F4xx/Source/system_gd32f4xx.c
 
+#GD32F4xx libc
+PLT_SDK_SRCS += $(PLT_SDK_DIR)gd32f4xx_libc_file.c
+
 #编译器附加选项
 PLT_SDK_CFLAGS += -mcpu=cortex-m4 -mthumb
 
