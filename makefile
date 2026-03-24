@@ -53,6 +53,13 @@ endif
 
 REL_PATH = $(patsubst $(ROOT_DIR)%,%,$(1))
 
+ifeq ($(OS),Windows_NT)
+define BUILD_OBJECT_RULE
+	@$(call MKDIR_P,$(dir $@))
+	@echo [INFO] [$(call REL_PATH,$<)]
+	@$(1) >> "$(BUILD_LOG)" 2>&1 || (echo [ERROR] Compile failed: $(call REL_PATH,$<) & exit /b 1)
+endef
+else
 define PRINT_TOOL_OUTPUT
 if [ -s "$$tmp_log" ]; then \
 	awk 'BEGIN { warn = "$(COLOR_WARN)"; err = "$(COLOR_ERROR)"; reset = "$(COLOR_RESET)" } /warning:/ { print warn $$0 reset; next } /error:|fatal error:|dangerous relocation|undefined reference/ { print err $$0 reset; next } { print $$0 }' "$$tmp_log"; \
@@ -71,30 +78,39 @@ define BUILD_OBJECT_RULE
 	else \
 		cat "$$tmp_log" >> "$(BUILD_LOG)"; \
 		$(PRINT_TOOL_OUTPUT); \
-		printf '%b\n' "$(COLOR_ERROR)[ERROR]$(COLOR_RESET) 编译失败: $(call REL_PATH,$<)"; \
+		printf '%b\n' "$(COLOR_ERROR)[ERROR]$(COLOR_RESET) Compile failed: $(call REL_PATH,$<)"; \
 		rm -f "$$tmp_log"; \
 		exit 1; \
 	fi
 endef
+endif
 
 .PHONY: all clean print-target prepare
 
 all: $(APP)
 
+ifeq ($(OS),Windows_NT)
+prepare:
+	@$(call MKDIR_P,$(BUILD_DIR))
+	@type NUL > "$(BUILD_LOG)"
+	@powershell -NoProfile -Command "[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()" > "$(BUILD_TIME_FILE)"
+
+$(APP): $(OBJS) | prepare
+	@$(call MKDIR_P,$(dir $@))
+	@echo [INFO] Linking target: $(APP)
+	@$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@ >> "$(BUILD_LOG)" 2>&1 || (echo [ERROR] Link failed: $(APP) & exit /b 1)
+	@echo [SUCCESS] Build completed
+	@echo [INFO] Target path: $(APP)
+else
 prepare:
 	@$(call MKDIR_P,$(BUILD_DIR))
 	@: > "$(BUILD_LOG)"
 	@date +%s > "$(BUILD_TIME_FILE)"
 
-print-target:
-	@echo TARGET=$(TARGET)
-	@echo TARGET_MK=$(TARGET_MK)
-
-
 $(APP): $(OBJS) | prepare
 	@$(call MKDIR_P,$(dir $@))
 	@tmp_log=$$(mktemp "$(BUILD_DIR)/.link.XXXXXX"); \
-	printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) 链接目标: $(APP)"; \
+	printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) Linking target: $(APP)"; \
 	if $(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@ >"$$tmp_log" 2>&1; then \
 		cat "$$tmp_log" >> "$(BUILD_LOG)"; \
 		$(PRINT_TOOL_OUTPUT); \
@@ -105,17 +121,22 @@ $(APP): $(OBJS) | prepare
 		elapsed=$$((end_time - start_time)); \
 		minutes=$$((elapsed / 60)); \
 		seconds=$$((elapsed % 60)); \
-		printf '%b\n' "$(COLOR_SUCCESS)[SUCCESS]$(COLOR_RESET) 构建完成"; \
-		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) 警告: $$warnings, 错误: $$errors, 耗时: $$(printf '%02d:%02d' $$minutes $$seconds)"; \
-		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) 目标路径: $(APP)"; \
+		printf '%b\n' "$(COLOR_SUCCESS)[SUCCESS]$(COLOR_RESET) Build completed"; \
+		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) Warnings: $$warnings, Errors: $$errors, Duration: $$(printf '%02d:%02d' $$minutes $$seconds)"; \
+		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) Target path: $(APP)"; \
 		rm -f "$$tmp_log"; \
 	else \
 		cat "$$tmp_log" >> "$(BUILD_LOG)"; \
 		$(PRINT_TOOL_OUTPUT); \
-		printf '%b\n' "$(COLOR_ERROR)[ERROR]$(COLOR_RESET) 链接失败: $(APP)"; \
+		printf '%b\n' "$(COLOR_ERROR)[ERROR]$(COLOR_RESET) Link failed: $(APP)"; \
 		rm -f "$$tmp_log"; \
 		exit 1; \
 	fi
+endif
+
+print-target:
+	@echo TARGET=$(TARGET)
+	@echo TARGET_MK=$(TARGET_MK)
 
 $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.c | prepare
 	$(call BUILD_OBJECT_RULE,$(CC) $(CFLAGS) -c $< -o $@)
