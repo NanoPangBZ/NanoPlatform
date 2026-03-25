@@ -59,7 +59,12 @@ SECTIONS
     __systick_function_regedit_end = .;
 
     . = ALIGN(4);
-    _etext = .;        /* define a global symbols at end of code */
+
+    /* 平台函数组注册表 */
+    __nano_function_regedit_start = .;
+    *(__nano_function_regedit)
+    __nano_function_regedit_end = .;
+    
   } >FLASH
 
   /* Constant data goes into FLASH */
