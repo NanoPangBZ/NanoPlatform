@@ -16,6 +16,9 @@ include $(PROJECT_SRC_DIR)framework/frmwk.mk
 BUILD_DIR ?= $(ROOT_DIR)build/$(TARGET)
 OBJ_DIR := $(BUILD_DIR)/obj
 APP := $(BUILD_DIR)/$(TARGET).elf
+APP_BIN := $(BUILD_DIR)/$(TARGET).bin
+APP_HEX := $(BUILD_DIR)/$(TARGET).hex
+APP_MAP := $(BUILD_DIR)/$(TARGET).map
 BUILD_LOG := $(BUILD_DIR)/.build.log
 BUILD_TIME_FILE := $(BUILD_DIR)/.build.start
 
@@ -98,9 +101,14 @@ prepare:
 $(APP): $(OBJS) | prepare
 	@$(call MKDIR_P,$(dir $@))
 	@echo [INFO] Linking target: $(APP)
-	@$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@ >> "$(BUILD_LOG)" 2>&1 || (echo [ERROR] Link failed: $(APP) & exit /b 1)
+	@$(CC) $(OBJS) $(LDFLAGS) -Wl,-Map,$(APP_MAP) $(LDLIBS) -o $@ >> "$(BUILD_LOG)" 2>&1 || (echo [ERROR] Link failed: $(APP) & exit /b 1)
+	@$(OBJCOPY) -O binary $@ $(APP_BIN) >> "$(BUILD_LOG)" 2>&1 || (echo [ERROR] Generate binary failed: $(APP_BIN) & exit /b 1)
+	@$(OBJCOPY) -O ihex $@ $(APP_HEX) >> "$(BUILD_LOG)" 2>&1 || (echo [ERROR] Generate hex failed: $(APP_HEX) & exit /b 1)
 	@echo [SUCCESS] Build completed
 	@echo [INFO] Target path: $(APP)
+	@echo [INFO] BIN path: $(APP_BIN)
+	@echo [INFO] HEX path: $(APP_HEX)
+	@echo [INFO] MAP path: $(APP_MAP)
 else
 prepare:
 	@$(call MKDIR_P,$(BUILD_DIR))
@@ -111,7 +119,21 @@ $(APP): $(OBJS) | prepare
 	@$(call MKDIR_P,$(dir $@))
 	@tmp_log=$$(mktemp "$(BUILD_DIR)/.link.XXXXXX"); \
 	printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) Linking target: $(APP)"; \
-	if $(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@ >"$$tmp_log" 2>&1; then \
+	if $(CC) $(OBJS) $(LDFLAGS) -Wl,-Map,$(APP_MAP) $(LDLIBS) -o $@ >"$$tmp_log" 2>&1; then \
+		if ! $(OBJCOPY) -O binary $@ $(APP_BIN) >>"$$tmp_log" 2>&1; then \
+			cat "$$tmp_log" >> "$(BUILD_LOG)"; \
+			$(PRINT_TOOL_OUTPUT); \
+			printf '%b\n' "$(COLOR_ERROR)[ERROR]$(COLOR_RESET) Generate binary failed: $(APP_BIN)"; \
+			rm -f "$$tmp_log"; \
+			exit 1; \
+		fi; \
+		if ! $(OBJCOPY) -O ihex $@ $(APP_HEX) >>"$$tmp_log" 2>&1; then \
+			cat "$$tmp_log" >> "$(BUILD_LOG)"; \
+			$(PRINT_TOOL_OUTPUT); \
+			printf '%b\n' "$(COLOR_ERROR)[ERROR]$(COLOR_RESET) Generate hex failed: $(APP_HEX)"; \
+			rm -f "$$tmp_log"; \
+			exit 1; \
+		fi; \
 		cat "$$tmp_log" >> "$(BUILD_LOG)"; \
 		$(PRINT_TOOL_OUTPUT); \
 		warnings=$$(grep -Eic 'warning:' "$(BUILD_LOG)" || true); \
@@ -124,6 +146,9 @@ $(APP): $(OBJS) | prepare
 		printf '%b\n' "$(COLOR_SUCCESS)[SUCCESS]$(COLOR_RESET) Build completed"; \
 		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) Warnings: $$warnings, Errors: $$errors, Duration: $$(printf '%02d:%02d' $$minutes $$seconds)"; \
 		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) Target path: $(APP)"; \
+		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) BIN path: $(APP_BIN)"; \
+		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) HEX path: $(APP_HEX)"; \
+		printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) MAP path: $(APP_MAP)"; \
 		rm -f "$$tmp_log"; \
 	else \
 		cat "$$tmp_log" >> "$(BUILD_LOG)"; \
