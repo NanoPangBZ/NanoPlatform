@@ -10,10 +10,12 @@ PLT_SDK_INC_DIRS += -I$(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Include
 PLT_SDK_SRCS += $(PLT_SDK_DIR)CMSIS/GD/GD32F4xx/Source/system_gd32f4xx.c
 
 #GD32F4xx标准外设库
-#todo
+PLT_SDK_SRCS += $(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c
+PLT_SDK_SRCS += $(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c
 
 #GD32F4xx arch抽象层
 PLT_SDK_SRCS += $(PLT_SDK_DIR)arch/arch_init.c
+PLT_SDK_SRCS += $(PLT_SDK_DIR)arch/arch_uart.c
 
 #GD32F4xx libc
 PLT_SDK_SRCS += $(PLT_SDK_DIR)gd32f4xx_libc_file.c
