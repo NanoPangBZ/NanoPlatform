@@ -33,7 +33,10 @@ void enter_nano_framework( void )
     /* 注册系统tick中断处理函数 */
     arch_set_systick_handler(nano_framework_core_tick_handler);
 
-
-
     while(1);
+}
+
+uint32_t nano_framework_time_ms(void)
+{
+    return s_tick_count;
 }

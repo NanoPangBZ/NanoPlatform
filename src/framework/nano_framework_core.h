@@ -8,8 +8,9 @@
 typedef struct systick_function_item_t{
     const char* name;
     void (*function)(void);
-    uint32_t reserved:32; // Reserved for future use, ensuring 32-bit alignment
 }systick_function_item_t;
+
+#define SYSTICK_ITEM_SIZE sizeof(systick_function_item_t)
 
 #pragma pack()
 
@@ -19,10 +20,9 @@ typedef struct systick_function_item_t{
  * @param _func 函数指针
 */
 #define DEFINE_SYSTICK_FUNCTION_ITEM( _func ) \
-    __attribute__(( used , section("__systick_function_regedit"))) static const systick_function_item_t __function_item_##_func = { \
+    __attribute__(( used , section("__systick_function_regedit") , aligned(4) )) static const systick_function_item_t __function_item_##_func = { \
         .name = #_func, \
-        .function = _func, \
-        .reserved = 0 \
+        .function = _func \
     }
 
 #ifdef __cplusplus
