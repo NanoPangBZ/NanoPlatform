@@ -21,6 +21,12 @@ void arch_init(void);
 */
 void arch_set_systick_handler(void (*handler)(void));
 
+/**
+ * @brief 获取系统tick计数值
+ * @return 当前系统tick计数值
+*/
+uint32_t arch_get_tick(void);
+
 #ifdef __cplusplus
 }
 #endif

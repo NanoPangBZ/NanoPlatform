@@ -5,6 +5,7 @@
 #include "gd32f4xx_rcu.h"
 
 static void (*s_systick_handler)(void) = NULL;
+static uint32_t s_tick_count = 0;
 
 void arch_init(void)
 {
@@ -23,8 +24,14 @@ void arch_set_systick_handler(void (*handler)(void))
     s_systick_handler = handler;
 }
 
+uint32_t arch_get_tick(void)
+{
+    return s_tick_count;
+}
+
 void SysTick_Handler(void)
 {
+    s_tick_count++;
     if (s_systick_handler)
     {
         s_systick_handler();

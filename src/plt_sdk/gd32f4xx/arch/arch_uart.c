@@ -1,5 +1,5 @@
 #include "arch/arch_uart.h"
-#include "framework/nano_framework_core.h"
+#include "arch/arch_init.h"
 #include "gd32f4xx_usart.h"
 
 static const uint32_t uart_periph[] = {
@@ -32,10 +32,10 @@ int arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer
     int ret = buffer_len;
     while( buffer_len != 0 )
     {
-        uint32_t tick_start = nano_framework_time_ms();
+        uint32_t tick_start = arch_get_tick();
         while ( usart_flag_get( uart_periph[port] , USART_FLAG_RBNE ) == RESET )
         {
-            if( (nano_framework_time_ms() - tick_start) >= timeout_ms )
+            if( (arch_get_tick() - tick_start) >= timeout_ms )
             {
                 return 0;
             }
