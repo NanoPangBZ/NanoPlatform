@@ -48,6 +48,20 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
+  /* 平台私有段 */
+  .nano_platform_area :
+  {
+    . = ALIGN(4);
+
+    /* 平台心跳函数注册表 */
+    __systick_function_regedit_start = .;
+    *(__systick_function_regedit)
+    __systick_function_regedit_end = .;
+
+    . = ALIGN(4);
+    _etext = .;        /* define a global symbols at end of code */
+  } >FLASH
+
   /* Constant data goes into FLASH */
   .rodata :
   {
@@ -57,7 +71,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /* 一堆和链接有关的表之类的，可能是目标文件的重定向表????? */
+  /* arm */
   .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
   .ARM : {
     __exidx_start = .;
