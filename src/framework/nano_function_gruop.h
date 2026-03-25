@@ -61,8 +61,9 @@ extern "C" {
 /**
  * @brief 调用指定函数组的所有函数
  * @param group 要调用的函数组
+ * @return 0表示成功调用，非0表示调用过程中有函数返回错误
 */
-void nano_function_gruop_call(nano_function_group_t group);
+int nano_function_gruop_call(nano_function_group_t group);
 
 #ifdef __cplusplus
 }

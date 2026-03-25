@@ -1,4 +1,5 @@
 #include "../nano_framework_core.h"
+#include "../nano_function_gruop.h"
 #include "arch/arch_init.h"
 
 extern int __systick_function_regedit_start;
@@ -32,6 +33,12 @@ void enter_nano_framework( void )
 {
     /* 注册系统tick中断处理函数 */
     arch_set_systick_handler(nano_framework_core_tick_handler);
+
+    /* 调用目标初始化函数 */
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_FRAMEWORK_INIT);
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_BSP_INIT);
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_SERVICE_INIT);
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_APP_INIT);
 
     while(1);
 }
