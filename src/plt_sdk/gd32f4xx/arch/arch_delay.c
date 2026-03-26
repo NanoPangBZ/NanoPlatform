@@ -2,8 +2,11 @@
 
 void arch_delay_us(uint32_t us)
 {
-    (void)us;
-    //@todo
+    volatile uint32_t count = us * 10;
+    while(count--)
+    {
+        __asm__ __volatile__("nop");
+    }
 }
 
 void arch_delay_ms(uint32_t ms)

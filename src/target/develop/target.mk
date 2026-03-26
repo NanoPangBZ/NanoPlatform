@@ -12,6 +12,9 @@ SIZE := $(CROSS_COMPILE)size
 # 加入对应平台SDK的Makefile
 include $(SRC_DIR)/plt_sdk/gd32f4xx/plt_sdk.mk
 
+# 加入弱符号实现的SDK Makefile
+include $(SRC_DIR)/plt_sdk/weak/plt_sdk.mk
+
 # Add current target directory to header search path
 TARGET_INC_DIRS += -I$(TARGET_DIR)
 
