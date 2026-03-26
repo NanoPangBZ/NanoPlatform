@@ -26,3 +26,15 @@
 #define ENTER_CRITICAL()
 #define EXIT_CRITICAL()
 
+
+/********************************************************************************************************************************************************************/
+//轮询任务池配置
+
+//模式选择
+#define NANO_POLLING_POOL_USE_SYSTICK_MODE  (1)
+#define NANO_POLLING_POOL_USE_THREAD_MODE   (0)
+
+//线程模式下的配置
+#if defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
+    #define NANO_POLLING_TASK_THREAD_STACK_SIZE   ( 2 * 1024 )
+#endif

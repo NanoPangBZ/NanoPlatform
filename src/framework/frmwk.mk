@@ -5,5 +5,7 @@ FRMWK_INC_DIRS += -I$(FRMWK_DIR)
 
 #框架源文件
 FRMWK_SRCS += $(FRMWK_DIR)impl/nano_heap.c
+FRMWK_SRCS += $(FRMWK_DIR)impl/nano_list.c
+FRMWK_SRCS += $(FRMWK_DIR)impl/nano_polling_pool.c
 FRMWK_SRCS += $(FRMWK_DIR)impl/nano_framework_core.c
 FRMWK_SRCS += $(FRMWK_DIR)impl/nano_function_gruop.c
