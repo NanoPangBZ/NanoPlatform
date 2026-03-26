@@ -14,7 +14,7 @@ static void nano_test_polling_task(void* args)
 {
     (void)args;
     const char* msg = "Hello NanoFramework Polling Task!\r\n";
-    arch_uart_send( 0 , (const uint8_t*)msg , 34 );
+    arch_uart_send( 0 , (const uint8_t*)msg , 34 , 100);
 }
 
 static int target_main(void)

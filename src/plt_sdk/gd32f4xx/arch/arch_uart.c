@@ -21,20 +21,30 @@ void arch_uart_deinit( arch_uart_port_t port )
     usart_disable( uart_periph[port] );
 }
 
-void arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t len )
+uint32_t arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t len , uint32_t timeout_ms )
 {
+    uint32_t ret = len;
     while( len != 0 )
     {
         usart_data_transmit( uart_periph[port] , *data );
-        while ( usart_flag_get( uart_periph[port] , USART_FLAG_TBE ) == RESET );
+        uint32_t tick_start = arch_get_tick();
+        while ( usart_flag_get( uart_periph[port] , USART_FLAG_TBE ) == RESET )
+        {
+            if( (arch_get_tick() - tick_start) >= timeout_ms )
+            {
+                return ret - len;
+            }
+        }
         data++;
         len--;
     }
+
+    return ret;
 }
 
-int arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len , uint32_t timeout_ms )
+uint32_t arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len , uint32_t timeout_ms )
 {
-    int ret = buffer_len;
+    uint32_t ret = buffer_len;
     while( buffer_len != 0 )
     {
         uint32_t tick_start = arch_get_tick();
@@ -42,7 +52,7 @@ int arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer
         {
             if( (arch_get_tick() - tick_start) >= timeout_ms )
             {
-                return 0;
+                return ret - buffer_len;
             }
         }
         *buffer = usart_data_receive( uart_periph[port] );
@@ -50,6 +60,13 @@ int arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer
         buffer_len--;
     }
     return ret;
+}
+
+void arch_uart_set_send_complete_callback( arch_uart_port_t port , arch_uart_send_callback_t callback , void* ctx )
+{
+    (void)port;
+    (void)callback;
+    (void)ctx;
 }
 
 void arch_uart_set_receive_callback( arch_uart_port_t port , arch_uart_receive_callback_t callback , void* ctx )
