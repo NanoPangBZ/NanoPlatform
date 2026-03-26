@@ -183,7 +183,7 @@ static void nano_polling_pool_systick_handler(void)
     }
 }
 
-ADD_SYSTICK_FUNCTION_ITEM(nano_polling_pool_systick_handler);
+ADD_NANO_SYSTICK_HANDLER_ITEM(nano_polling_pool_systick_handler);
 
 static int nano_polling_pool_init(void)
 {
@@ -191,6 +191,7 @@ static int nano_polling_pool_init(void)
     e_basnano_polling_pool = (nano_polling_pool_handle_t)MALLOC(sizeof(nano_polling_pool_t));
     if( e_basnano_polling_pool == NULL )
     {
+        ERROR_LOG("Failed to create basic polling pool");
         return -1;
     }
     memset(e_basnano_polling_pool, 0, sizeof(nano_polling_pool_t));
@@ -199,11 +200,12 @@ static int nano_polling_pool_init(void)
     e_basnano_polling_pool->polling_task_list = list_create( sizeof(nano_polling_task_handle_t) );
     if( e_basnano_polling_pool->polling_task_list == NULL )
     {
-        return -1;
+        ERROR_LOG("Failed to create polling task list");
+        return -2;
     }
 
     //设置基本池参数
-    e_basnano_polling_pool->tick_ms = 1; //默认1ms轮询一次
+    e_basnano_polling_pool->tick_ms = NANO_POLLING_TASK_SYSTICK_INTERVAL_MS; //默认轮询间隔
 
     return 0;
 }

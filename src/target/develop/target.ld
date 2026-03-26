@@ -54,9 +54,9 @@ SECTIONS
     . = ALIGN(4);
 
     /* 平台心跳函数注册表 */
-    __systick_function_regedit_start = .;
-    *(__systick_function_regedit)
-    __systick_function_regedit_end = .;
+    __nano_systick_handler_regedit_start = .;
+    *(__nano_systick_handler_regedit)
+    __nano_systick_handler_regedit_end = .;
 
     . = ALIGN(4);
 

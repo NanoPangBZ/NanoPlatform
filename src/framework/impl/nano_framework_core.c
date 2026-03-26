@@ -5,11 +5,11 @@
 #include "framework_cfg.h"
 #include "arch/arch_init.h"
 
-extern int __systick_function_regedit_start;
-extern int __systick_function_regedit_end;
+extern int __nano_systick_handler_regedit_start;
+extern int __nano_systick_handler_regedit_end;
 
-#define SYSTICK_FUNCTION_REGEDIT_START_ADDR     (int)(&__systick_function_regedit_start)
-#define SYSTICK_FUNCTION_REGEDIT_END_ADDR       (int)(&__systick_function_regedit_end)
+#define SYSTICK_HANDLER_REGEDIT_START_ADDR     (int)(&__nano_systick_handler_regedit_start)
+#define SYSTICK_HANDLER_REGEDIT_END_ADDR       (int)(&__nano_systick_handler_regedit_end)
 
 static uint32_t s_tick_count = 0;
 
@@ -21,8 +21,8 @@ static void nano_framework_core_tick_handler(void)
     s_tick_count++;
 
     /* 遍历系统tick函数注册项并调用对应的函数 */
-    const systick_function_item_t* item = (const systick_function_item_t*)SYSTICK_FUNCTION_REGEDIT_START_ADDR;
-    while ( item < (const systick_function_item_t*)SYSTICK_FUNCTION_REGEDIT_END_ADDR)
+    const systick_function_item_t* item = (const systick_function_item_t*)SYSTICK_HANDLER_REGEDIT_START_ADDR;
+    while ( item < (const systick_function_item_t*)SYSTICK_HANDLER_REGEDIT_END_ADDR)
     {
         if (item->function)
         {
