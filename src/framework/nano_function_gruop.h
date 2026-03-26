@@ -22,7 +22,6 @@ typedef enum nano_function_group_e{
     /*系统框架级别事件响应组*/
     NANO_FUNCTION_GRUOP_SHUTDOWN = 0x20,    // 系统关机函数组
 
-
 }nano_function_group_e;
 typedef uint32_t nano_function_group_t;
 

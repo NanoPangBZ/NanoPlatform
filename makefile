@@ -1,6 +1,9 @@
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 PROJECT_SRC_DIR := $(ROOT_DIR)src/
 
+#是否启用单元测试
+UNIT_TEST ?= 0
+
 TARGET ?= develop
 TARGET_DIR := $(PROJECT_SRC_DIR)target/$(TARGET)
 TARGET_MK := $(TARGET_DIR)/target.mk
@@ -38,6 +41,11 @@ OBJS_S_CAP := $(patsubst $(PROJECT_SRC_DIR)%.S,$(OBJ_DIR)/%.o,$(filter %.S,$(SRC
 OBJS_S_LOW := $(patsubst $(PROJECT_SRC_DIR)%.s,$(OBJ_DIR)/%.o,$(filter %.s,$(SRCS)))
 OBJS := $(OBJS_C) $(OBJS_S_CAP) $(OBJS_S_LOW)
 TOTAL_OBJS := $(words $(OBJS))
+
+ifeq ($(UNIT_TEST),1)
+include $(PROJECT_SRC_DIR)test/test.mk
+OBJS += $(patsubst $(PROJECT_SRC_DIR)%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(TEST_SRCS)))
+endif
 
 CFLAGS ?= -O0 -g3 -Wall -Wextra -std=c11
 CFLAGS += -I$(PROJECT_SRC_DIR) $(FRMWK_INC_DIRS) $(TARGET_INC_DIRS)

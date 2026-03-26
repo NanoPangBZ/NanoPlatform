@@ -10,10 +10,10 @@
 #define FREE(_ptr)             nano_heap_free(_ptr)
 
 #define TAG "nano_polling_pool"
-#define DEBUG_LOG(...)    E_DEBUG_LOG(TAG, __VA_ARGS__)
-#define INFO_LOG(...)     E_INFO_LOG(TAG, __VA_ARGS__)
-#define WARN_LOG(...)     E_WARN_LOG(TAG, __VA_ARGS__)
-#define ERROR_LOG(...)    E_ERROR_LOG(TAG, __VA_ARGS__)
+#define DEBUG_LOG(...)
+#define INFO_LOG(...)
+#define WARN_LOG(...)
+#define ERROR_LOG(...)
 
 //轮询任务池句柄
 typedef struct nano_polling_pool_t* nano_polling_pool_handle_t;
