@@ -6,6 +6,11 @@ __attribute__((weak)) void arch_uart_init( arch_uart_port_t port , uint32_t baud
     (void)baudrate;
 }
 
+__attribute__((weak)) void arch_uart_deinit( arch_uart_port_t port )
+{
+    (void)port;
+}
+
 __attribute__((weak)) void arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t len )
 {
     (void)port;

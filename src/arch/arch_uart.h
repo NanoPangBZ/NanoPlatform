@@ -18,6 +18,12 @@ extern "C" {
 void arch_uart_init( arch_uart_port_t port , uint32_t baudrate );
 
 /**
+ * @brief 逆初始化UART端口
+ * @param port UART端口
+*/
+void arch_uart_deinit( arch_uart_port_t port );
+
+/**
  * @brief 发送数据到UART端口
  * @param port UART端口号
  * @param data 要发送的数据缓冲区

@@ -16,6 +16,11 @@ void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )
     usart_enable( uart_periph[port] );
 }
 
+void arch_uart_deinit( arch_uart_port_t port )
+{
+    usart_disable( uart_periph[port] );
+}
+
 void arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t len )
 {
     while( len != 0 )
