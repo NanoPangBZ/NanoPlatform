@@ -5,18 +5,22 @@
 #include "gd32f4xx_gpio.h"
 #include "gd32f4xx_rcu.h"
 
+//GPIO引脚映射表
 typedef struct arch_gpio_pin_map_t{
     uint32_t rcu;
     uint32_t gpio_periph;
     uint32_t gpio_pin;
 }arch_gpio_pin_map_t;
 
+//GPIO实例结构体
 typedef struct arch_gpio_ins_t{
     const arch_gpio_pin_map_t* pin_map;
 }arch_gpio_ins_t;
 
+//GPIO实例表数组
 static const arch_gpio_pin_map_t arch_gpio_pin_map_table[] = ARCH_GPIO_PIN_MAP_TABLE;
 
+//GPIO实例表
 static arch_gpio_ins_t arch_gpio_ins_table[ sizeof(arch_gpio_pin_map_table) / sizeof(arch_gpio_pin_map_table[0]) ];
 
 static void gpio_init( arch_gpio_ins_t* gpio_ins , arch_gpio_dir_t dir , arch_gpio_pull_t pull )
