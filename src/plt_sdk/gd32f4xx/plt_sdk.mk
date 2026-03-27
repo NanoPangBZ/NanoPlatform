@@ -18,6 +18,7 @@ PLT_SDK_SRCS += $(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.
 PLT_SDK_SRCS += $(PLT_SDK_DIR)arch/arch_init.c
 PLT_SDK_SRCS += $(PLT_SDK_DIR)arch/arch_uart.c
 PLT_SDK_SRCS += $(PLT_SDK_DIR)arch/arch_delay.c
+PLT_SDK_SRCS += $(PLT_SDK_DIR)arch/arch_gpio.c
 
 #GD32F4xx libc
 PLT_SDK_SRCS += $(PLT_SDK_DIR)gd32f4xx_libc_file.c
