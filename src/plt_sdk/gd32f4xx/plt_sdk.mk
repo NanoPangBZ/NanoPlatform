@@ -12,6 +12,7 @@ PLT_SDK_SRCS += $(PLT_SDK_DIR)CMSIS/GD/GD32F4xx/Source/system_gd32f4xx.c
 #GD32F4xx标准外设库
 PLT_SDK_SRCS += $(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c
 PLT_SDK_SRCS += $(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c
+PLT_SDK_SRCS += $(PLT_SDK_DIR)GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c
 
 #GD32F4xx arch抽象层
 PLT_SDK_SRCS += $(PLT_SDK_DIR)arch/arch_init.c
