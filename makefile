@@ -4,6 +4,9 @@ PROJECT_SRC_DIR := $(ROOT_DIR)src/
 #是否启用单元测试
 UNIT_TEST ?= 0
 
+#选择是否debug构建
+DEBUG ?= 0
+
 TARGET ?= develop
 TARGET_DIR := $(PROJECT_SRC_DIR)target/$(TARGET)
 TARGET_MK := $(TARGET_DIR)/target.mk
@@ -35,7 +38,7 @@ COLOR_RESET := $(ESC)[0m
 MAIN_SRCS := \
 	$(PROJECT_SRC_DIR)main.c
 
-SRCS := $(MAIN_SRCS) $(FRMWK_SRCS) $(TARGET_SRCS)
+SRCS := $(TARGET_SRCS) $(FRMWK_SRCS) $(MAIN_SRCS)
 OBJS_C := $(patsubst $(PROJECT_SRC_DIR)%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(SRCS)))
 OBJS_S_CAP := $(patsubst $(PROJECT_SRC_DIR)%.S,$(OBJ_DIR)/%.o,$(filter %.S,$(SRCS)))
 OBJS_S_LOW := $(patsubst $(PROJECT_SRC_DIR)%.s,$(OBJ_DIR)/%.o,$(filter %.s,$(SRCS)))
@@ -47,7 +50,12 @@ include $(PROJECT_SRC_DIR)test/test.mk
 OBJS += $(patsubst $(PROJECT_SRC_DIR)%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(TEST_SRCS)))
 endif
 
+ifeq ($(DEBUG),1)
 CFLAGS ?= -O0 -g3 -Wall -Wextra -std=c11
+else
+CFLAGS ?= -Os -g3 -Wall -Wextra -std=c11
+endif
+
 CFLAGS += -I$(PROJECT_SRC_DIR) $(FRMWK_INC_DIRS) $(TARGET_INC_DIRS)
 CFLAGS += $(TARGET_CFLAGS)
 

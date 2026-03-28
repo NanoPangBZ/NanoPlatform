@@ -1,7 +1,7 @@
 TARGET_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 SRC_DIR := $(abspath $(TARGET_DIR)/../..)
 
-# Use ARM GCC cross toolchain
+# 工具链选择
 CROSS_COMPILE ?= arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
@@ -9,26 +9,22 @@ AR := $(CROSS_COMPILE)ar
 OBJCOPY := $(CROSS_COMPILE)objcopy
 SIZE := $(CROSS_COMPILE)size
 
-# 加入对应平台SDK的Makefile
-include $(SRC_DIR)/plt_sdk/gd32f4xx/plt_sdk.mk
+# 选择arch平台
+include $(SRC_DIR)/arch_plt/gd32f4xx/arch_plt.mk
 
-# 加入弱符号实现的SDK Makefile
-include $(SRC_DIR)/plt_sdk/weak/plt_sdk.mk
+# 加入arch平台的弱符号实现
+include $(SRC_DIR)/arch_plt/weak/arch_plt.mk
 
-# Add current target directory to header search path
-TARGET_INC_DIRS += -I$(TARGET_DIR)
+# 收集arch平台的头文件搜索路径、源文件、编译器选项
+TARGET_INC_DIRS += $(ARCH_PLT_INC_DIRS)
+TARGET_SRCS += $(ARCH_PLT_SRC)
+TARGET_CFLAGS += $(ARCH_PLT_CFLAGS)
 
-# Add platform SDK include paths and sources
-TARGET_INC_DIRS += $(PLT_SDK_INC_DIRS)
-TARGET_SRCS += $(PLT_SDK_SRCS)
-
-#加入目标私有源文件
-TARGET_SRCS += $(TARGET_DIR)target_main.c
-
-# 全局宏定义
-TARGET_CFLAGS += $(PLT_SDK_CFLAGS)
+# 加入目标私有的头文件搜索路径、源文件
+TARGET_INC_DIRS += -I$(TARGET_DIR)cfg
+TARGET_SRCS += $(TARGET_DIR)src/target_main.c
 TARGET_CFLAGS += -DGD32F427
 
-# Use the target-local linker script; nosys.specs provides _exit stub for bare-metal
-LDFLAGS += $(PLT_SDK_LDFLAGS)
+# 链接器选项
+LDFLAGS += $(ARCH_PLT_LDFLAGS)
 LDFLAGS += -T$(TARGET_DIR)target.ld
