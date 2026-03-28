@@ -62,6 +62,7 @@ int nano_heap_init(void)
 void* nano_heap_malloc(uint32_t size,nano_heap_attr_t attr)
 {
     ENTER_CRITICAL();
+    (void)attr;
 
 #if defined(NANO_FAST_ACCESS_HEAP_ENABLE) && NANO_FAST_ACCESS_HEAP_ENABLE
     if( attr & NANO_HEAP_ATTR_FAST_ACCESS )
