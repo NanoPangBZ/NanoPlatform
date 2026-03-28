@@ -63,9 +63,9 @@ void* nano_heap_malloc(uint32_t size,nano_heap_attr_t attr)
 {
     ENTER_CRITICAL();
 
+#if defined(NANO_FAST_ACCESS_HEAP_ENABLE) && NANO_FAST_ACCESS_HEAP_ENABLE
     if( attr & NANO_HEAP_ATTR_FAST_ACCESS )
     {
-        #if defined(NANO_FAST_ACCESS_HEAP_ENABLE) && NANO_FAST_ACCESS_HEAP_ENABLE
         // 快速访问堆
         if( fast_access_heap.is_init && size + fast_access_heap.heap_used <= fast_access_heap.heap_size )
         {
@@ -74,12 +74,17 @@ void* nano_heap_malloc(uint32_t size,nano_heap_attr_t attr)
             EXIT_CRITICAL();
             return ptr;
         }
-        #endif
+        else
+        {
+            EXIT_CRITICAL();
+            return NULL;
+        }
     }
-    else if( attr & NANO_HEAP_ATTR_BIG_BLOCKS )
-    {
-        #if defined(NANO_BIG_BLOCKS_HEAP_ENABLE) && NANO_BIG_BLOCKS_HEAP_ENABLE
+#endif
 
+#if defined(NANO_BIG_BLOCKS_HEAP_ENABLE) && NANO_BIG_BLOCKS_HEAP_ENABLE
+    if( attr & NANO_HEAP_ATTR_BIG_BLOCKS )
+    {
         // 大块内存堆
         if( big_blocks_heap.is_init && size + big_blocks_heap.heap_used <= big_blocks_heap.heap_size )
         {
@@ -88,19 +93,21 @@ void* nano_heap_malloc(uint32_t size,nano_heap_attr_t attr)
             EXIT_CRITICAL();
             return ptr;
         }
-
-        #endif
-    }
-    else
-    {
-        // 默认堆
-        if( default_heap.is_init && size + default_heap.heap_used <= default_heap.heap_size )
+        else
         {
-            void* ptr = default_heap.heap_mem + default_heap.heap_used;
-            default_heap.heap_used += (size + default_heap.align_size - 1) & ~(default_heap.align_size - 1); // 对齐
             EXIT_CRITICAL();
-            return ptr;
+            return NULL;
         }
+    }
+#endif
+
+    // 默认堆
+    if( default_heap.is_init && size + default_heap.heap_used <= default_heap.heap_size )
+    {
+        void* ptr = default_heap.heap_mem + default_heap.heap_used;
+        default_heap.heap_used += (size + default_heap.align_size - 1) & ~(default_heap.align_size - 1); // 对齐
+        EXIT_CRITICAL();
+        return ptr;
     }
 
     EXIT_CRITICAL();
