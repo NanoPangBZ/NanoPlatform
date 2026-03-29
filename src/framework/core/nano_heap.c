@@ -61,6 +61,8 @@ int nano_heap_init(void)
 
 void* nano_heap_malloc(uint32_t size,nano_heap_attr_t attr)
 {
+    (void)attr;
+
     ENTER_CRITICAL();
     (void)attr;
 
