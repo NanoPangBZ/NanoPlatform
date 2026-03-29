@@ -56,5 +56,16 @@
 
 #define NANO_NET_LOCAL_HOST_ENABLE (1)
 
-#define NANO_NET_LOCAL_HOST_ID NANO_NET_HOST_ID_MAIN_CONTROLLER
-#define NANO_NET_LOCAL_HOST_RUNNING_FREQ_HZ 100
+/**
+ * @param NANO_NET_LOCAL_HOST_ID 本地主机ID，默认为NANO_NET_HOST_ID_MAIN_CONTROLLER
+ * @param NANO_NET_LOCAL_HOST_RUNNING_FREQ_HZ 本地主机运行频率，默认为100Hz，即每10ms执行一次本地主机的运行逻辑
+ * @param NANO_NET_LL_STACK_BUFF_MEM_ATTR nano通信网络底层协议栈运行时使用的栈内存属性，默认为放在.nano_net_ll_stack_buff段
+ * @param NANO_NET_LL_STACK_BUFF_SIZE nano通信网络底层协议栈运行时使用的栈内存大小，默认为4KB
+ * @param NANO_NET_LL_STACK_ALIGN nano通信网络底层协议栈运行时使用的栈内存对齐大小，默认为4字节
+*/
+#define NANO_NET_LOCAL_HOST_ID                  NANO_NET_HOST_ID_MAIN_CONTROLLER
+#define NANO_NET_LOCAL_HOST_RUNNING_FREQ_HZ     100
+#define NANO_NET_LL_STACK_BUFF_MEM_ATTR         __attribute__((section(".nano_net_ll_stack_buff")))
+#define NANO_NET_LL_STACK_BUFF_SIZE             (4 * 1024)
+#define NANO_NET_LL_STACK_ALIGN                 4
+
