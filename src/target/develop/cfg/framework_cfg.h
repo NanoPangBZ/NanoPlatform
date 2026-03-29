@@ -50,3 +50,11 @@
 #if defined(NANO_POLLING_POOL_USE_SYSTICK_MODE) && NANO_POLLING_POOL_USE_SYSTICK_MODE
     #define NANO_POLLING_TASK_SYSTICK_INTERVAL_MS ( 2 )    // 轮询任务在系统tick中断模式下的执行间隔，单位毫秒
 #endif
+
+/********************************************************************************************************************************************************************/
+//nano net 本地主机配置 - nano_net_host
+
+#define NANO_NET_LOCAL_HOST_ENABLE (1)
+
+#define NANO_NET_LOCAL_HOST_ID NANO_NET_HOST_ID_MAIN_CONTROLLER
+#define NANO_NET_LOCAL_HOST_RUNNING_FREQ_HZ 100

@@ -9,6 +9,7 @@ FRMWK_SRCS += $(FRMWK_DIR)core/nano_list.c
 FRMWK_SRCS += $(FRMWK_DIR)core/nano_polling_pool.c
 FRMWK_SRCS += $(FRMWK_DIR)core/nano_framework_core.c
 FRMWK_SRCS += $(FRMWK_DIR)core/nano_function_gruop.c
+FRMWK_SRCS += $(FRMWK_DIR)core/nano_net_host.c
 
 # 加入nano_net模块
 include $(FRMWK_DIR)core/nano_net/nano_net.mk
