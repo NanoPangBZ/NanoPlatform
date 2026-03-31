@@ -140,6 +140,8 @@ ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_FRAMEWORK_INIT , nano_net_host_init 
 
 #else
 
+#include <stdint.h>
+
 nano_net_host_handle_t nano_net_get_local_host(void)
 {
     return NULL;

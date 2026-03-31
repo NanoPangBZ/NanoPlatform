@@ -96,83 +96,13 @@ void nano_polling_pool_set_freq( nano_polling_task_handle_t handle, uint32_t fre
     handle->cycle_ms = (freq_hz == 0) ? 0 : (1000 / freq_hz);
 }
 
-#if defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
-
-static void nano_polling_pool_thread(void* arg)
-{
-    nano_polling_pool_t* pool = (nano_polling_pool_t*)arg;
-    
-    while(1)
-    {
-        uint32_t now = e_sched_time_ms();
-        foreach_list( pool->polling_task_list , task_handle_addr , nano_polling_task_handle_t )
-        {
-            nano_polling_task_handle_t task = *task_handle_addr;
-            if( now - task->last_run_time_ms >= task->cycle_ms && 
-                (task->flag & NANO_POLLING_TASK_FLAG_STARTED) )
-            {
-                task->last_run_time_ms = now;
-                task->flag |= NANO_POLLING_TASK_FLAG_RUNNING;
-                task->polling_func( task->user_ctx );
-                task->flag &= ~NANO_POLLING_TASK_FLAG_RUNNING;
-            }
-        }
-        e_sched_task_delay_ms(e_basnano_polling_pool->tick_ms);
-    }
-}
-
-static int nano_polling_pool_init(void)
-{   
-    e_sched_task_desc_t task_desc;
-
-    //创建基本池
-    e_basnano_polling_pool = (nano_polling_pool_handle_t)MALLOC(sizeof(nano_polling_pool_t));
-    if( e_basnano_polling_pool == NULL )
-    {
-        goto err_recycle;
-    }
-    memset(e_basnano_polling_pool, 0, sizeof(nano_polling_pool_t));
-
-    //为基本池创建任务列表
-    e_basnano_polling_pool->polling_task_list = list_create( sizeof(nano_polling_task_handle_t) );
-    if( e_basnano_polling_pool->polling_task_list == NULL )
-    {
-        goto err_recycle;
-    }
-
-    //设置基本池参数
-    e_basnano_polling_pool->tick_ms = 1; //默认1ms轮询一次
-
-    //创建基本池线程
-    memset(&task_desc, 0, sizeof(task_desc));
-    task_desc.name = "nano_polling_pool";
-    task_desc.task_entry = nano_polling_pool_thread;
-    task_desc.arg = e_basnano_polling_pool;
-    task_desc.attr = E_SCHED_TASK_ATTR_DEFAULT | E_SCHED_TASK_ATTR_INDEPEND_INIT_THREAD;
-    task_desc.stack_size_byte = NANO_POLLING_TASK_THREAD_STACK_SIZE;
-    if( e_sched_task_create(&task_desc) == NULL )
-    {
-        goto err_recycle;
-    }
-
-    return 0;
-
-err_recycle:
-    //todo...
-    return -1;
-}
-
-REGEDIT_FRAMEWORK_INIT_FUNCTION(nano_polling_pool_init, 1);
-
-#elif defined(NANO_POLLING_POOL_USE_SYSTICK_MODE) && NANO_POLLING_POOL_USE_SYSTICK_MODE
-
-static void nano_polling_pool_systick_handler(void)
+void nano_polling_pool_run(void)
 {
     uint32_t now = nano_framework_time_ms();
     foreach_list( e_basnano_polling_pool->polling_task_list , task_handle_addr , nano_polling_task_handle_t )
     {
         nano_polling_task_handle_t task = *task_handle_addr;
-        if( now - task->last_run_time_ms >= task->cycle_ms && 
+        if( now - task->last_run_time_ms >= task->cycle_ms &&
             (task->flag & NANO_POLLING_TASK_FLAG_STARTED) )
         {
             task->last_run_time_ms = now;
@@ -183,10 +113,34 @@ static void nano_polling_pool_systick_handler(void)
     }
 }
 
+#if defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
+
+static void nano_polling_pool_thread(void* arg)
+{    
+    while(1)
+    {
+        nano_polling_pool_run();
+        e_sched_task_delay_ms(e_basnano_polling_pool->tick_ms);
+    }
+}
+
+#endif  //defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
+
+
+#if defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
+
+static void nano_polling_pool_systick_handler(void)
+{
+    nano_polling_pool_run();
+}
+
 ADD_NANO_SYSTICK_HANDLER_ITEM(nano_polling_pool_systick_handler);
 
+#endif
+
+
 static int nano_polling_pool_init(void)
-{
+{   
     //创建基本池
     e_basnano_polling_pool = (nano_polling_pool_handle_t)MALLOC(sizeof(nano_polling_pool_t));
     if( e_basnano_polling_pool == NULL )
@@ -205,11 +159,25 @@ static int nano_polling_pool_init(void)
     }
 
     //设置基本池参数
-    e_basnano_polling_pool->tick_ms = NANO_POLLING_TASK_SYSTICK_INTERVAL_MS; //默认轮询间隔
+    e_basnano_polling_pool->tick_ms = NANO_POLLING_TASK_INTERVAL_MS;
+
+#if defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
+    //创建基本池线程
+    memset(&task_desc, 0, sizeof(task_desc));
+    task_desc.name = "nano_polling_pool";
+    task_desc.task_entry = nano_polling_pool_thread;
+    task_desc.arg = e_basnano_polling_pool;
+    task_desc.attr = E_SCHED_TASK_ATTR_DEFAULT | E_SCHED_TASK_ATTR_INDEPEND_INIT_THREAD;
+    task_desc.stack_size_byte = NANO_POLLING_TASK_THREAD_STACK_SIZE;
+    if( e_sched_task_create(&task_desc) == NULL )
+    {
+        ERROR_LOG( "create polling pool thread failed!" );
+        return -1;
+    }
+#endif  //defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
 
     return 0;
 }
 
-ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_FRAMEWORK_INIT, nano_polling_pool_init, 1 );
+ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_FRAMEWORK_INIT , nano_polling_pool_init, 1 );
 
-#endif

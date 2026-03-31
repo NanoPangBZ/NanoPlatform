@@ -1,6 +1,7 @@
 #include "../nano_framework_core.h"
 #include "../nano_function_gruop.h"
 #include "../nano_heap.h"
+#include "./core/nano_core_sched.h"
 
 #include "framework_cfg.h"
 #include "arch/arch_init.h"
@@ -50,7 +51,7 @@ void enter_nano_framework( void )
 
     EXIT_CRITICAL();
 
-    while(1);
+    nano_core_sched_start();
 }
 
 uint32_t nano_framework_time_ms(void)

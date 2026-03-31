@@ -34,22 +34,20 @@
  * @brief 轮询任务池模式选择
  * NANO_POLLING_POOL_USE_SYSTICK_MODE: 使用系统tick中断模式，在系统tick中断处理函数中执行轮询任务
  * NANO_POLLING_POOL_USE_THREAD_MODE: 使用独立线程模式，在一个独立线程中循环执行轮询任务
- * NANO_POLLING_POOL_USE_MSP_MODE: 使用MSP（Main Stack Pointer）模式，在主堆栈中循环执行轮询任务
+ * NANO_POLLING_POOL_USE_MSP_LOOP_MODE: 使用MSP（Main Stack Pointer）模式，在主堆栈中循环执行轮询任务
  * 以上三种模式只能选择一种，裸机情况下建议使用MSP模式，RTOS环境下建议使用线程模式，系统tick中断模式适用于对轮询任务实时性要求较高的场景
 */
-#define NANO_POLLING_POOL_USE_SYSTICK_MODE  (1)
-#define NANO_POLLING_POOL_USE_THREAD_MODE   (0)
-#define NANO_POLLING_POOL_USE_MSP_MODE      (0)
+#define NANO_POLLING_POOL_USE_SYSTICK_MODE      (0)
+#define NANO_POLLING_POOL_USE_THREAD_MODE       (0)
+#define NANO_POLLING_POOL_USE_MSP_LOOP_MODE     (1)
 
 //线程模式下的配置
 #if defined(NANO_POLLING_POOL_USE_THREAD_MODE) && NANO_POLLING_POOL_USE_THREAD_MODE
     #define NANO_POLLING_TASK_THREAD_STACK_SIZE   ( 2 * 1024 )
 #endif
 
-//系统tick中断模式下的配置
-#if defined(NANO_POLLING_POOL_USE_SYSTICK_MODE) && NANO_POLLING_POOL_USE_SYSTICK_MODE
-    #define NANO_POLLING_TASK_SYSTICK_INTERVAL_MS ( 2 )    // 轮询任务在系统tick中断模式下的执行间隔，单位毫秒
-#endif
+//轮询间隔
+#define NANO_POLLING_TASK_INTERVAL_MS   ( 2 )
 
 /********************************************************************************************************************************************************************/
 //nano net 本地主机配置 - nano_net_host
