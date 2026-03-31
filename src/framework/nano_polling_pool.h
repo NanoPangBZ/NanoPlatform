@@ -66,6 +66,11 @@ void nano_polling_task_stop( nano_polling_task_handle_t handle );
 */
 void nano_polling_task_set_freq( nano_polling_task_handle_t handle, uint32_t freq_hz );
 
+/**
+ * @brief 执行轮询池，检查并执行满足条件的轮询任务
+*/
+void nano_polling_pool_run(void);
+
 #ifdef __cplusplus
 }
 #endif
