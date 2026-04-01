@@ -9,5 +9,6 @@ ARCH_PLT_SRC += $(ARCH_PLT_WEAK_DIR)arch_adc_weak.c
 ARCH_PLT_SRC += $(ARCH_PLT_WEAK_DIR)arch_exti_weak.c
 ARCH_PLT_SRC += $(ARCH_PLT_WEAK_DIR)arch_spi_weak.c
 ARCH_PLT_SRC += $(ARCH_PLT_WEAK_DIR)arch_i2c_weak.c
+ARCH_PLT_SRC += $(ARCH_PLT_WEAK_DIR)arch_lp_weak.c
 ARCH_PLT_SRC += $(ARCH_PLT_WEAK_DIR)arch_cpu_weak.c
 ARCH_PLT_SRC += $(ARCH_PLT_WEAK_DIR)arch_flash_weak.c
