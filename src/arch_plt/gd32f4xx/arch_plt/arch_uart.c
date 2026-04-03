@@ -1,6 +1,7 @@
 #include "arch/arch_uart.h"
 #include "arch/arch_init.h"
 #include "gd32f4xx_usart.h"
+#include "gd32f4xx_dma.h"
 
 // UART外设映射表，根据实际情况进行修改
 typedef struct arch_uart_map_t{
@@ -14,6 +15,9 @@ typedef struct arch_uart_map_t{
 // 外设实例
 typedef struct arch_uart_ins_t{
     const arch_uart_map_t* map;
+    uint8_t is_sending : 1;
+    uint8_t is_receiving : 1;
+    uint8_t reserved : 6;
 }arch_uart_ins_t;
 
 static const arch_uart_map_t uart_map_table[] = {
@@ -55,15 +59,25 @@ uint32_t arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t 
 
     arch_uart_ins_t* ins = &uart_ins_table[port];
     uint32_t ret = len;
+    uint32_t timeout_time = arch_get_tick() + timeout_ms;
 
+    while( ins->is_sending )
+    {
+        if( arch_get_tick() >= timeout_time )
+        {
+            return 0;
+        }
+    }
+
+    ins->is_sending = 1;
     while( len != 0 )
     {
         usart_data_transmit( ins->map->uart_periph , *data );
-        uint32_t tick_start = arch_get_tick();
         while ( usart_flag_get( ins->map->uart_periph , USART_FLAG_TBE ) == RESET )
         {
-            if( (arch_get_tick() - tick_start) >= timeout_ms )
+            if( arch_get_tick() >= timeout_time )
             {
+                ins->is_sending = 0;
                 return ret - len;
             }
         }
@@ -71,6 +85,7 @@ uint32_t arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t 
         len--;
     }
 
+    ins->is_sending = 0;
     return ret;
 }
 
