@@ -51,6 +51,8 @@ include $(PROJECT_SRC_DIR)test/test.mk
 OBJS += $(patsubst $(PROJECT_SRC_DIR)%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(TEST_SRCS)))
 endif
 
+DEPS := $(OBJS:%.o=%.d)
+
 ifeq ($(DEBUG),1)
 CFLAGS ?= -O0 -g3 -Wall -Wextra -std=c11
 else
@@ -59,6 +61,8 @@ endif
 
 CFLAGS += -I$(PROJECT_SRC_DIR) $(FRMWK_INC_DIRS) $(TARGET_INC_DIRS)
 CFLAGS += $(TARGET_CFLAGS)
+# 生成 .d 依赖（用户头文件），头文件变更时自动重编对应 .o
+CFLAGS += -MMD -MP
 
 LDFLAGS ?=
 LDLIBS ?=
@@ -88,7 +92,7 @@ endef
 
 define BUILD_OBJECT_RULE
 	@$(call MKDIR_P,$(dir $@))
-	@current=$$(awk 'BEGIN { n = split("$(strip $(OBJS))", objs, " "); for (i = 1; i <= n; ++i) if (objs[i] == "$@") { print i; exit } }'); \
+	@line=$$(grep -Fxn "$@" "$(BUILD_DIR)/.objs.list" | head -n1); current=$${line%%:*}; \
 	tmp_log=$$(mktemp "$(BUILD_DIR)/.obj.XXXXXX"); \
 	printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) [$$current/$(TOTAL_OBJS)] $(call REL_PATH,$<)"; \
 	if $(1) >"$$tmp_log" 2>&1; then \
@@ -105,9 +109,12 @@ define BUILD_OBJECT_RULE
 endef
 endif
 
-.PHONY: all clean print-target prepare
+.PHONY: all clean print-target prepare always_link
 
 all: $(APP)
+
+# 空 phony：作为 $(APP) 的普通前提，使每次 make 都执行链接（.o 仍按依赖增量编译）
+always_link:
 
 ifeq ($(OS),Windows_NT)
 prepare:
@@ -115,7 +122,7 @@ prepare:
 	@type NUL > "$(BUILD_LOG)"
 	@powershell -NoProfile -Command "[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()" > "$(BUILD_TIME_FILE)"
 
-$(APP): $(OBJS) | prepare
+$(APP): $(OBJS) always_link | prepare
 	@$(call MKDIR_P,$(dir $@))
 	@echo [INFO] Linking target: $(APP)
 	@$(CC) $(OBJS) $(LDFLAGS) -Wl,-Map,$(APP_MAP) $(LDLIBS) -o $@ >> "$(BUILD_LOG)" 2>&1 || (echo [ERROR] Link failed: $(APP) & exit /b 1)
@@ -131,8 +138,10 @@ prepare:
 	@$(call MKDIR_P,$(BUILD_DIR))
 	@: > "$(BUILD_LOG)"
 	@date +%s > "$(BUILD_TIME_FILE)"
+	@rm -f "$(BUILD_DIR)/.objs.list"
+	@$(foreach o,$(OBJS),printf '%s\n' '$(subst ','\'',$(o))' >> "$(BUILD_DIR)/.objs.list";)
 
-$(APP): $(OBJS) | prepare
+$(APP): $(OBJS) always_link | prepare
 	@$(call MKDIR_P,$(dir $@))
 	@tmp_log=$$(mktemp "$(BUILD_DIR)/.link.XXXXXX"); \
 	printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) Linking target: $(APP)"; \
@@ -191,6 +200,8 @@ $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.S | prepare
 
 $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.s | prepare
 	$(call BUILD_OBJECT_RULE,$(CC) $(CFLAGS) -c $< -o $@)
+
+-include $(DEPS)
 
 clean:
 	@$(call RMDIR_R,$(BUILD_DIR))
