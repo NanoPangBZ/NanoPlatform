@@ -39,3 +39,8 @@ __attribute__((weak)) void* _sbrk(int incr) {
     (void)incr; // Suppress unused parameter warning
     return (void*)-1;
 }
+
+__attribute__((weak)) int* __errno(void) {
+    static int nano_errno;
+    return &nano_errno;
+}
