@@ -12,6 +12,7 @@ else
 ARCH_IMPL_CFLAGS += -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard
 ARCH_IMPL_LDFLAGS += -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard
 ARCH_IMPL_SRCS += $(SDK_DIR)CMSIS/device/startup/startup_n32h78x_cm7_gcc.s
+ARCH_IMPL_CFLAGS += -D__ICACHE_PRESENT=1 -D__DCACHE_PRESENT=1
 endif
 
 ARCH_IMPL_LDFLAGS += --specs=nosys.specs
