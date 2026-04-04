@@ -92,7 +92,7 @@ endef
 
 define BUILD_OBJECT_RULE
 	@$(call MKDIR_P,$(dir $@))
-	@current=$$(awk 'BEGIN { n = split("$(strip $(OBJS))", objs, " "); for (i = 1; i <= n; ++i) if (objs[i] == "$@") { print i; exit } }'); \
+	@line=$$(grep -Fxn "$@" "$(BUILD_DIR)/.objs.list" | head -n1); current=$${line%%:*}; \
 	tmp_log=$$(mktemp "$(BUILD_DIR)/.obj.XXXXXX"); \
 	printf '%b\n' "$(COLOR_INFO)[INFO]$(COLOR_RESET) [$$current/$(TOTAL_OBJS)] $(call REL_PATH,$<)"; \
 	if $(1) >"$$tmp_log" 2>&1; then \
@@ -138,6 +138,8 @@ prepare:
 	@$(call MKDIR_P,$(BUILD_DIR))
 	@: > "$(BUILD_LOG)"
 	@date +%s > "$(BUILD_TIME_FILE)"
+	@rm -f "$(BUILD_DIR)/.objs.list"
+	@$(foreach o,$(OBJS),printf '%s\n' '$(subst ','\'',$(o))' >> "$(BUILD_DIR)/.objs.list";)
 
 $(APP): $(OBJS) always_link | prepare
 	@$(call MKDIR_P,$(dir $@))
