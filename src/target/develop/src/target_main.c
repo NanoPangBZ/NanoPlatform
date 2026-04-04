@@ -3,6 +3,7 @@
 #include <stddef.h>
 
 #include "arch/arch_uart.h"
+#include "arch/arch_gpio.h"
 
 #define TAG "target_main"
 #define DEBUG_LOG(...)
@@ -13,17 +14,22 @@
 static void nano_test_polling_task(void* args)
 {
     (void)args;
+    static uint8_t led_state = 0;
+    led_state = !led_state;
+
     const char* msg = "Hello NanoFramework Polling Task!\r\n";
     arch_uart_send( 0 , (const uint8_t*)msg , 34 , 100);
+    arch_gpio_write( 0 , led_state );
 }
 
 static int target_main(void)
 {
+    arch_gpio_init( 0 , ARCH_GPIO_DIR_OUTPUT , ARCH_GPIO_PULL_NONE );
     arch_uart_init( 0 , 115200 );
 
     nano_polling_task_desc_t task_desc = {
         .attr = NANO_POLLING_TASK_ATTR_DEFAULT,
-        .freq_hz = 1, // 1Hz轮询频率
+        .freq_hz = 5, // 5Hz轮询频率
         .name = "test_polling_task",
         .polling_func = nano_test_polling_task,
         .start_before_create = 1, // 创建前启动
