@@ -1,9 +1,0 @@
-ARCH_PLT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-
-include $(ARCH_PLT_DIR)/sdk/sdk.mk
-include $(ARCH_PLT_DIR)/arch_plt/arch.mk
-
-ARCH_PLT_SRC += $(SDK_SRCS) $(ARCH_SRCS)
-ARCH_PLT_INC_DIRS += $(SDK_INC_DIRS) $(ARCH_INC_DIRS)
-ARCH_PLT_CFLAGS += $(SDK_CFLAGS) $(ARCH_CFLAGS)
-ARCH_PLT_LDFLAGS += $(SDK_LDFLAGS) $(ARCH_LDFLAGS)
