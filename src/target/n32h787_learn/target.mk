@@ -30,6 +30,7 @@ TARGET_CFLAGS += $(ARCH_CFLAGS)
 # 加入目标私有的头文件搜索路径、源文件
 TARGET_INC_DIRS += -I$(TARGET_DIR)cfg
 TARGET_SRCS += $(TARGET_DIR)src/target_main.c
+TARGET_CFLAGS += -DN32H78x
 TARGET_CFLAGS += -DN32H787
 
 # 链接器选项
