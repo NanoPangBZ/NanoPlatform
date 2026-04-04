@@ -180,6 +180,9 @@ print-target:
 	@echo TARGET=$(TARGET)
 	@echo TARGET_MK=$(TARGET_MK)
 
+# 仅对 n32h787 厂商 SDK 路径下的目标文件附加 -w；其余源码仍保留完整告警（-Wall -Wextra 等）
+$(OBJ_DIR)/arch/arch_plt/n32h787/sdk/%.o: CFLAGS += -w
+
 $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.c | prepare
 	$(call BUILD_OBJECT_RULE,$(CC) $(CFLAGS) -c $< -o $@)
 
