@@ -1,4 +1,5 @@
 #include "../nano_msg.h"
+#include "framework_cfg.h"
 
 #include "framework/nano_list.h"
 #include "framework/nano_function_gruop.h"
@@ -29,15 +30,15 @@ typedef struct nano_msg_subscriber_t{
 
 /// @brief 消息管理器结构体
 typedef struct nano_msg_manager_t{
-    nano_msg_t msg_array[ 8 ];
+    nano_msg_t msg_array[ NANO_MSG_MAX_STORED_MSG_NUM ];
     uint32_t msg_array_used ;
-    uint8_t data_buf[ 512 ];
+    uint8_t data_buf[ NANO_MSG_MAX_DATA_BUF_SIZE ];
     uint32_t data_buf_used;
 
     // 在消息处理阶段发出的消息会存储在这，防止消息回环导致死循环
-    nano_msg_t pending_msg_array[ 4 ];
+    nano_msg_t pending_msg_array[ NANO_MSG_PENDING_ARRAY_SIZE ];
     uint8_t pending_msg_used;
-    uint8_t pending_msg_data_buf[ 256 ];
+    uint8_t pending_msg_data_buf[ NANO_MSG_PENDING_DATA_BUF_SIZE ];
     uint32_t pending_msg_data_buf_used;
 
     // 订阅者列表
