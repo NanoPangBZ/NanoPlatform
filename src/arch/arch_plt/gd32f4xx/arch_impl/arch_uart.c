@@ -1,15 +1,23 @@
 #include "arch/arch_uart.h"
 #include "arch/arch_init.h"
+#include "gd32f4xx_gpio.h"
 #include "gd32f4xx_usart.h"
 #include "gd32f4xx_dma.h"
+
+typedef struct arch_uart_pin_t{
+    uint32_t port_rcu;
+    uint32_t port;
+    uint32_t pin;
+    uint32_t af;
+}arch_uart_pin_t;
 
 // UART外设映射表，根据实际情况进行修改
 typedef struct arch_uart_map_t{
     uint32_t uart_periph;
-    uint32_t uart_tx_port;
-    uint32_t uart_tx_pin;
-    uint32_t uart_rx_port;
-    uint32_t uart_rx_pin;
+    uint32_t tx_dma_rcu;
+    uint32_t uart_rcu;
+    arch_uart_pin_t uart_tx_pin;
+    arch_uart_pin_t uart_rx_pin;
 }arch_uart_map_t;
 
 // 外设实例
@@ -23,14 +31,63 @@ typedef struct arch_uart_ins_t{
 static const arch_uart_map_t uart_map_table[] = {
     {
         .uart_periph = USART0,
-        .uart_tx_port = GPIOA,
-        .uart_tx_pin = GPIO_PIN_9,
-        .uart_rx_port = GPIOA,
-        .uart_rx_pin = GPIO_PIN_10,
+        .tx_dma_rcu = RCU_DMA1,
+        .uart_rcu = RCU_USART0,
+        .uart_tx_pin = { .port = GPIOA, .pin = GPIO_PIN_9 },
+        .uart_rx_pin = { .port = GPIOA, .pin = GPIO_PIN_10 },
     }
 };
 
 static arch_uart_ins_t uart_ins_table[ sizeof(uart_map_table) / sizeof(uart_map_table[0]) ];
+
+/**
+ * @brief UART GPIO初始化
+ * @param ins UART实例
+*/
+static void uart_gpio_init( arch_uart_ins_t* ins )
+{
+    //tx
+    if( ins->map->uart_tx_pin.port != 0 )
+    {
+        rcu_periph_clock_enable( ins->map->uart_tx_pin.port_rcu );
+        gpio_af_set( ins->map->uart_tx_pin.port , ins->map->uart_tx_pin.af , ins->map->uart_tx_pin.pin );
+        gpio_mode_set( ins->map->uart_tx_pin.port , GPIO_MODE_AF , GPIO_PUPD_PULLUP , ins->map->uart_tx_pin.pin );
+        gpio_output_options_set( ins->map->uart_tx_pin.port , GPIO_OTYPE_PP , GPIO_OSPEED_50MHZ , ins->map->uart_tx_pin.pin );
+    }
+
+    //rx
+    if( ins->map->uart_rx_pin.port != 0 )
+    {
+        rcu_periph_clock_enable( ins->map->uart_rx_pin.port_rcu );
+        gpio_af_set( ins->map->uart_rx_pin.port , ins->map->uart_rx_pin.af , ins->map->uart_rx_pin.pin );
+        gpio_mode_set( ins->map->uart_rx_pin.port , GPIO_MODE_AF , GPIO_PUPD_PULLUP , ins->map->uart_rx_pin.pin );
+        gpio_output_options_set( ins->map->uart_rx_pin.port , GPIO_OTYPE_PP , GPIO_OSPEED_50MHZ , ins->map->uart_rx_pin.pin );
+    }
+}
+
+/**
+ * @brief UART外设初始化
+ * @param ins UART实例
+ * @param baudrate 波特率
+*/
+static void uart_ip_init( arch_uart_ins_t* ins , uint32_t baudrate )
+{
+    rcu_periph_clock_enable( ins->map->uart_rcu );
+    usart_deinit( ins->map->uart_periph );
+    usart_baudrate_set( ins->map->uart_periph , baudrate );
+    usart_transmit_config( ins->map->uart_periph , USART_TRANSMIT_ENABLE );
+    usart_receive_config( ins->map->uart_periph , USART_RECEIVE_ENABLE );
+    usart_enable( ins->map->uart_periph );
+}
+
+/**
+ * @brief UART TX DMA初始化
+ * @param ins UART实例
+*/
+static void uart_tx_dma_init( arch_uart_ins_t* ins )
+{
+    (void)ins;
+}
 
 void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )
 {
@@ -39,9 +96,13 @@ void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )
     {
         return;
     }
-    uart_ins_table[port].map = &uart_map_table[port];
 
-    //@todo...
+    arch_uart_ins_t* uart_ins = &uart_ins_table[port];
+    uart_ins->map = &uart_map_table[port];
+
+    uart_gpio_init( uart_ins );
+    uart_ip_init( uart_ins , baudrate );
+    uart_tx_dma_init( uart_ins );
 }
 
 void arch_uart_deinit( arch_uart_port_t port )
