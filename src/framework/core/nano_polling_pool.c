@@ -2,6 +2,7 @@
 #include "../nano_framework_core.h"
 #include "../nano_function_gruop.h"
 #include "../nano_list.h"
+#include "../nano_msg.h"
 #include "framework_cfg.h"
 #include <string.h>
 
@@ -109,6 +110,7 @@ void nano_polling_pool_run(void)
             task->flag |= NANO_POLLING_TASK_FLAG_RUNNING;
             task->polling_func( task->user_ctx );
             task->flag &= ~NANO_POLLING_TASK_FLAG_RUNNING;
+            nano_msg_handler();  //每个任务执行完后都调用一次消息处理函数，确保消息能够及时处理
         }
     }
 }
