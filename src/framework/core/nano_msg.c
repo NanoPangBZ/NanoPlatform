@@ -226,6 +226,8 @@ void nano_msg_handler(void)
         msg_manager.pending_msg_used = 0;
         msg_manager.pending_msg_data_buf_used = 0;
     }
+
+    msg_manager.handing_msg_flag = 0; // 清除正在处理消息标志
 }
 
 static int nano_msg_mamanger_init(void)
