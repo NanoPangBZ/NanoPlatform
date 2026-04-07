@@ -10,6 +10,22 @@
  * @todo 临界区保护
 */
 
+#ifndef NANO_MSG_MAX_STORED_MSG_NUM
+    #define NANO_MSG_MAX_STORED_MSG_NUM 8
+#endif
+
+#ifndef NANO_MSG_MAX_DATA_BUF_SIZE
+    #define NANO_MSG_MAX_DATA_BUF_SIZE 512
+#endif
+
+#ifndef NANO_MSG_PENDING_ARRAY_SIZE
+    #define NANO_MSG_PENDING_ARRAY_SIZE 2
+#endif
+
+#ifndef NANO_MSG_PENDING_DATA_BUF_SIZE
+    #define NANO_MSG_PENDING_DATA_BUF_SIZE 128
+#endif
+
 #define TAG "nano_msg"
 #define INFO_LOG(...)
 #define WARN_LOG(...)
