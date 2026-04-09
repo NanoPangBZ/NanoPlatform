@@ -14,8 +14,11 @@ typedef struct arch_uart_pin_t{
 // UART外设映射表，根据实际情况进行修改
 typedef struct arch_uart_map_t{
     uint32_t uart_periph;
-    uint32_t tx_dma_rcu;
     uint32_t uart_rcu;
+    uint32_t dma_periph;
+    uint32_t dma_priority;
+    dma_subperipheral_enum dma_subperiph;
+    dma_channel_enum dma_channel;
     arch_uart_pin_t uart_tx_pin;
     arch_uart_pin_t uart_rx_pin;
 }arch_uart_map_t;
@@ -31,7 +34,6 @@ typedef struct arch_uart_ins_t{
 static const arch_uart_map_t uart_map_table[] = {
     {
         .uart_periph = USART0,
-        .tx_dma_rcu = RCU_DMA1,
         .uart_rcu = RCU_USART0,
         .uart_tx_pin = { .port = GPIOA, .pin = GPIO_PIN_9 },
         .uart_rx_pin = { .port = GPIOA, .pin = GPIO_PIN_10 },
@@ -86,7 +88,30 @@ static void uart_ip_init( arch_uart_ins_t* ins , uint32_t baudrate )
 */
 static void uart_tx_dma_init( arch_uart_ins_t* ins )
 {
-    (void)ins;
+    if( ins->map->dma_periph == 0 )
+    {
+        return;
+    }
+
+    dma_single_data_parameter_struct dma_init_struct;
+
+    dma_single_data_para_struct_init(&dma_init_struct);
+    dma_deinit( ins->map->dma_periph , ins->map->dma_channel);
+
+    dma_init_struct.direction = DMA_MEMORY_TO_PERIPH;
+    dma_init_struct.memory0_addr = NULL;
+    dma_init_struct.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
+    dma_init_struct.periph_memory_width = DMA_PERIPH_WIDTH_8BIT;
+    dma_init_struct.number = 0;
+    dma_init_struct.periph_addr = &USART_DATA( ins->map->uart_periph );
+    dma_init_struct.priority = ins->map->dma_priority;
+
+    dma_single_data_mode_init( ins->map->dma_periph , ins->map->dma_channel, &dma_init_struct);
+
+    dma_circulation_disable(ins->map->dma_periph, ins->map->dma_channel);
+    dma_channel_subperipheral_select(ins->map->dma_periph, ins->map->dma_channel, ins->map->dma_subperiph);
+    dma_interrupt_enable( ins->map->dma_periph , ins->map->dma_channel , DMA_CHXCTL_FTFIE );
+    dma_channel_enable( ins->map->dma_periph , ins->map->dma_channel );
 }
 
 void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )
