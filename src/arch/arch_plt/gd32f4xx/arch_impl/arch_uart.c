@@ -99,11 +99,11 @@ static void uart_tx_dma_init( arch_uart_ins_t* ins )
     dma_deinit( ins->map->dma_periph , ins->map->dma_channel);
 
     dma_init_struct.direction = DMA_MEMORY_TO_PERIPH;
-    dma_init_struct.memory0_addr = NULL;
+    dma_init_struct.memory0_addr = 0;
     dma_init_struct.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
     dma_init_struct.periph_memory_width = DMA_PERIPH_WIDTH_8BIT;
     dma_init_struct.number = 0;
-    dma_init_struct.periph_addr = &USART_DATA( ins->map->uart_periph );
+    dma_init_struct.periph_addr = (uint32_t)(&USART_DATA( ins->map->uart_periph ));
     dma_init_struct.priority = ins->map->dma_priority;
 
     dma_single_data_mode_init( ins->map->dma_periph , ins->map->dma_channel, &dma_init_struct);
