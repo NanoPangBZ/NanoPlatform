@@ -201,7 +201,9 @@ $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.S | prepare
 $(OBJ_DIR)/%.o: $(PROJECT_SRC_DIR)%.s | prepare
 	$(call BUILD_OBJECT_RULE,$(CC) $(CFLAGS) -c $< -o $@)
 
+ifneq ($(filter clean,$(MAKECMDGOALS)),clean)
 -include $(DEPS)
+endif
 
 clean:
 	@$(call RMDIR_R,$(BUILD_DIR))

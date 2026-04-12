@@ -1,3 +1,11 @@
+/*
+ * @Author: NanoPangBZ codingbugstd@gmail.com
+ * @Date: 2026-04-05 01:14:30
+ * @LastEditors: NanoPangBZ codingbugstd@gmail.com
+ * @LastEditTime: 2026-04-13 02:15:17
+ * @FilePath: \NanoPlatform\src\target\develop\src\target_main.c
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #include "framework/nano_function_gruop.h"
 #include "framework/nano_polling_pool.h"
 #include <stddef.h>
@@ -24,23 +32,22 @@ static void nano_test_polling_task(void* args)
 
 static int target_main(void)
 {
-    arch_gpio_init( 0 , ARCH_GPIO_DIR_OUTPUT , ARCH_GPIO_PULL_NONE );
-    arch_uart_init( 0 , 115200 );
+    // arch_gpio_init( 0 , ARCH_GPIO_DIR_OUTPUT , ARCH_GPIO_PULL_NONE );
 
-    nano_polling_task_desc_t task_desc = {
-        .attr = NANO_POLLING_TASK_ATTR_DEFAULT,
-        .freq_hz = 5, // 5Hz轮询频率
-        .name = "test_polling_task",
-        .polling_func = nano_test_polling_task,
-        .start_before_create = 1, // 创建前启动
-        .user_ctx = NULL
-    };
-    nano_polling_task_handle_t task_handle = nano_polling_task_create( &task_desc );
-    if( task_handle == NULL )
-    {
-        ERROR_LOG("Failed to create polling task");
-        return -1;
-    }
+    // nano_polling_task_desc_t task_desc = {
+    //     .attr = NANO_POLLING_TASK_ATTR_DEFAULT,
+    //     .freq_hz = 5, // 5Hz轮询频率
+    //     .name = "test_polling_task",
+    //     .polling_func = nano_test_polling_task,
+    //     .start_before_create = 1, // 创建前启动
+    //     .user_ctx = NULL
+    // };
+    // nano_polling_task_handle_t task_handle = nano_polling_task_create( &task_desc );
+    // if( task_handle == NULL )
+    // {
+    //     ERROR_LOG("Failed to create polling task");
+    //     return -1;
+    // }
 
     return 0;
 }
