@@ -18,6 +18,10 @@ FRMWK_SRCS += $(FRMWK_DIR)core/nano_core_sched.c
 include $(FRMWK_DIR)core/nano_net/nano_net.mk
 FRMWK_SRCS += $(NANO_NET_SRCS)
 
+# 加入nkv模块
+include $(FRMWK_DIR)core/nkv/nkv.mk
+FRMWK_SRCS += $(NKV_SRCS)
+
 # 加入模块的头文件搜索路径、源文件
 include $(FRMWK_DIR)module/module.mk
 FRMWK_INC_DIRS += $(MODULE_INC_DIRS)
