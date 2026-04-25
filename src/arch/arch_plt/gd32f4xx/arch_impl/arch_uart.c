@@ -17,6 +17,9 @@ typedef struct arch_uart_pin_t{
 typedef struct arch_uart_map_t{
     uint32_t uart_periph;
     uint32_t uart_rcu;
+    IRQn_Type uart_irqn;
+    uint8_t uart_irq_pre_priority;
+    uint8_t uart_irq_sub_priority;
     uint32_t dma_periph;
     uint32_t dma_priority;
     dma_subperipheral_enum dma_subperiph;
@@ -39,12 +42,17 @@ typedef struct arch_uart_ins_t{
     // 接收回调函数及其上下文指针
     arch_uart_receive_callback_t receive_callback;
     void* receive_callback_ctx;
+    uint8_t* receive_buffer;
+    uint32_t receive_buffer_len;
 }arch_uart_ins_t;
 
 static const arch_uart_map_t uart_map_table[] = {
     {
         .uart_periph = USART0,
         .uart_rcu = RCU_USART0,
+        .uart_irqn = USART0_IRQn,
+        .uart_irq_pre_priority = 0U,
+        .uart_irq_sub_priority = 0U,
         .dma_periph = DMA1,
         .dma_priority = DMA_PRIORITY_HIGH,
         .dma_subperiph = DMA_SUBPERI4,
@@ -126,7 +134,7 @@ static void uart_tx_dma_init( arch_uart_ins_t* ins )
 
     //@todo bad code, need to map DMA channel to correct IRQn
     nvic_irq_enable( DMA1_Channel7_IRQn , 0 , 0 );
-    nvic_irq_enable( USART0_IRQn , 0 , 0 );
+    nvic_irq_enable( ins->map->uart_irqn , ins->map->uart_irq_pre_priority , ins->map->uart_irq_sub_priority );
 }
 
 void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )
@@ -285,6 +293,31 @@ void arch_uart_start_send( arch_uart_port_t port , const uint8_t* data , uint32_
     dma_channel_enable( ins->map->dma_periph , ins->map->dma_channel );
 }
 
+void arch_uart_start_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len )
+{
+    if( port >= sizeof(uart_map_table) / sizeof(uart_map_table[0]) )
+    {
+        return;
+    }
+
+    arch_uart_ins_t* ins = &uart_ins_table[port];
+    if( ins->is_receiving )
+    {
+        return;
+    }
+
+    if( (buffer == NULL) || (buffer_len == 0U) )
+    {
+        return;
+    }
+
+    ins->receive_buffer = buffer;
+    ins->receive_buffer_len = buffer_len;
+    ins->is_receiving = 1;
+
+    usart_interrupt_enable( ins->map->uart_periph , USART_INT_RBNE );
+}
+
 /**
  * @brief UART TX DMA完成中断处理函数
  * @param ins UART实例
@@ -306,7 +339,28 @@ static void uart_tx_dma_irq_handler( arch_uart_ins_t* ins )
     {
         dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_TAE );
     }
+}
 
+/**
+ * @brief UART RX中断处理函数
+ * @param ins UART实例
+*/
+static void uart_rx_irq_handler( arch_uart_ins_t* ins )
+{
+    if( usart_interrupt_flag_get( ins->map->uart_periph , USART_INT_FLAG_RBNE ) != RESET )
+    {
+        uint8_t data = (uint8_t)usart_data_receive( ins->map->uart_periph );
+
+        if( ins->is_receiving && (ins->receive_buffer != NULL) && (ins->receive_buffer_len > 0U) )
+        {
+            ins->receive_buffer[0] = data;
+
+            if( ins->receive_callback != NULL )
+            {
+                ins->receive_callback( ins->port , ins->receive_callback_ctx , ins->receive_buffer , 1U );
+            }
+        }
+    }
 }
 
 /**
@@ -316,4 +370,9 @@ void DMA1_Channel7_IRQHandler(void)
 {
     // 这里假设DMA1的Channel7用于USART0的TX DMA，根据实际情况修改
     uart_tx_dma_irq_handler( &uart_ins_table[0] );
+}
+
+void USART0_IRQHandler(void)
+{
+    uart_rx_irq_handler( &uart_ins_table[0] );
 }

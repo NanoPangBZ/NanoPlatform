@@ -20,17 +20,19 @@
 #define TEST_ARCH_UART_PORT 0
 #define TEST_ARCH_UART_BAUDRATE 115200
 
-#define ECHO_TEST                   0
+#define ECHO_TEST                   1
 #define SEND_TEST                   0
-#define ASYN_ISR_MODE_SEND_TEST     1
+#define ASYN_ISR_MODE_SEND_TEST     0
 #define ASYN_PS_MODE_SEND_TEST      0
 
 #if ECHO_TEST == 1
 
 static uint8_t* recieve_buffer = NULL;
 
-static void uart_receive_callback(void* ctx, const uint8_t* data, uint32_t len)
+static void arch_uart_receive_callback( arch_uart_port_t port , void* ctx , const uint8_t* data , uint32_t len)
 {
+    (void)port;
+    (void)ctx;
     INFO_LOG("uart receive callback, data len: %u", len);
     DUMP_HEX("uart receive data: ", data, len);
     arch_uart_send(TEST_ARCH_UART_PORT, data, len, 1000);
@@ -48,7 +50,7 @@ static int test_init(void)
         return -1;
     }
 
-    arch_uart_set_receive_callback(TEST_ARCH_UART_PORT, uart_receive_callback, NULL);
+    arch_uart_set_receive_callback(TEST_ARCH_UART_PORT, arch_uart_receive_callback, NULL);
     arch_uart_start_receive(TEST_ARCH_UART_PORT, recieve_buffer, 128);
 
     return 0;
