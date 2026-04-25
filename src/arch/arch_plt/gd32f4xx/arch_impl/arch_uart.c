@@ -1,4 +1,8 @@
+#include "arch_cfg.h"
 #include "arch/arch_uart.h"
+
+#ifdef ARCH_UART_MAP_TABLE
+
 #include "arch/arch_init.h"
 
 #include "gd32f4xx_gpio.h"
@@ -46,33 +50,7 @@ typedef struct arch_uart_ins_t{
     uint32_t receive_buffer_len;
 }arch_uart_ins_t;
 
-static const arch_uart_map_t uart_map_table[] = {
-    {
-        .uart_periph = USART0,
-        .uart_rcu = RCU_USART0,
-        .uart_irqn = USART0_IRQn,
-        .uart_irq_pre_priority = 0U,
-        .uart_irq_sub_priority = 0U,
-        .dma_periph = DMA1,
-        .dma_priority = DMA_PRIORITY_HIGH,
-        .dma_subperiph = DMA_SUBPERI4,
-        .dma_channel = DMA_CH7,
-        .uart_tx_pin = {
-            .port_rcu = RCU_GPIOB,
-            .port = GPIOB,
-            .pin = GPIO_PIN_6,
-            .af = GPIO_AF_7
-        },
-        .uart_rx_pin = {
-            .port_rcu = RCU_GPIOB,
-            .port = GPIOB,
-            .pin = GPIO_PIN_7,
-            .af = GPIO_AF_7
-        }
-    }
-
-};
-
+static const arch_uart_map_t uart_map_table[] = ARCH_UART_MAP_TABLE;
 static arch_uart_ins_t uart_ins_table[ sizeof(uart_map_table) / sizeof(uart_map_table[0]) ];
 
 /**
@@ -376,3 +354,5 @@ void USART0_IRQHandler(void)
 {
     uart_rx_irq_handler( &uart_ins_table[0] );
 }
+
+#endif  // #ifdef ARCH_UART_MAP_TABLE
