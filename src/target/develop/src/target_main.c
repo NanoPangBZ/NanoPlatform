@@ -32,22 +32,23 @@ static void nano_test_polling_task(void* args)
 
 static int target_main(void)
 {
-    // arch_gpio_init( 0 , ARCH_GPIO_DIR_OUTPUT , ARCH_GPIO_PULL_NONE );
+    arch_gpio_init( 0 , ARCH_GPIO_DIR_OUTPUT , ARCH_GPIO_PULL_NONE );
+    arch_uart_init( 0 , 115200 );
 
-    // nano_polling_task_desc_t task_desc = {
-    //     .attr = NANO_POLLING_TASK_ATTR_DEFAULT,
-    //     .freq_hz = 5, // 5Hz轮询频率
-    //     .name = "test_polling_task",
-    //     .polling_func = nano_test_polling_task,
-    //     .start_before_create = 1, // 创建前启动
-    //     .user_ctx = NULL
-    // };
-    // nano_polling_task_handle_t task_handle = nano_polling_task_create( &task_desc );
-    // if( task_handle == NULL )
-    // {
-    //     ERROR_LOG("Failed to create polling task");
-    //     return -1;
-    // }
+    nano_polling_task_desc_t task_desc = {
+        .attr = NANO_POLLING_TASK_ATTR_DEFAULT,
+        .freq_hz = 5, // 5Hz轮询频率
+        .name = "test_polling_task",
+        .polling_func = nano_test_polling_task,
+        .start_before_create = 1, // 创建前启动
+        .user_ctx = NULL
+    };
+    nano_polling_task_handle_t task_handle = nano_polling_task_create( &task_desc );
+    if( task_handle == NULL )
+    {
+        ERROR_LOG("Failed to create polling task");
+        return -1;
+    }
 
     return 0;
 }
