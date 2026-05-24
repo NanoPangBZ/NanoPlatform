@@ -13,3 +13,4 @@ ARCH_WEAK_SRCS += $(ARCH_WEAK_DIR)arch_i2c_weak.c
 ARCH_WEAK_SRCS += $(ARCH_WEAK_DIR)arch_lp_weak.c
 ARCH_WEAK_SRCS += $(ARCH_WEAK_DIR)arch_cpu_weak.c
 ARCH_WEAK_SRCS += $(ARCH_WEAK_DIR)arch_flash_weak.c
+ARCH_WEAK_SRCS += $(ARCH_WEAK_DIR)arch_one_wire_weak.c
