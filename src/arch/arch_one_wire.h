@@ -36,7 +36,7 @@ void arch_one_wire_reset( arch_one_wire_port_t port );
  * @param bit_count 要发送的数据位数
  * @return 实际发送的数据长度
 */
-uint32_t arch_one_write_send( arch_one_wire_port_t port , const uint8_t* buf , uint32_t bit_count );
+uint32_t arch_one_wire_send( arch_one_wire_port_t port , const uint8_t* buf , uint32_t bit_count );
 
 /**
  * @brief 从One Wire总线读取数据
@@ -45,7 +45,7 @@ uint32_t arch_one_write_send( arch_one_wire_port_t port , const uint8_t* buf , u
  * @param bit_count 要接收的数据位数
  * @return 实际接收到的数据长度
 */
-uint32_t arch_one_write_read( arch_one_wire_port_t port , uint8_t* buf , uint32_t bit_count );
+uint32_t arch_one_wire_read( arch_one_wire_port_t port , uint8_t* buf , uint32_t bit_count );
 
 /**
  * @brief 设置One Wire写入回调函数
@@ -54,7 +54,7 @@ uint32_t arch_one_write_read( arch_one_wire_port_t port , uint8_t* buf , uint32_
  * @param ctx 回调函数的上下文指针
  * @return 0表示成功，非0表示失败
 */
-uint32_t arch_one_write_set_write_finish_cb( arch_one_wire_port_t port , arch_one_wire_write_callback_t write_cb , void* ctx );
+uint32_t arch_one_write_set_wire_finish_cb( arch_one_wire_port_t port , arch_one_wire_write_callback_t write_cb , void* ctx );
 
 #ifdef __cplusplus
 }
