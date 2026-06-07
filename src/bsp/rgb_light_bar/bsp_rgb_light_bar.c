@@ -1,5 +1,203 @@
 #include "../bsp_rgb_light_bar.h"
+#include "bsp_cfg.h"
+
+#ifdef BSP_RGB_LIGHT_BAR_MAP_TABLE
+
+#include "arch/arch_one_wire.h"
+#include "framework/nano_list.h"
+#include "framework/nano_function_gruop.h"
 #include <stddef.h>
+#include <string.h>
+
+#include "framework/nano_heap.h"
+#define MALLOC( __size ) nano_heap_malloc( __size , NANO_HEAP_ATTR_DEFAULT )
+#define FREE( __ptr ) nano_heap_free( __ptr )
+
+#define INFO_LOG(...)
+#define WARN_LOG(...)
+#define ERROR_LOG(...)
+
+typedef struct bsp_rgb_light_bar_map_t{
+    const char* name;
+    arch_one_wire_port_t arch_one_wire_port_idx;
+    uint32_t rgb_cnt;
+}bsp_rgb_light_bar_map_t;
+
+typedef struct bsp_rgb_light_bar_t{
+    const bsp_rgb_light_bar_map_t* map;
+    uint8_t* led_color_send_buf;
+    uint8_t open_cnt;
+}bsp_rgb_light_bar_t;
+
+static const bsp_rgb_light_bar_map_t bsp_rgb_light_bar_maps[] = BSP_RGB_LIGHT_BAR_MAP_TABLE;
+static list_handle_t bsp_rgb_light_bar_list = NULL;
+
+bsp_rgb_light_bar_handle_t bsp_rgb_light_bar_open( const char* name )
+{
+    // 遍历已经打开的RGB灯条列表，查找是否已经打开了同名的RGB灯条
+    foreach_list( bsp_rgb_light_bar_list , item , bsp_rgb_light_bar_t )
+    {
+        if( strcmp( item->map->name , name ) == 0 )
+        {
+            item->open_cnt++;
+            INFO_LOG("bsp_rgb_light_bar_open: %s already opened, return exist handle", name );
+            return item;
+        }
+    }
+
+    const bsp_rgb_light_bar_map_t* map = NULL;
+    for( uint32_t i = 0 ; i < sizeof(bsp_rgb_light_bar_maps) / sizeof(bsp_rgb_light_bar_maps[0]) ; i++ )
+    {
+        if( strcmp( bsp_rgb_light_bar_maps[i].name , name ) == 0 )
+        {
+            map = &bsp_rgb_light_bar_maps[i];
+            break;
+        }
+    }
+
+    if( map == NULL )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_open: %s not exist in map", name );
+        return NULL;
+    }
+
+    //先在栈上实例化
+    bsp_rgb_light_bar_t light_bar;
+    memset( &light_bar , 0 , sizeof(light_bar) );
+    light_bar.map = map;
+
+    //分配发送缓冲区，长度为RGB灯珠数量 * 3（每个灯珠需要3个字节表示RGB颜色） + 1（reset信号）
+    light_bar.led_color_send_buf = MALLOC( light_bar.map->rgb_cnt * 3 + 1 );
+    if( light_bar.led_color_send_buf == NULL )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_open: %s malloc led_color_send_buf failed", name );
+        return NULL;
+    }
+    memset( light_bar.led_color_send_buf , 0 , light_bar.map->rgb_cnt * 3 + 1 );
+
+    //打开RGB灯条的One Wire接口
+    arch_one_wire_init( light_bar.map->arch_one_wire_port_idx );
+
+    //默认将所有灯珠颜色设置为黑色（即关闭状态）
+    light_bar.led_color_send_buf[ light_bar.map->rgb_cnt * 3 ] = 0x00; // reset信号
+
+    //刷新一次RGB灯条，使其显示为默认颜色
+    arch_one_wire_send( light_bar.map->arch_one_wire_port_idx , light_bar.led_color_send_buf , light_bar.map->rgb_cnt * 3 + 1 );
+
+    //将新打开的RGB灯条的open_cnt设置为1
+    light_bar.open_cnt = 1;
+
+    //将新打开的RGB灯条添加到列表中，并返回其句柄
+    bsp_rgb_light_bar_handle_t handle = list_add_element( bsp_rgb_light_bar_list , &light_bar );
+    if( handle == NULL )
+    {
+        FREE( light_bar.led_color_send_buf );
+        ERROR_LOG("bsp_rgb_light_bar_open: %s add to list failed", name );
+        return NULL;
+    }
+
+    return handle;
+}
+
+void bsp_rgb_light_bar_close( bsp_rgb_light_bar_handle_t handle )
+{
+    if( handle == NULL )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_close: handle is NULL");
+        return;
+    }
+
+    handle->open_cnt--;
+    if( handle->open_cnt > 0 )
+    {
+        INFO_LOG("bsp_rgb_light_bar_close: %s still has %d open count, not close", handle->map->name , handle->open_cnt );
+        return;
+    }
+
+    //关闭RGB灯条的One Wire接口
+    arch_one_wire_deinit( handle->map->arch_one_wire_port_idx );
+
+    //释放发送缓冲区
+    FREE( handle->led_color_send_buf );
+
+    //从列表中移除RGB灯条
+    list_remove_element( bsp_rgb_light_bar_list , handle );
+
+    return;
+}
+
+void bsp_rgb_light_bar_set_color( bsp_rgb_light_bar_handle_t handle , uint32_t rgb_color )
+{
+    (void)handle;
+    (void)rgb_color;
+    return;
+}
+
+uint32_t bsp_rgb_light_bar_get_led_cnt( bsp_rgb_light_bar_handle_t handle )
+{
+    if( handle == NULL )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_get_led_cnt: handle is NULL");
+        return 0;
+    }
+
+    return handle->map->rgb_cnt;
+}
+
+int bsp_rgb_light_bar_set_led_color_by_index( bsp_rgb_light_bar_handle_t handle , uint32_t idx , uint32_t rgb_color )
+{
+    (void)handle;
+    (void)idx;
+    (void)rgb_color;
+    return 0;
+}
+
+uint32_t bsp_rgb_light_bar_get_color_by_index( bsp_rgb_light_bar_handle_t handle , uint32_t idx )
+{
+    (void)handle;
+    (void)idx;
+    return 0;
+}
+
+int bsp_rgb_light_bar_set_led_color( bsp_rgb_light_bar_handle_t handle , uint32_t* rgb_color_buf , uint32_t led_cnt )
+{
+    (void)handle;
+    (void)rgb_color_buf;
+    (void)led_cnt;
+    return 0;
+}
+
+static int bsp_rgb_light_bar_init(void)
+{
+    bsp_rgb_light_bar_list = list_create( sizeof(bsp_rgb_light_bar_t) );
+
+    if( bsp_rgb_light_bar_list == NULL )
+    {
+        ERROR_LOG("create bsp_rgb_light_bar_list failed");
+        return -1;
+    }
+
+    INFO_LOG("bsp_rgb_light_bar_init success");
+    return 0;
+}
+
+static int bsp_rgb_light_bar_deinit(void)
+{
+    if( bsp_rgb_light_bar_list != NULL )
+    {
+        list_handle_t temp = bsp_rgb_light_bar_list;
+        bsp_rgb_light_bar_list = NULL;
+        list_destroyed( temp );
+    }
+
+    INFO_LOG("bsp_rgb_light_bar_deinit success");
+    return 0;
+}
+
+ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_BSP_INIT , bsp_rgb_light_bar_init , 0 );
+ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_BSP_DEINIT , bsp_rgb_light_bar_deinit , 0 );
+
+#else
 
 bsp_rgb_light_bar_handle_t bsp_rgb_light_bar_open( const char* name )
 {
@@ -47,3 +245,5 @@ int bsp_rgb_light_bar_set_led_color( bsp_rgb_light_bar_handle_t handle , uint32_
     (void)led_cnt;
     return 0;
 }
+
+#endif
