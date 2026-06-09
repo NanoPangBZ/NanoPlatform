@@ -53,14 +53,6 @@ int bsp_rgb_light_bar_set_led_color_by_index( bsp_rgb_light_bar_handle_t handle 
 */
 uint32_t bsp_rgb_light_bar_get_color_by_index( bsp_rgb_light_bar_handle_t handle , uint32_t idx );
 
-/**
- * @brief 设置LED颜色
- * @param handle 句柄
- * @param rgb_color_buf 颜色缓冲
- * @param led_cnt
- * @return 0表示成功，非0表示失败
-*/
-int bsp_rgb_light_bar_set_led_color( bsp_rgb_light_bar_handle_t handle , uint32_t* rgb_color_buf , uint32_t led_cnt );
 
 #ifdef __cplusplus
 }

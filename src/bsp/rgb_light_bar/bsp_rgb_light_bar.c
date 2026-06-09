@@ -38,6 +38,35 @@ typedef struct bsp_rgb_light_bar_t{
 static const bsp_rgb_light_bar_map_t bsp_rgb_light_bar_maps[] = BSP_RGB_LIGHT_BAR_MAP_TABLE;
 static list_handle_t bsp_rgb_light_bar_list = NULL;
 
+static void bsp_rgb_light_bar_rgb_to_grb( uint32_t rgb_color , uint8_t* grb )
+{
+    grb[0] = (uint8_t)( ( rgb_color >> 8 ) & 0xFFU );
+    grb[1] = (uint8_t)( ( rgb_color >> 16 ) & 0xFFU );
+    grb[2] = (uint8_t)( rgb_color & 0xFFU );
+}
+
+static uint32_t bsp_rgb_light_bar_grb_to_rgb( const uint8_t* grb )
+{
+    return ( ( uint32_t )grb[1] << 16 ) | ( ( uint32_t )grb[0] << 8 ) | ( uint32_t )grb[2];
+}
+
+static int bsp_rgb_light_bar_is_led_idx_valid( bsp_rgb_light_bar_handle_t handle , uint32_t idx )
+{
+    return ( idx < handle->map->rgb_cnt ) ? 1 : 0;
+}
+
+static void bsp_rgb_light_bar_write_led_color_buf( bsp_rgb_light_bar_handle_t handle , uint32_t idx , uint32_t rgb_color )
+{
+    uint8_t grb[3];
+    bsp_rgb_light_bar_rgb_to_grb( rgb_color , grb );
+    memcpy( &handle->led_color_send_buf[idx * 3U] , grb , 3U );
+}
+
+static uint32_t bsp_rgb_light_bar_read_led_color_buf( bsp_rgb_light_bar_handle_t handle , uint32_t idx )
+{
+    return bsp_rgb_light_bar_grb_to_rgb( &handle->led_color_send_buf[idx * 3U] );
+}
+
 bsp_rgb_light_bar_handle_t bsp_rgb_light_bar_open( const char* name )
 {
     // 遍历已经打开的RGB灯条列表，查找是否已经打开了同名的RGB灯条
@@ -134,9 +163,22 @@ void bsp_rgb_light_bar_close( bsp_rgb_light_bar_handle_t handle )
 
 void bsp_rgb_light_bar_set_color( bsp_rgb_light_bar_handle_t handle , uint32_t rgb_color )
 {
-    (void)handle;
-    (void)rgb_color;
-    return;
+    if( handle == NULL )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_set_color: handle is NULL");
+        return;
+    }
+
+    if( handle->led_color_send_buf == NULL )
+    {
+        return;
+    }
+
+    uint32_t rgb_cnt = handle->map->rgb_cnt;
+    for( uint32_t i = 0U; i < rgb_cnt; i++ )
+    {
+        bsp_rgb_light_bar_write_led_color_buf( handle , i , rgb_color );
+    }
 }
 
 uint32_t bsp_rgb_light_bar_get_led_cnt( bsp_rgb_light_bar_handle_t handle )
@@ -152,25 +194,47 @@ uint32_t bsp_rgb_light_bar_get_led_cnt( bsp_rgb_light_bar_handle_t handle )
 
 int bsp_rgb_light_bar_set_led_color_by_index( bsp_rgb_light_bar_handle_t handle , uint32_t idx , uint32_t rgb_color )
 {
-    (void)handle;
-    (void)idx;
-    (void)rgb_color;
+    if( handle == NULL )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_set_led_color_by_index: handle is NULL");
+        return -1;
+    }
+
+    if( handle->led_color_send_buf == NULL )
+    {
+        return -1;
+    }
+
+    if( !bsp_rgb_light_bar_is_led_idx_valid( handle , idx ) )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_set_led_color_by_index: idx %u out of range", idx );
+        return -1;
+    }
+
+    bsp_rgb_light_bar_write_led_color_buf( handle , idx , rgb_color );
     return 0;
 }
 
 uint32_t bsp_rgb_light_bar_get_color_by_index( bsp_rgb_light_bar_handle_t handle , uint32_t idx )
 {
-    (void)handle;
-    (void)idx;
-    return 0;
-}
+    if( handle == NULL )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_get_color_by_index: handle is NULL");
+        return 0;
+    }
 
-int bsp_rgb_light_bar_set_led_color( bsp_rgb_light_bar_handle_t handle , uint32_t* rgb_color_buf , uint32_t led_cnt )
-{
-    (void)handle;
-    (void)rgb_color_buf;
-    (void)led_cnt;
-    return 0;
+    if( handle->led_color_send_buf == NULL )
+    {
+        return 0;
+    }
+
+    if( !bsp_rgb_light_bar_is_led_idx_valid( handle , idx ) )
+    {
+        ERROR_LOG("bsp_rgb_light_bar_get_color_by_index: idx %u out of range", idx );
+        return 0;
+    }
+
+    return bsp_rgb_light_bar_read_led_color_buf( handle , idx );
 }
 
 static int bsp_rgb_light_bar_init(void)
