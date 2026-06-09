@@ -6,6 +6,7 @@
 #include "arch/arch_one_wire.h"
 #include "framework/nano_list.h"
 #include "framework/nano_function_gruop.h"
+#include "framework/nano_polling_pool.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -20,6 +21,8 @@
 #define BSP_RGB_LIGHT_BAR_BITS_PER_LED        24U
 #define BSP_RGB_LIGHT_BAR_COLOR_BUF_SIZE( __rgb_cnt )   ( ( __rgb_cnt ) * 3U )
 #define BSP_RGB_LIGHT_BAR_COLOR_BIT_CNT( __rgb_cnt )    ( ( __rgb_cnt ) * BSP_RGB_LIGHT_BAR_BITS_PER_LED )
+#define BSP_RGB_LIGHT_BAR_POLLING_FREQ_HZ     100U
+#define bsp_rgb_light_bar_polling_task_handle_NAME   "bsp_rgb_light_bar"
 
 typedef struct bsp_rgb_light_bar_map_t{
     const char* name;
@@ -37,6 +40,7 @@ typedef struct bsp_rgb_light_bar_t{
 
 static const bsp_rgb_light_bar_map_t bsp_rgb_light_bar_maps[] = BSP_RGB_LIGHT_BAR_MAP_TABLE;
 static list_handle_t bsp_rgb_light_bar_list = NULL;
+static nano_polling_task_handle_t bsp_rgb_light_bar_polling_task_handle = NULL;
 
 static void bsp_rgb_light_bar_rgb_to_grb( uint32_t rgb_color , uint8_t* grb )
 {
@@ -115,9 +119,6 @@ bsp_rgb_light_bar_handle_t bsp_rgb_light_bar_open( const char* name )
 
     //打开RGB灯条的One Wire接口
     arch_one_wire_init( light_bar.map->arch_one_wire_port_idx );
-
-    //刷新一次RGB灯条，使其显示为默认颜色（全黑）
-    arch_one_wire_send( light_bar.map->arch_one_wire_port_idx , light_bar.led_color_send_buf , light_bar.led_color_send_buf_bit_cnt );
 
     //将新打开的RGB灯条的open_cnt设置为1
     light_bar.open_cnt = 1;
@@ -237,6 +238,26 @@ uint32_t bsp_rgb_light_bar_get_color_by_index( bsp_rgb_light_bar_handle_t handle
     return bsp_rgb_light_bar_read_led_color_buf( handle , idx );
 }
 
+static void bsp_rgb_light_bar_polling_task( void* args )
+{
+    (void)args;
+
+    if( bsp_rgb_light_bar_list == NULL )
+    {
+        return;
+    }
+
+    foreach_list( bsp_rgb_light_bar_list , item , bsp_rgb_light_bar_t )
+    {
+        if( item->led_color_send_buf != NULL )
+        {
+            arch_one_wire_send( item->map->arch_one_wire_port_idx ,
+                                item->led_color_send_buf ,
+                                item->led_color_send_buf_bit_cnt );
+        }
+    }
+}
+
 static int bsp_rgb_light_bar_init(void)
 {
     bsp_rgb_light_bar_list = list_create( sizeof(bsp_rgb_light_bar_t) );
@@ -247,12 +268,34 @@ static int bsp_rgb_light_bar_init(void)
         return -1;
     }
 
+    nano_polling_task_desc_t desc = {
+        .attr = NANO_POLLING_TASK_ATTR_DEFAULT,
+        .name = bsp_rgb_light_bar_polling_task_handle_NAME,
+        .polling_func = bsp_rgb_light_bar_polling_task,
+        .freq_hz = BSP_RGB_LIGHT_BAR_POLLING_FREQ_HZ,
+        .start_before_create = 1,
+    };
+    bsp_rgb_light_bar_polling_task_handle = nano_polling_task_create( &desc );
+    if( bsp_rgb_light_bar_polling_task_handle == NULL )
+    {
+        ERROR_LOG("create bsp_rgb_light_bar polling task failed");
+        list_destroyed( bsp_rgb_light_bar_list );
+        bsp_rgb_light_bar_list = NULL;
+        return -1;
+    }
+
     INFO_LOG("bsp_rgb_light_bar_init success");
     return 0;
 }
 
 static int bsp_rgb_light_bar_deinit(void)
 {
+    if( bsp_rgb_light_bar_polling_task_handle != NULL )
+    {
+        nano_polling_task_destroy( bsp_rgb_light_bar_polling_task_handle );
+        bsp_rgb_light_bar_polling_task_handle = NULL;
+    }
+
     if( bsp_rgb_light_bar_list != NULL )
     {
         list_handle_t temp = bsp_rgb_light_bar_list;
