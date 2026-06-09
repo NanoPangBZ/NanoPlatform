@@ -17,6 +17,10 @@
 #define WARN_LOG(...)
 #define ERROR_LOG(...)
 
+#define BSP_RGB_LIGHT_BAR_BITS_PER_LED        24U
+#define BSP_RGB_LIGHT_BAR_COLOR_BUF_SIZE( __rgb_cnt )   ( ( __rgb_cnt ) * 3U )
+#define BSP_RGB_LIGHT_BAR_COLOR_BIT_CNT( __rgb_cnt )    ( ( __rgb_cnt ) * BSP_RGB_LIGHT_BAR_BITS_PER_LED )
+
 typedef struct bsp_rgb_light_bar_map_t{
     const char* name;
     arch_one_wire_port_t arch_one_wire_port_idx;
@@ -26,6 +30,8 @@ typedef struct bsp_rgb_light_bar_map_t{
 typedef struct bsp_rgb_light_bar_t{
     const bsp_rgb_light_bar_map_t* map;
     uint8_t* led_color_send_buf;
+    uint32_t led_color_send_buf_size;
+    uint32_t led_color_send_buf_bit_cnt;
     uint8_t open_cnt;
 }bsp_rgb_light_bar_t;
 
@@ -66,23 +72,23 @@ bsp_rgb_light_bar_handle_t bsp_rgb_light_bar_open( const char* name )
     memset( &light_bar , 0 , sizeof(light_bar) );
     light_bar.map = map;
 
-    //分配发送缓冲区，长度为RGB灯珠数量 * 3（每个灯珠需要3个字节表示RGB颜色） + 1（reset信号）
-    light_bar.led_color_send_buf = MALLOC( light_bar.map->rgb_cnt * 3 + 1 );
+    // 每个灯珠 24bit（RGB 各 8bit），停止位由 arch_one_wire 底层处理
+    light_bar.led_color_send_buf_size = BSP_RGB_LIGHT_BAR_COLOR_BUF_SIZE( light_bar.map->rgb_cnt );
+    light_bar.led_color_send_buf_bit_cnt = BSP_RGB_LIGHT_BAR_COLOR_BIT_CNT( light_bar.map->rgb_cnt );
+
+    light_bar.led_color_send_buf = MALLOC( light_bar.led_color_send_buf_size );
     if( light_bar.led_color_send_buf == NULL )
     {
         ERROR_LOG("bsp_rgb_light_bar_open: %s malloc led_color_send_buf failed", name );
         return NULL;
     }
-    memset( light_bar.led_color_send_buf , 0 , light_bar.map->rgb_cnt * 3 + 1 );
+    memset( light_bar.led_color_send_buf , 0 , light_bar.led_color_send_buf_size );
 
     //打开RGB灯条的One Wire接口
     arch_one_wire_init( light_bar.map->arch_one_wire_port_idx );
 
-    //默认将所有灯珠颜色设置为黑色（即关闭状态）
-    light_bar.led_color_send_buf[ light_bar.map->rgb_cnt * 3 ] = 0x00; // reset信号
-
-    //刷新一次RGB灯条，使其显示为默认颜色
-    arch_one_wire_send( light_bar.map->arch_one_wire_port_idx , light_bar.led_color_send_buf , light_bar.map->rgb_cnt * 3 + 1 );
+    //刷新一次RGB灯条，使其显示为默认颜色（全黑）
+    arch_one_wire_send( light_bar.map->arch_one_wire_port_idx , light_bar.led_color_send_buf , light_bar.led_color_send_buf_bit_cnt );
 
     //将新打开的RGB灯条的open_cnt设置为1
     light_bar.open_cnt = 1;
