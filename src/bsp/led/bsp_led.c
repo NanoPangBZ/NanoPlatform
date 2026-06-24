@@ -1,4 +1,7 @@
 #include "bsp/bsp_led.h"
+#include "bsp_cfg.h"
+
+#ifdef BSP_LED_MAP_TABLE
 
 #include "arch/arch_gpio.h"
 #include "framework/nano_list.h"
@@ -28,12 +31,7 @@ typedef struct bsp_led_t{
     uint32_t value;
 }bsp_led_t;
 
-static const bsp_led_map_t bsp_led_maps[] = {
-    {
-        .name = "tick",
-        .pin = 0,
-    }
-};
+static const bsp_led_map_t bsp_led_maps[] = BSP_LED_MAP_TABLE;
 
 static list_handle_t bsp_led_list = NULL;
 
@@ -143,3 +141,31 @@ static int bsp_led_deinit(void)
 
 ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_BSP_INIT , bsp_led_init , 3 );
 ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_BSP_DEINIT , bsp_led_deinit , 3 );
+
+#else
+
+#include <stddef.h>
+
+bsp_led_handle_t bsp_led_open( const char* name )
+{
+    (void)name;
+    return NULL;
+}
+
+void bsp_led_close( bsp_led_handle_t handle )
+{
+    (void)handle;
+}
+
+void bsp_led_set_value( bsp_led_handle_t handle , uint32_t value )
+{
+    (void)handle;
+}
+
+uint32_t bsp_led_get_value( bsp_led_handle_t handle )
+{
+    (void)handle;
+    return 0;
+}
+
+#endif
