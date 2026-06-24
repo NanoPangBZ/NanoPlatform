@@ -279,7 +279,7 @@ static int bsp_rgb_light_bar_init(void)
     if( bsp_rgb_light_bar_polling_task_handle == NULL )
     {
         ERROR_LOG("create bsp_rgb_light_bar polling task failed");
-        list_destroyed( bsp_rgb_light_bar_list );
+        list_destroy( bsp_rgb_light_bar_list );
         bsp_rgb_light_bar_list = NULL;
         return -1;
     }
@@ -300,7 +300,7 @@ static int bsp_rgb_light_bar_deinit(void)
     {
         list_handle_t temp = bsp_rgb_light_bar_list;
         bsp_rgb_light_bar_list = NULL;
-        list_destroyed( temp );
+        list_destroy( temp );
     }
 
     INFO_LOG("bsp_rgb_light_bar_deinit success");

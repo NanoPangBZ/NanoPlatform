@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 #include "arch/arch_uart.h"
-#include "arch/arch_gpio.h"
+#include "bsp/bsp_led.h"
 
 #define TAG "target_main"
 #define DEBUG_LOG(...)
@@ -21,19 +21,20 @@
 
 static void nano_test_polling_task(void* args)
 {
-    (void)args;
-    static uint8_t led_state = 0;
-    led_state = !led_state;
-
-    const char* msg = "Hello NanoFramework Polling Task!\r\n";
-    arch_uart_send( 0 , (const uint8_t*)msg , 34 , 100);
-    arch_gpio_write( 0 , led_state );
+    bsp_led_handle_t led_handle = (bsp_led_handle_t)args;
+    bsp_led_set_value( led_handle , !bsp_led_get_value( led_handle ) );
 }
 
 static int target_main(void)
 {
-    arch_gpio_init( 0 , ARCH_GPIO_DIR_OUTPUT , ARCH_GPIO_PULL_NONE );
     arch_uart_init( 0 , 115200 );
+
+    bsp_led_handle_t led_handle = bsp_led_open( "tick" );
+    if( led_handle == NULL )
+    {
+        ERROR_LOG("Failed to open led");
+        return -1;
+    }
 
     nano_polling_task_desc_t task_desc = {
         .attr = NANO_POLLING_TASK_ATTR_DEFAULT,
@@ -41,7 +42,7 @@ static int target_main(void)
         .name = "test_polling_task",
         .polling_func = nano_test_polling_task,
         .start_before_create = 1, // 创建前启动
-        .user_ctx = NULL
+        .user_ctx = led_handle
     };
     nano_polling_task_handle_t task_handle = nano_polling_task_create( &task_desc );
     if( task_handle == NULL )

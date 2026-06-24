@@ -30,7 +30,7 @@ typedef struct{
 
 
 nano_net_list_handle_t nano_net_list_create(nano_net_list_desc_t* desc);
-void nano_net_list_destroyed(nano_net_list_handle_t list);
+void nano_net_list_destroy(nano_net_list_handle_t list);
 
 int32_t nano_net_list_iterator_reset(nano_net_list_handle_t list);
 nano_net_list_element_t nano_net_list_iterator_get_element(nano_net_list_handle_t list);

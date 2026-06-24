@@ -22,7 +22,7 @@ list_handle_t list_create(uint32_t element_size);
  * @brief 销毁列表
  * @param list 列表句柄
 */
-void list_destroyed(list_handle_t list);
+void list_destroy(list_handle_t list);
 
 /**
  * @brief 重置列表迭代器
