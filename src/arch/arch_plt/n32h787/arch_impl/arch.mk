@@ -2,6 +2,11 @@ ARCH_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ARCH_IMPL_INC_DIRS += -I$(ARCH_DIR)
 
+ARCH_IMPL_SRCS += $(ARCH_DIR)private/clock.c
+ARCH_IMPL_SRCS += $(ARCH_DIR)private/delay.c
+
+ARCH_IMPL_SRCS += $(ARCH_DIR)arch_init.c
+
 # N32H787_CORE / DCORE 在 sdk/sdk.mk 中解析；此处仅消费 N32H787_CORE
 ifeq ($(N32H787_CORE),CM4)
 ARCH_IMPL_CFLAGS += -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard

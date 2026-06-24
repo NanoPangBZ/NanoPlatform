@@ -4,8 +4,8 @@
 
 typedef uint8_t arch_uart_port_t;
 
-typedef void (*arch_uart_send_callback_t)( void* ctx );
-typedef void (*arch_uart_receive_callback_t)( void* ctx , const uint8_t* data , uint32_t len);
+typedef void (*arch_uart_send_callback_t)( arch_uart_port_t port , void* ctx );
+typedef void (*arch_uart_receive_callback_t)( arch_uart_port_t port , void* ctx , const uint8_t* data , uint32_t len);
 
 #ifdef __cplusplus
 extern "C" {

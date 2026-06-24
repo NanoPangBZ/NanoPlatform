@@ -43,6 +43,13 @@ __attribute__((weak)) void arch_uart_set_receive_callback( arch_uart_port_t port
     (void)ctx;
 }
 
+__attribute__((weak))  void arch_uart_start_send( arch_uart_port_t port , const uint8_t* data , uint32_t len )
+{
+    (void)port;
+    (void)data;
+    (void)len;
+}
+
 __attribute__((weak)) void arch_uart_start_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len )
 {
     (void)port;

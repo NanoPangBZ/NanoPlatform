@@ -8,6 +8,7 @@ ARCH_IMPL_SRCS += $(ARCH_DIR)arch_init.c
 ARCH_IMPL_SRCS += $(ARCH_DIR)arch_uart.c
 ARCH_IMPL_SRCS += $(ARCH_DIR)arch_delay.c
 ARCH_IMPL_SRCS += $(ARCH_DIR)arch_gpio.c
+ARCH_IMPL_SRCS += $(ARCH_DIR)arch_one_wire.c
 
 #GD32F4xx libc
 ARCH_IMPL_SRCS += $(ARCH_DIR)gd32f4xx_libc_file.c

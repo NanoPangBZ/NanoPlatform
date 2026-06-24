@@ -3,12 +3,16 @@
 #include "gd32f4xx.h"
 #include "system_gd32f4xx.h"
 #include "gd32f4xx_rcu.h"
+#include "gd32f4xx_dma.h"
 
 static void (*s_systick_handler)(void) = NULL;
 static uint32_t s_tick_count = 0;
 
 void arch_init(void)
 {
+    /* 初始化dma */
+    rcu_periph_clock_enable(RCU_DMA1);
+
     /* setup systick timer for 1000Hz interrupts */
     if(SysTick_Config(SystemCoreClock / 1000U)) {
         /* capture error */

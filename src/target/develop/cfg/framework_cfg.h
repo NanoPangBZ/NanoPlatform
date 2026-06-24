@@ -50,6 +50,21 @@
 #define NANO_POLLING_TASK_INTERVAL_MS   ( 2 )
 
 /********************************************************************************************************************************************************************/
+//nano msg 消息发布/订阅模块 - nano_msg
+
+/**
+ * @brief NANO_MSG_MAX_STORED_MSG_NUM 存储的最大消息数量，超过这个数量后新消息将被丢弃
+ * @brief NANO_MSG_MAX_DATA_BUF_SIZE 数据缓冲区的最大大小，超过这个大小后新消息将被丢弃
+ * @brief NANO_MSG_PENDING_ARRAY_SIZE 待处理消息数组的大小，正在处理消息时新消息会存储在这个数组中，防止消息回环导致死循环
+ * @brief NANO_MSG_PENDING_DATA_BUF_SIZE 待处理消息数据缓冲区的大小，正在处理消息时新消息的数据会存储在这个缓冲区中，防止消息回环导致死循环
+*/
+#define NANO_MSG_MAX_STORED_MSG_NUM 16
+#define NANO_MSG_MAX_DATA_BUF_SIZE 1024
+#define NANO_MSG_PENDING_ARRAY_SIZE 4
+#define NANO_MSG_PENDING_DATA_BUF_SIZE 256
+
+
+/********************************************************************************************************************************************************************/
 //nano net 本地主机配置 - nano_net_host
 
 #define NANO_NET_LOCAL_HOST_ENABLE (1)

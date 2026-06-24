@@ -31,25 +31,8 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /* 用户编写的代码段 */
-  .text :
-  {
-    . = ALIGN(4);
-    *(.text)           /* .text sections (code) */
-    *(.text*)          /* .text* sections (code) */
-    *(.glue_7)         /* glue arm to thumb code */
-    *(.glue_7t)        /* glue thumb to arm code */
-    *(.eh_frame)
-
-    KEEP (*(.init))
-    KEEP (*(.fini))
-
-    . = ALIGN(4);
-    _etext = .;        /* define a global symbols at end of code */
-  } >FLASH
-
-  /* 平台私有段 */
-  .nano_platform_area :
+    /* 平台私有段 */
+  .nano_platform_fixed_section :
   {
     . = ALIGN(4);
 
@@ -65,6 +48,23 @@ SECTIONS
     *(__nano_function_regedit)
     __nano_function_regedit_end = .;
     
+  } >FLASH
+
+  /* 用户编写的代码段 */
+  .text :
+  {
+    . = ALIGN(4);
+    *(.text)           /* .text sections (code) */
+    *(.text*)          /* .text* sections (code) */
+    *(.glue_7)         /* glue arm to thumb code */
+    *(.glue_7t)        /* glue thumb to arm code */
+    *(.eh_frame)
+
+    KEEP (*(.init))
+    KEEP (*(.fini))
+
+    . = ALIGN(4);
+    _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
   /* Constant data goes into FLASH */
@@ -86,7 +86,6 @@ SECTIONS
 
   _sidata = LOADADDR(.data);
 
-  /* LMA - > 装载内存地址 */
   /* Initialized data sections goes into RAM, load LMA copy after code */
   .data : 
   {
