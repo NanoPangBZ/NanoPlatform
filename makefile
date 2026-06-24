@@ -19,6 +19,7 @@ endif
 include $(TARGET_MK)
 include $(PROJECT_SRC_DIR)framework/frmwk.mk
 include $(PROJECT_SRC_DIR)bsp/bsp.mk
+include $(PROJECT_SRC_DIR)service/service.mk
 include $(PROJECT_SRC_DIR)lib/lib.mk
 
 BUILD_DIR ?= $(ROOT_DIR)build/$(TARGET)
@@ -40,7 +41,7 @@ COLOR_RESET := $(ESC)[0m
 MAIN_SRCS := \
 	$(PROJECT_SRC_DIR)main.c
 
-SRCS := $(TARGET_SRCS) $(FRMWK_SRCS) $(LIB_SRCS) $(BSP_SRCS) $(MAIN_SRCS)
+SRCS := $(TARGET_SRCS) $(FRMWK_SRCS) $(LIB_SRCS) $(BSP_SRCS) $(SERVICE_SRCS) $(MAIN_SRCS)
 OBJS_C := $(patsubst $(PROJECT_SRC_DIR)%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(SRCS)))
 OBJS_S_CAP := $(patsubst $(PROJECT_SRC_DIR)%.S,$(OBJ_DIR)/%.o,$(filter %.S,$(SRCS)))
 OBJS_S_LOW := $(patsubst $(PROJECT_SRC_DIR)%.s,$(OBJ_DIR)/%.o,$(filter %.s,$(SRCS)))

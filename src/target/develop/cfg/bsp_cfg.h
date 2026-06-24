@@ -14,6 +14,6 @@
         {\
             .name = "tick",\
             .pin = 0,\
-            .active_level = 0,\
+            .active_level = 1,\
         },\
     }
