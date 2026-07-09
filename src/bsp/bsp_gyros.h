@@ -67,8 +67,9 @@ void bsp_gyros_read( bsp_gyros_handle_t handle, bsp_gyros_data_t* data );
  * @param handle 陀螺仪句柄
  * @param cb 触发回调
  * @param user_data 用户数据
+ * @return 0:成功,其他:失败
  */
-void bsp_gyros_register_trigger( bsp_gyros_handle_t handle, bsp_gyros_trigger_cb_t cb, void* user_data );
+int bsp_gyros_register_trigger( bsp_gyros_handle_t handle, bsp_gyros_trigger_cb_t cb, void* user_data );
 
 /**
  * @brief 取消陀螺仪触发回调

@@ -18,11 +18,12 @@ uint32_t bsp_keyboard_get_key_mask( bsp_keyboard_handle_t handle )
     return 0;
 }
 
-void bsp_keyboard_register_trigger( bsp_keyboard_handle_t handle , bsp_keyboard_trigger_callback_t callback , void* user_data )
+int bsp_keyboard_register_trigger( bsp_keyboard_handle_t handle , bsp_keyboard_trigger_callback_t callback , void* user_data )
 {
     (void)handle;
     (void)callback;
     (void)user_data;
+    return 0;
 }
 
 void bsp_keyboard_unregister_trigger( bsp_keyboard_handle_t handle , bsp_keyboard_trigger_callback_t callback , void* user_data )

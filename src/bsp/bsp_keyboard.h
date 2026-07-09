@@ -42,8 +42,9 @@ uint32_t bsp_keyboard_get_key_mask( bsp_keyboard_handle_t handle );
  * @param handle 键盘句柄
  * @param callback 键盘触发回调函数
  * @param user_data 用户数据
+ * @return 0:成功,其他:失败
 */
-void bsp_keyboard_register_trigger( bsp_keyboard_handle_t handle , bsp_keyboard_trigger_callback_t callback , void* user_data );
+int bsp_keyboard_register_trigger( bsp_keyboard_handle_t handle , bsp_keyboard_trigger_callback_t callback , void* user_data );
 
 /**
  * @brief 注销键盘触发回调

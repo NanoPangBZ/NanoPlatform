@@ -18,11 +18,12 @@ void bsp_gyros_read( bsp_gyros_handle_t handle, bsp_gyros_data_t* data )
     (void)data;
 }
 
-void bsp_gyros_register_trigger( bsp_gyros_handle_t handle, bsp_gyros_trigger_cb_t cb, void* user_data )
+int bsp_gyros_register_trigger( bsp_gyros_handle_t handle, bsp_gyros_trigger_cb_t cb, void* user_data )
 {
     (void)handle;
     (void)cb;
     (void)user_data;
+    return 0;
 }
 
 void bsp_gyros_unregister_trigger( bsp_gyros_handle_t handle, bsp_gyros_trigger_cb_t cb, void* user_data )
