@@ -9,6 +9,7 @@
 #include "gd32f4xx_usart.h"
 #include "gd32f4xx_dma.h"
 #include "gd32f4xx_misc.h"
+#include "arch_irq_handler.h"
 
 typedef struct arch_uart_pin_t{
     uint32_t port_rcu;
@@ -94,6 +95,31 @@ static void uart_ip_init( arch_uart_ins_t* ins , uint32_t baudrate )
 }
 
 /**
+ * @brief UART TX DMA完成中断处理函数
+ * @param ctx UART实例
+*/
+static void uart_tx_dma_irq_handler( void* ctx )
+{
+    arch_uart_ins_t* ins = (arch_uart_ins_t*)ctx;
+
+    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_FTF ) )
+    {
+        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_FTF );
+        usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_DISABLE );
+        ins->is_sending = 0;
+        if( ins->send_callback != NULL )
+        {
+            ins->send_callback( ins->port , ins->send_callback_ctx );
+        }
+    }
+
+    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_TAE ) )
+    {
+        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_TAE );
+    }
+}
+
+/**
  * @brief UART TX DMA初始化
  * @param ins UART实例
 */
@@ -106,7 +132,9 @@ static void uart_tx_dma_init( arch_uart_ins_t* ins )
 
     rcu_periph_clock_enable( ins->map->dma_periph == DMA0 ? RCU_DMA0 : RCU_DMA1 );
 
-    //@todo bad code, need to map DMA channel to correct IRQn
+    //@todo bad code
+    arch_irq_handler_register( DMA1_Channel7_IRQn , uart_tx_dma_irq_handler , ins );
+
     nvic_irq_enable( DMA1_Channel7_IRQn , 0 , 0 );
     nvic_irq_enable( USART0_IRQn , 0 , 0 );
 }
@@ -265,38 +293,6 @@ void arch_uart_start_send( arch_uart_port_t port , const uint8_t* data , uint32_
     dma_channel_subperipheral_select( ins->map->dma_periph , ins->map->dma_channel , ins->map->dma_subperiph );
     dma_interrupt_enable( ins->map->dma_periph , ins->map->dma_channel , DMA_CHXCTL_FTFIE );
     dma_channel_enable( ins->map->dma_periph , ins->map->dma_channel );
-}
-
-/**
- * @brief UART TX DMA完成中断处理函数
- * @param ins UART实例
-*/
-static void uart_tx_dma_irq_handler( arch_uart_ins_t* ins )
-{
-    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_FTF ) )
-    {
-        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_FTF );
-        usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_DISABLE );
-        ins->is_sending = 0;
-        if( ins->send_callback != NULL )
-        {
-            ins->send_callback( ins->port , ins->send_callback_ctx );
-        }
-    }
-
-    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_TAE ) )
-    {
-        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_TAE );
-    }
-}
-
-/**
- * @todo bad code, 需要根据实际情况修改中断处理函数名称和参数，等待调整
-*/
-void DMA1_Channel7_IRQHandler(void)
-{
-    // 这里假设DMA1的Channel7用于USART0的TX DMA，根据实际情况修改
-    uart_tx_dma_irq_handler( &uart_ins_table[0] );
 }
 
 #endif
