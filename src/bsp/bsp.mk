@@ -5,3 +5,4 @@ BSP_SRCS += $(BSP_DIR)rgb_light_bar/bsp_rgb_light_bar.c
 BSP_SRCS += $(BSP_DIR)led/bsp_led.c
 BSP_SRCS += $(BSP_DIR)keyboard/bsp_keyboard.c
 BSP_SRCS += $(BSP_DIR)gyros/bsp_gyros.c
+BSP_SRCS += $(BSP_DIR)encoder/bsp_encoder.c
