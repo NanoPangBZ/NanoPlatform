@@ -160,6 +160,7 @@ void bsp_led_close( bsp_led_handle_t handle )
 void bsp_led_set_value( bsp_led_handle_t handle , uint32_t value )
 {
     (void)handle;
+    (void)value;
 }
 
 uint32_t bsp_led_get_value( bsp_led_handle_t handle )
