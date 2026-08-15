@@ -40,7 +40,7 @@ list_handle_t list_create(uint32_t element_size)
     return list;
 }
 
-void list_destroyed(list_handle_t list)
+void list_destroy(list_handle_t list)
 {
     //需要连同元素的内存一并释放
     (void)list;

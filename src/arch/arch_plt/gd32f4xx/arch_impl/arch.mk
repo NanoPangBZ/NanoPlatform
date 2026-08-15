@@ -5,6 +5,7 @@ ARCH_IMPL_INC_DIRS += -I$(ARCH_DIR)
 
 #GD32F4xx arch抽象层实现
 ARCH_IMPL_SRCS += $(ARCH_DIR)arch_init.c
+ARCH_IMPL_SRCS += $(ARCH_DIR)arch_irq_handler.c
 ARCH_IMPL_SRCS += $(ARCH_DIR)arch_uart.c
 ARCH_IMPL_SRCS += $(ARCH_DIR)arch_delay.c
 ARCH_IMPL_SRCS += $(ARCH_DIR)arch_gpio.c

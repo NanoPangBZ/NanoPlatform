@@ -1,5 +1,6 @@
 #pragma once
 
+/* RGB灯条映射表 */
 #define BSP_RGB_LIGHT_BAR_MAP_TABLE {\
         {\
             .name = "default",\
@@ -8,3 +9,11 @@
         }\
     }
 
+/* led映射表 */
+#define BSP_LED_MAP_TABLE {\
+        {\
+            .name = "tick",\
+            .pin = 0,\
+            .active_level = 1,\
+        },\
+    }
