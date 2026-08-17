@@ -81,6 +81,8 @@ def find_tool_in_wsl(wsl: str, distro: str, tool: str) -> tuple[bool, str]:
     lines = clean_lines(decode_output(result.stdout))
     if result.returncode == 0 and lines:
         return True, lines[-1]
+    if result.returncode in (1, 127) and not lines:
+        return False, "not found in WSL PATH"
     detail = decode_output(result.stderr).strip()
     return False, detail or "not found in WSL PATH"
 
