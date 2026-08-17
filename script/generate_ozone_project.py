@@ -13,6 +13,11 @@ from check_build_environment import decode_output
 
 
 ASSIGNMENT = re.compile(r"^\s*(OZONE_DEVICE|OZONE_SVD)\s*:?=\s*(.*?)\s*(?:#.*)?$")
+LANGUAGE = "en"
+
+
+def message(english: str, chinese: str) -> str:
+    return chinese if LANGUAGE == "zh" else english
 
 
 def read_target_config(target_mk: Path) -> dict[str, str]:
@@ -96,11 +101,14 @@ void OnProjectLoad (void) {{
 
 
 def main() -> int:
+    global LANGUAGE
     parser = argparse.ArgumentParser(description="Generate an OZone .jdebug project")
     parser.add_argument("--target", required=True)
     parser.add_argument("--elf", help="ELF path; WSL paths are converted on Windows")
     parser.add_argument("--distro", help="WSL distribution used for path conversion")
+    parser.add_argument("--language", choices=("en", "zh"), default="en", help="output language (default: en)")
     args = parser.parse_args()
+    LANGUAGE = args.language
 
     repo = Path(__file__).resolve().parent.parent
     target_mk = repo / "src" / "target" / args.target / "target.mk"
@@ -133,9 +141,9 @@ def main() -> int:
         print(f"[ERROR] {error}")
         return 1
 
-    print(f"[SUCCESS] OZone project generated: {output}")
-    print(f"[INFO] ELF path in project: {elf_relative}")
-    print(f"[INFO] WSL source mapping: {source_root_wsl} -> $(ProjectDir)/{source_root_relative}")
+    print(f"[SUCCESS] {message('OZone project generated', '已生成 OZone 工程')}: {output}")
+    print(f"[INFO] {message('ELF path in project', '工程中的 ELF 路径')}: {elf_relative}")
+    print(f"[INFO] {message('WSL source mapping', 'WSL 源码路径映射')}: {source_root_wsl} -> $(ProjectDir)/{source_root_relative}")
     return 0
 
 

@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
+import unicodedata
 from dataclasses import dataclass
 
 
@@ -20,6 +21,29 @@ TOOLS = (
     "arm-none-eabi-objcopy",
     "arm-none-eabi-size",
 )
+
+LANGUAGE = "en"
+TEXT = {
+    "Operating system": "操作系统",
+    "WSL executable": "WSL 可执行文件",
+    "WSL distribution": "WSL 发行版",
+    "Selected distribution": "选定的发行版",
+    "not found in PATH": "未在 PATH 中找到",
+    "not found in WSL PATH": "未在 WSL PATH 中找到",
+    "none installed": "未安装",
+    "CHECK": "检查项",
+    "STATUS": "状态",
+    "DETAIL": "详情",
+    "PASS": "通过",
+    "FAIL": "失败",
+    "RESULT": "结果",
+    "PASS - build environment is ready": "通过 - 构建环境已就绪",
+    "FAIL - missing build prerequisites": "失败 - 缺少构建依赖",
+}
+
+
+def tr(text: str) -> str:
+    return TEXT.get(text, text) if LANGUAGE == "zh" else text
 
 
 @dataclass
@@ -53,10 +77,10 @@ def clean_lines(output: str) -> list[str]:
 
 
 def check_linux_tools() -> list[Check]:
-    checks = [Check("Operating system", True, "Linux")]
+    checks = [Check(tr("Operating system"), True, "Linux")]
     for tool in TOOLS:
         path = shutil.which(tool)
-        checks.append(Check(tool, path is not None, path or "not found in PATH"))
+        checks.append(Check(tool, path is not None, path or tr("not found in PATH")))
     return checks
 
 
@@ -82,26 +106,26 @@ def find_tool_in_wsl(wsl: str, distro: str, tool: str) -> tuple[bool, str]:
     if result.returncode == 0 and lines:
         return True, lines[-1]
     if result.returncode in (1, 127) and not lines:
-        return False, "not found in WSL PATH"
+        return False, tr("not found in WSL PATH")
     detail = decode_output(result.stderr).strip()
-    return False, detail or "not found in WSL PATH"
+    return False, detail or tr("not found in WSL PATH")
 
 
 def check_windows_wsl(requested_distro: str | None) -> list[Check]:
-    checks = [Check("Operating system", True, "Windows")]
+    checks = [Check(tr("Operating system"), True, "Windows")]
     wsl = shutil.which("wsl.exe") or shutil.which("wsl")
-    checks.append(Check("WSL executable", wsl is not None, wsl or "wsl.exe not found"))
+    checks.append(Check(tr("WSL executable"), wsl is not None, wsl or "wsl.exe not found"))
     if wsl is None:
         return checks
 
     distros, list_error = list_wsl_distros(wsl)
-    checks.append(Check("WSL distribution", bool(distros), ", ".join(distros) if distros else (list_error or "none installed")))
+    checks.append(Check(tr("WSL distribution"), bool(distros), ", ".join(distros) if distros else (list_error or tr("none installed"))))
     if not distros:
         return checks
 
     distro = requested_distro or distros[0]
     distro_found = distro in distros
-    checks.append(Check("Selected distribution", distro_found, distro if distro_found else f"{distro} is not installed"))
+    checks.append(Check(tr("Selected distribution"), distro_found, distro if distro_found else f"{distro} is not installed"))
     if not distro_found:
         return checks
 
@@ -112,17 +136,20 @@ def check_windows_wsl(requested_distro: str | None) -> list[Check]:
 
 
 def render_table(checks: list[Check]) -> None:
-    headers = ("CHECK", "STATUS", "DETAIL")
-    rows = [(check.item, "PASS" if check.passed else "FAIL", check.detail) for check in checks]
-    widths = [len(header) for header in headers]
+    headers = (tr("CHECK"), tr("STATUS"), tr("DETAIL"))
+    rows = [(check.item, tr("PASS") if check.passed else tr("FAIL"), check.detail) for check in checks]
+    def display_width(value: str) -> int:
+        return sum(2 if unicodedata.east_asian_width(character) in {"W", "F"} else 1 for character in value)
+
+    widths = [display_width(header) for header in headers]
     for row in rows:
         for index, value in enumerate(row):
-            widths[index] = max(widths[index], len(value))
+            widths[index] = max(widths[index], display_width(value))
 
     border = "+" + "+".join("-" * (width + 2) for width in widths) + "+"
 
     def line(values: tuple[str, str, str]) -> str:
-        return "|" + "|".join(f" {value:<{width}} " for value, width in zip(values, widths)) + "|"
+        return "|" + "|".join(f" {value}{' ' * (width - display_width(value))} " for value, width in zip(values, widths)) + "|"
 
     print(border)
     print(line(headers))
@@ -131,7 +158,8 @@ def render_table(checks: list[Check]) -> None:
         print(line(row))
     print(border)
     passed = all(check.passed for check in checks)
-    print(f"RESULT: {'PASS - build environment is ready' if passed else 'FAIL - missing build prerequisites'}")
+    result = "PASS - build environment is ready" if passed else "FAIL - missing build prerequisites"
+    print(f"{tr('RESULT')}: {tr(result)}")
 
 
 def detect_platform() -> str:
@@ -143,9 +171,12 @@ def detect_platform() -> str:
 
 
 def main() -> int:
+    global LANGUAGE
     parser = argparse.ArgumentParser(description="Check NanoPlatform Make and ARM GNU toolchain prerequisites")
     parser.add_argument("--distro", help="WSL distribution to check on Windows; defaults to the first installed distribution")
+    parser.add_argument("--language", choices=("en", "zh"), default="en", help="output language (default: en)")
     args = parser.parse_args()
+    LANGUAGE = args.language
 
     platform_name = detect_platform()
     if platform_name == "windows":
@@ -153,7 +184,7 @@ def main() -> int:
     elif platform_name == "linux":
         checks = check_linux_tools()
     else:
-        checks = [Check("Operating system", False, f"unsupported platform: {sys.platform}")]
+        checks = [Check(tr("Operating system"), False, f"unsupported platform: {sys.platform}")]
 
     render_table(checks)
     return 0 if all(check.passed for check in checks) else 1

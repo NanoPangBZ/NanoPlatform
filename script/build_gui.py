@@ -12,21 +12,70 @@ from pathlib import Path
 
 from check_build_environment import decode_output, list_wsl_distros
 
+LANGUAGE = "en"
+TEXT = {
+    "Debug / no optimization (-O0)": "调试 / 不优化 (-O0)",
+    "Release / optimize for size (-Os)": "发布 / 优化代码大小 (-Os)",
+    "Incremental build (keep existing objects)": "增量编译（保留已有中间文件）",
+    "Full build (clean selected target first)": "全量编译（先清理所选目标）",
+    "Do not generate an OZone debug project": "不生成 OZone 调试工程",
+    "Generate an OZone debug project after a successful build": "编译成功后生成 OZone 调试工程",
+    "Use Up/Down to move, Enter to confirm, Esc to cancel.": "使用方向键上下移动，Enter 确认，Esc 取消。",
+    "default": "默认",
+    "Select": "请选择",
+    "Please enter a number from {first} to {last}.": "请输入 {first} 到 {last} 之间的数字。",
+    "No": "否",
+    "Yes": "是",
+    "Please enter y or n.": "请输入 y 或 n。",
+    "Build target": "编译目标",
+    "Optimization": "优化等级",
+    "Compile unit tests?": "是否编译单元测试？",
+    "Build mode": "编译模式",
+    "OZone project": "OZone 调试工程",
+    "Build selection cancelled.": "已取消编译选择。",
+    "Build configuration": "编译配置",
+    "Target": "目标",
+    "Unit tests": "单元测试",
+    "Clean command": "清理命令",
+    "Build command": "编译命令",
+    "yes": "是",
+    "no": "否",
+    "Output": "输出目录",
+    "Build was not started.": "未开始编译。",
+    "Cleaning build/{target} before full build...": "全量编译前正在清理 build/{target}...",
+    "Clean failed with exit code {code}; build was not started.": "清理失败，退出码 {code}；未开始编译。",
+    "Starting build...": "开始编译...",
+    "Build succeeded, but OZone project generation failed.": "编译成功，但 OZone 工程生成失败。",
+    "Build result": "编译结果",
+    "Status": "状态",
+    "Exit code": "退出码",
+    "Directory": "目录",
+    "Artifacts": "产物",
+    "none": "无",
+    "Build log": "编译日志",
+    "Build completed.": "编译完成。",
+    "Build failed with exit code {code}.": "编译失败，退出码 {code}。",
+    "SUCCESS": "成功",
+    "FAILED": "失败",
+    "No non-empty src/target/*/target.mk files were found.": "未找到非空的 src/target/*/target.mk 文件。",
+}
 
-OPTIMIZATIONS = (
-    ("Debug / no optimization (-O0)", "1"),
-    ("Release / optimize for size (-Os)", "0"),
-)
 
-BUILD_MODES = (
-    ("Incremental build (keep existing objects)", False),
-    ("Full build (clean selected target first)", True),
-)
+def tr(text: str, **values: object) -> str:
+    translated = TEXT.get(text, text) if LANGUAGE == "zh" else text
+    return translated.format(**values) if values else translated
 
-OZONE_OPTIONS = (
-    ("Do not generate an OZone debug project", False),
-    ("Generate an OZone debug project after a successful build", True),
-)
+
+def optimization_options() -> tuple[tuple[str, str], ...]:
+    return ((tr("Debug / no optimization (-O0)"), "1"), (tr("Release / optimize for size (-Os)"), "0"))
+
+
+def build_mode_options() -> tuple[tuple[str, bool], ...]:
+    return ((tr("Incremental build (keep existing objects)"), False), (tr("Full build (clean selected target first)"), True))
+
+
+def ozone_options() -> tuple[tuple[str, bool], ...]:
+    return ((tr("Do not generate an OZone debug project"), False), (tr("Generate an OZone debug project after a successful build"), True))
 
 RESET = "\033[0m"
 HIGHLIGHT = "\033[7m"
@@ -86,7 +135,7 @@ def choose_with_arrows(title: str, options: list[str], default_index: int) -> in
     enable_virtual_terminal()
     selected = default_index
     print(f"\n{title}")
-    print("Use Up/Down to move, Enter to confirm, Esc to cancel.")
+    print(tr("Use Up/Down to move, Enter to confirm, Esc to cancel."))
 
     def render(move_up: bool) -> None:
         if move_up:
@@ -117,9 +166,9 @@ def choose_numbered(title: str, options: list[str], default_index: int) -> int:
     while True:
         print(f"\n{title}")
         for index, option in enumerate(options, 1):
-            default = " [default]" if index - 1 == default_index else ""
+            default = f" [{tr('default')}]" if index - 1 == default_index else ""
             print(f"  {index}. {option}{default}")
-        raw = input(f"Select [default {default_index + 1}]: ").strip()
+        raw = input(f"{tr('Select')} [{tr('default')} {default_index + 1}]: ").strip()
         if not raw:
             return default_index
         try:
@@ -128,7 +177,7 @@ def choose_numbered(title: str, options: list[str], default_index: int) -> int:
             selected = -1
         if 0 <= selected < len(options):
             return selected
-        print(f"Please enter a number from 1 to {len(options)}.")
+        print(tr("Please enter a number from {first} to {last}.", first=1, last=len(options)))
 
 
 def choose(title: str, options: list[str], default_index: int = 0) -> int:
@@ -142,7 +191,7 @@ def choose(title: str, options: list[str], default_index: int = 0) -> int:
 def choose_yes_no(title: str, default: bool = False) -> bool:
     if sys.stdin.isatty() and sys.stdout.isatty():
         default_index = 1 if default else 0
-        return choose(title, ["No", "Yes"], default_index) == 1
+        return choose(title, [tr("No"), tr("Yes")], default_index) == 1
     suffix = "Y/n" if default else "y/N"
     while True:
         raw = input(f"{title} [{suffix}]: ").strip().lower()
@@ -152,7 +201,7 @@ def choose_yes_no(title: str, default: bool = False) -> bool:
             return True
         if raw in {"n", "no"}:
             return False
-        print("Please enter y or n.")
+        print(tr("Please enter y or n."))
 
 
 def wsl_repo_path(wsl: str, distro: str, repo: Path) -> str:
@@ -199,10 +248,10 @@ def make_command(
 
 def print_build_result(repo: Path, target: str, returncode: int) -> None:
     build_dir = repo / "build" / target
-    print("\nBuild result")
-    print(f"  Status    : {'SUCCESS' if returncode == 0 else 'FAILED'}")
-    print(f"  Exit code : {returncode}")
-    print(f"  Directory : {build_dir}")
+    print(f"\n{tr('Build result')}")
+    print(f"  {tr('Status'):<12}: {tr('SUCCESS') if returncode == 0 else tr('FAILED')}")
+    print(f"  {tr('Exit code'):<12}: {returncode}")
+    print(f"  {tr('Directory'):<12}: {build_dir}")
 
     artifacts = [
         build_dir / f"{target}.elf",
@@ -212,76 +261,83 @@ def print_build_result(repo: Path, target: str, returncode: int) -> None:
     ]
     existing = [artifact for artifact in artifacts if artifact.is_file()]
     if existing:
-        print("  Artifacts :")
+        print(f"  {tr('Artifacts'):<12}:")
         for artifact in existing:
             print(f"    - {artifact}")
     else:
-        print("  Artifacts : none")
+        print(f"  {tr('Artifacts'):<12}: {tr('none')}")
 
     build_log = build_dir / ".build.log"
     if build_log.is_file():
-        print(f"  Build log : {build_log}")
+        print(f"  {tr('Build log'):<12}: {build_log}")
 
 
 def main() -> int:
+    global LANGUAGE
     parser = argparse.ArgumentParser(description="Choose and build a NanoPlatform target")
     parser.add_argument("--distro", help="WSL distribution to use on Windows")
     parser.add_argument("--dry-run", action="store_true", help="show the selected build command without executing it")
+    parser.add_argument("--language", choices=("en", "zh"), default="en", help="interface language (default: en)")
     args = parser.parse_args()
+    LANGUAGE = args.language
 
     repo = Path(__file__).resolve().parent.parent
     targets = discover_targets(repo)
     if not targets:
-        print("[ERROR] No non-empty src/target/*/target.mk files were found.", file=sys.stderr)
+        print(f"[ERROR] {tr('No non-empty src/target/*/target.mk files were found.')}", file=sys.stderr)
         return 1
 
     try:
-        target = targets[choose("Build target", targets)]
-        optimization_index = choose("Optimization", [item[0] for item in OPTIMIZATIONS], default_index=1)
-        optimization_label, debug = OPTIMIZATIONS[optimization_index]
-        unit_test = choose_yes_no("Compile unit tests?", default=False)
-        build_mode_index = choose("Build mode", [item[0] for item in BUILD_MODES], default_index=0)
-        build_mode_label, full_build = BUILD_MODES[build_mode_index]
-        ozone_index = choose("OZone project", [item[0] for item in OZONE_OPTIONS], default_index=0)
-        ozone_label, generate_ozone = OZONE_OPTIONS[ozone_index]
+        optimizations = optimization_options()
+        build_modes = build_mode_options()
+        ozone_choices = ozone_options()
+        target = targets[choose(tr("Build target"), targets)]
+        optimization_index = choose(tr("Optimization"), [item[0] for item in optimizations], default_index=1)
+        optimization_label, debug = optimizations[optimization_index]
+        unit_test = choose_yes_no(tr("Compile unit tests?"), default=False)
+        build_mode_index = choose(tr("Build mode"), [item[0] for item in build_modes], default_index=0)
+        build_mode_label, full_build = build_modes[build_mode_index]
+        ozone_index = choose(tr("OZone project"), [item[0] for item in ozone_choices], default_index=0)
+        ozone_label, generate_ozone = ozone_choices[ozone_index]
         command = make_command(repo, target, debug, unit_test, args.distro)
         clean_command = make_command(repo, target, debug, unit_test, args.distro, clean=True) if full_build else None
     except (EOFError, KeyboardInterrupt):
-        print("\n[CANCELLED] Build selection cancelled.")
+        print(f"\n[CANCELLED] {tr('Build selection cancelled.')}")
         return 130
     except (ValueError, RuntimeError) as error:
         print(f"[ERROR] {error}", file=sys.stderr)
         return 1
 
-    print("\nBuild configuration")
-    print(f"  Target       : {target}")
-    print(f"  Optimization : {optimization_label}")
-    print(f"  Unit tests   : {'yes' if unit_test else 'no'}")
-    print(f"  Build mode   : {build_mode_label}")
-    print(f"  OZone project: {ozone_label}")
+    print(f"\n{tr('Build configuration')}")
+    print(f"  {tr('Target'):<12}: {target}")
+    print(f"  {tr('Optimization'):<12}: {optimization_label}")
+    print(f"  {tr('Unit tests'):<12}: {tr('yes') if unit_test else tr('no')}")
+    print(f"  {tr('Build mode'):<12}: {build_mode_label}")
+    print(f"  {tr('OZone project'):<12}: {ozone_label}")
     if clean_command:
-        print("  Clean command: " + subprocess.list2cmdline(clean_command))
-    print("  Build command: " + subprocess.list2cmdline(command))
+        print(f"  {tr('Clean command')}: " + subprocess.list2cmdline(clean_command))
+    print(f"  {tr('Build command')}: " + subprocess.list2cmdline(command))
 
     if args.dry_run:
-        print(f"  Output       : {repo / 'build' / target}")
-        print("[DRY RUN] Build was not started.")
+        print(f"  {tr('Output'):<12}: {repo / 'build' / target}")
+        print(f"[DRY RUN] {tr('Build was not started.')}")
         return 0
 
     if clean_command:
-        print(f"\n[INFO] Cleaning build/{target} before full build...\n")
+        print(f"\n[INFO] {tr('Cleaning build/{target} before full build...', target=target)}\n")
         clean_result = subprocess.run(clean_command, cwd=repo, check=False)
         if clean_result.returncode != 0:
             print_build_result(repo, target, clean_result.returncode)
-            print(f"[ERROR] Clean failed with exit code {clean_result.returncode}; build was not started.", file=sys.stderr)
+            print(f"[ERROR] {tr('Clean failed with exit code {code}; build was not started.', code=clean_result.returncode)}", file=sys.stderr)
             return clean_result.returncode
 
-    print("\n[INFO] Starting build...\n")
+    print(f"\n[INFO] {tr('Starting build...')}\n")
     result = subprocess.run(command, cwd=repo, check=False)
     ozone_project: Path | None = None
     if result.returncode == 0 and generate_ozone:
         generator = repo / "script" / "generate_ozone_project.py"
         generator_command = [sys.executable, str(generator), "--target", target]
+        generator_command += ["--language", args.language]
         if args.distro:
             generator_command += ["--distro", args.distro]
         ozone_result = subprocess.run(
@@ -291,16 +347,16 @@ def main() -> int:
         )
         if ozone_result.returncode != 0:
             print_build_result(repo, target, result.returncode)
-            print("[ERROR] Build succeeded, but OZone project generation failed.", file=sys.stderr)
+            print(f"[ERROR] {tr('Build succeeded, but OZone project generation failed.')}", file=sys.stderr)
             return ozone_result.returncode
         ozone_project = repo / "build" / target / f"{target}.jdebug"
     print_build_result(repo, target, result.returncode)
     if result.returncode == 0:
-        print("[SUCCESS] Build completed.")
+        print(f"[SUCCESS] {tr('Build completed.')}")
         if ozone_project:
             print(f"[SUCCESS] OZone project: {ozone_project}")
     else:
-        print(f"[ERROR] Build failed with exit code {result.returncode}.", file=sys.stderr)
+        print(f"[ERROR] {tr('Build failed with exit code {code}.', code=result.returncode)}", file=sys.stderr)
     return result.returncode
 
 
