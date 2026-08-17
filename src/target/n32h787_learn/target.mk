@@ -35,6 +35,11 @@ TARGET_CFLAGS += -DN32H787
 TARGET_CFLAGS += -DCORE_CM7
 # TARGET_CFLAGS += -DCORE_CM4
 
+# OZone/J-Link debug configuration. The J-Link device name follows the
+# vendor SDK's CHIP_TYPE setting for the selected CM7 core.
+OZONE_DEVICE := N32H785xIx7:CM7
+OZONE_SVD := $(InstallDir)/Config/CPU/Cortex-M7.svd
+
 # 链接器选项
 LDFLAGS += $(ARCH_LDFLAGS)
 LDFLAGS += -T$(TARGET_DIR)target.ld

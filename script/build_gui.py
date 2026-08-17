@@ -23,6 +23,11 @@ BUILD_MODES = (
     ("Full build (clean selected target first)", True),
 )
 
+OZONE_OPTIONS = (
+    ("Do not generate an OZone debug project", False),
+    ("Generate an OZone debug project after a successful build", True),
+)
+
 RESET = "\033[0m"
 HIGHLIGHT = "\033[7m"
 CLEAR_LINE = "\033[2K"
@@ -237,6 +242,8 @@ def main() -> int:
         unit_test = choose_yes_no("Compile unit tests?", default=False)
         build_mode_index = choose("Build mode", [item[0] for item in BUILD_MODES], default_index=0)
         build_mode_label, full_build = BUILD_MODES[build_mode_index]
+        ozone_index = choose("OZone project", [item[0] for item in OZONE_OPTIONS], default_index=0)
+        ozone_label, generate_ozone = OZONE_OPTIONS[ozone_index]
         command = make_command(repo, target, debug, unit_test, args.distro)
         clean_command = make_command(repo, target, debug, unit_test, args.distro, clean=True) if full_build else None
     except (EOFError, KeyboardInterrupt):
@@ -251,6 +258,7 @@ def main() -> int:
     print(f"  Optimization : {optimization_label}")
     print(f"  Unit tests   : {'yes' if unit_test else 'no'}")
     print(f"  Build mode   : {build_mode_label}")
+    print(f"  OZone project: {ozone_label}")
     if clean_command:
         print("  Clean command: " + subprocess.list2cmdline(clean_command))
     print("  Build command: " + subprocess.list2cmdline(command))
@@ -270,9 +278,27 @@ def main() -> int:
 
     print("\n[INFO] Starting build...\n")
     result = subprocess.run(command, cwd=repo, check=False)
+    ozone_project: Path | None = None
+    if result.returncode == 0 and generate_ozone:
+        generator = repo / "script" / "generate_ozone_project.py"
+        generator_command = [sys.executable, str(generator), "--target", target]
+        if args.distro:
+            generator_command += ["--distro", args.distro]
+        ozone_result = subprocess.run(
+            generator_command,
+            cwd=repo,
+            check=False,
+        )
+        if ozone_result.returncode != 0:
+            print_build_result(repo, target, result.returncode)
+            print("[ERROR] Build succeeded, but OZone project generation failed.", file=sys.stderr)
+            return ozone_result.returncode
+        ozone_project = repo / "build" / target / f"{target}.jdebug"
     print_build_result(repo, target, result.returncode)
     if result.returncode == 0:
         print("[SUCCESS] Build completed.")
+        if ozone_project:
+            print(f"[SUCCESS] OZone project: {ozone_project}")
     else:
         print(f"[ERROR] Build failed with exit code {result.returncode}.", file=sys.stderr)
     return result.returncode
