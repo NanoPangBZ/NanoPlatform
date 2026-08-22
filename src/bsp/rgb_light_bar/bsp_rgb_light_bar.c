@@ -279,7 +279,7 @@ static int bsp_rgb_light_bar_init(void)
     if( bsp_rgb_light_bar_polling_task_handle == NULL )
     {
         ERROR_LOG("create bsp_rgb_light_bar polling task failed");
-        list_destroyed( bsp_rgb_light_bar_list );
+        list_destroy( bsp_rgb_light_bar_list );
         bsp_rgb_light_bar_list = NULL;
         return -1;
     }
@@ -300,7 +300,7 @@ static int bsp_rgb_light_bar_deinit(void)
     {
         list_handle_t temp = bsp_rgb_light_bar_list;
         bsp_rgb_light_bar_list = NULL;
-        list_destroyed( temp );
+        list_destroy( temp );
     }
 
     INFO_LOG("bsp_rgb_light_bar_deinit success");
@@ -311,6 +311,8 @@ ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_BSP_INIT , bsp_rgb_light_bar_init , 
 ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_BSP_DEINIT , bsp_rgb_light_bar_deinit , 0 );
 
 #else
+
+#include <stddef.h>
 
 bsp_rgb_light_bar_handle_t bsp_rgb_light_bar_open( const char* name )
 {

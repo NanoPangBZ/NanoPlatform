@@ -50,7 +50,7 @@ nano_net_list_handle_t nano_net_list_create(nano_net_list_desc_t* desc)
  * @param list 列表句柄
  * @note 未实现
 */
-void nano_net_list_destroyed(nano_net_list_handle_t list)
+void nano_net_list_destroy(nano_net_list_handle_t list)
 {
     //需要连同元素的内存一并释放
 	(void)list;

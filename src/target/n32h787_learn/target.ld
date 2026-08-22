@@ -49,7 +49,7 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = 0x30020000;    /* end of RAM */
+_estack = 0x24020000;    /* end of CM7 AXI SRAM */
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x2000;      /* required amount of heap  */
 _Min_Stack_Size = 0x1000;     /* required amount of stack */
@@ -57,8 +57,8 @@ _Min_Stack_Size = 0x1000;     /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-AXI_SRAM (xrw)     : ORIGIN = 0x30000000, LENGTH = 0x20000      /* 128K */
-FLASH (rx)     : ORIGIN = 0x15080000, LENGTH = 0x80000          /* 512K */
+AXI_SRAM (xrw)     : ORIGIN = 0x24000000, LENGTH = 0x20000      /* 128K */
+FLASH (rx)     : ORIGIN = 0x15000000, LENGTH = 0x80000          /* CM7 Flash Bank1, 512K */
 }
 
 /* Define output sections */
@@ -144,6 +144,15 @@ SECTIONS
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
+
+  /* Reserve the first 1 KiB of CM7 AXI SRAM for the relocated vector table. */
+  .ram_vector (NOLOAD) :
+  {
+    . = ALIGN(0x400);
+    __ram_vector_start__ = .;
+    . = . + 0x400;
+    __ram_vector_end__ = .;
+  } >AXI_SRAM
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);

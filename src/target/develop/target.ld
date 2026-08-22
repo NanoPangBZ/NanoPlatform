@@ -93,6 +93,7 @@ SECTIONS
     _sdata = .;        /* create a global symbol at data start */
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
+    *(.nano_heap_default)   /* 平台默认堆 */
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
