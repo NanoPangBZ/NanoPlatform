@@ -22,8 +22,8 @@
             .uart_rcu = RCU_USART0,\
             .dma_periph = DMA1,\
             .dma_priority = DMA_PRIORITY_HIGH,\
-            .dma_subperiph = DMA_SUBPERI4,\
-            .dma_channel = DMA_CH7,\
+            .tx_dma_subperiph = DMA_SUBPERI4,\
+            .tx_dma_channel = DMA_CH7,\
             .uart_tx_pin = {\
                 .port_rcu = RCU_GPIOB,\
                 .port = GPIOB,\

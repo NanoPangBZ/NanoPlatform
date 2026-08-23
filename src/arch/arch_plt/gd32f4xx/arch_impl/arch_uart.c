@@ -27,8 +27,8 @@ typedef struct arch_uart_map_t{
     uint32_t dma_periph;
     uint32_t dma_priority;
     uint32_t dma_irq_priority;
-    dma_subperipheral_enum dma_subperiph;
-    dma_channel_enum dma_channel;
+    dma_subperipheral_enum tx_dma_subperiph;
+    dma_channel_enum tx_dma_channel;
     arch_uart_pin_t uart_tx_pin;
     arch_uart_pin_t uart_rx_pin;
 }arch_uart_map_t;
@@ -41,12 +41,15 @@ typedef struct arch_uart_ins_t{
     uint8_t is_receiving : 1;
     uint8_t reserved : 6;
 
-    // 发送完成回调函数及其上下文指针
-    arch_uart_send_callback_t send_callback;
+    arch_uart_tranc_non_block_cb_t send_callback;
     void* send_callback_ctx;
-    // 接收回调函数及其上下文指针
-    arch_uart_receive_callback_t receive_callback;
+    uint8_t* send_buffer;
+    uint32_t send_len;
+    arch_uart_tranc_non_block_cb_t receive_callback;
     void* receive_callback_ctx;
+    uint8_t* receive_buffer;
+    uint32_t receive_len;
+    uint32_t receive_pos;
 }arch_uart_ins_t;
 
 static const arch_uart_map_t uart_map_table[] = ARCH_UART_MAP_TABLE;
@@ -101,24 +104,46 @@ static void uart_ip_init( arch_uart_ins_t* ins , uint32_t baudrate )
  * @brief UART TX DMA完成中断处理函数
  * @param ctx UART实例
 */
-static void uart_tx_dma_irq_handler( void* ctx )
+static void uart_dma_irq_handler( void* ctx )
 {
     arch_uart_ins_t* ins = (arch_uart_ins_t*)ctx;
 
-    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_FTF ) )
+    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->tx_dma_channel , DMA_INT_FLAG_FTF ) )
     {
-        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_FTF );
+        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->tx_dma_channel , DMA_INT_FLAG_FTF );
         usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_DISABLE );
         ins->is_sending = 0;
         if( ins->send_callback != NULL )
         {
-            ins->send_callback( ins->port , ins->send_callback_ctx );
+            ins->send_callback( ins->send_callback_ctx , ins->send_buffer , ins->send_len );
         }
     }
 
-    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_TAE ) )
+    if( dma_interrupt_flag_get( ins->map->dma_periph , ins->map->tx_dma_channel , DMA_INT_FLAG_TAE ) )
     {
-        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->dma_channel , DMA_INT_FLAG_TAE );
+        dma_interrupt_flag_clear( ins->map->dma_periph , ins->map->tx_dma_channel , DMA_INT_FLAG_TAE );
+        usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_DISABLE );
+        ins->is_sending = 0;
+    }
+
+}
+
+static void uart_irq_handler( void* ctx )
+{
+    arch_uart_ins_t* ins = (arch_uart_ins_t*)ctx;
+
+    if( ins->is_receiving && ( usart_flag_get( ins->map->uart_periph , USART_FLAG_RBNE ) == SET ) )
+    {
+        ins->receive_buffer[ins->receive_pos++] = (uint8_t)usart_data_receive( ins->map->uart_periph );
+        if( ins->receive_pos >= ins->receive_len )
+        {
+            usart_interrupt_disable( ins->map->uart_periph , USART_INT_RBNE );
+            ins->is_receiving = 0;
+            if( ins->receive_callback != NULL )
+            {
+                ins->receive_callback( ins->receive_callback_ctx , ins->receive_buffer , ins->receive_pos );
+            }
+        }
     }
 }
 
@@ -131,12 +156,13 @@ static void uart_tx_dma_init( arch_uart_ins_t* ins )
     rcu_periph_clock_enable( ins->map->dma_periph == DMA0 ? RCU_DMA0 : RCU_DMA1 );
 
     /* 使能DMA中断 */
-    IRQn_Type dma_irqn = arch_helper_get_dma_irqn( ins->map->dma_periph , ins->map->dma_channel );
-    arch_irq_handler_register( dma_irqn , uart_tx_dma_irq_handler , ins );
-    nvic_irq_enable( dma_irqn , ins->map->dma_irq_priority , 0 );
+    IRQn_Type tx_dma_irqn = arch_helper_get_dma_irqn( ins->map->dma_periph , ins->map->tx_dma_channel );
+    arch_irq_handler_register( tx_dma_irqn , uart_dma_irq_handler , ins );
+    nvic_irq_enable( tx_dma_irqn , ins->map->dma_irq_priority , 0 );
 
-    /* 使能UART中断 */
-    nvic_irq_enable( ins->map->uart_irqn , 0 , 0 );
+    /* 使能UART接收中断 */
+    arch_irq_handler_register( ins->map->uart_irqn , uart_irq_handler , ins );
+    nvic_irq_enable( ins->map->uart_irqn , ins->map->dma_irq_priority , 0 );
 }
 
 void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )
@@ -157,7 +183,14 @@ void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )
 
 void arch_uart_deinit( arch_uart_port_t port )
 {
+    if( port >= sizeof(uart_map_table) / sizeof(uart_map_table[0]) )
+    {
+        return;
+    }
+
     arch_uart_ins_t* uart_ins = &uart_ins_table[port];
+    usart_interrupt_disable( uart_ins->map->uart_periph , USART_INT_RBNE );
+    uart_ins->is_receiving = 0;
     usart_disable( uart_ins->map->uart_periph );
 }
 
@@ -172,8 +205,6 @@ uint32_t arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t 
     uint32_t ret = len;
     uint32_t timeout_time = arch_get_tick() + timeout_ms;
 
-    usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_DISABLE );
-
     while( ins->is_sending )
     {
         if( arch_get_tick() >= timeout_time )
@@ -182,6 +213,7 @@ uint32_t arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t 
         }
     }
 
+    usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_DISABLE );
     ins->is_sending = 1;
     while( len != 0 )
     {
@@ -210,6 +242,10 @@ uint32_t arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t b
     }
 
     arch_uart_ins_t* ins = &uart_ins_table[port];
+    if( ins->is_receiving )
+    {
+        return 0U;
+    }
 
     uint32_t ret = buffer_len;
     while( buffer_len != 0 )
@@ -229,56 +265,29 @@ uint32_t arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t b
     return ret;
 }
 
-void arch_uart_set_send_complete_callback( arch_uart_port_t port , arch_uart_send_callback_t callback , void* ctx )
+uint32_t arch_uart_send_non_block( arch_uart_port_t port , const uint8_t* data , uint32_t len , arch_uart_tranc_non_block_cb_t cb , void* ctx )
 {
-    if( port >= sizeof(uart_map_table) / sizeof(uart_map_table[0]) )
+    if( ( port >= sizeof(uart_map_table) / sizeof(uart_map_table[0]) ) || ( data == NULL ) || ( len == 0U ) )
     {
-        return;
-    }
-
-    arch_uart_ins_t* ins = &uart_ins_table[port];
-    ins->send_callback = callback;
-    ins->send_callback_ctx = ctx;
-}
-
-void arch_uart_set_receive_callback( arch_uart_port_t port , arch_uart_receive_callback_t callback , void* ctx )
-{
-    if( port >= sizeof(uart_map_table) / sizeof(uart_map_table[0]) )
-    {
-        return;
-    }
-
-    arch_uart_ins_t* ins = &uart_ins_table[port];
-    ins->receive_callback = callback;
-    ins->receive_callback_ctx = ctx;
-}
-
-void arch_uart_start_send( arch_uart_port_t port , const uint8_t* data , uint32_t len )
-{
-    if( port >= sizeof(uart_map_table) / sizeof(uart_map_table[0]) )
-    {
-        return;
+        return 0U;
     }
 
     arch_uart_ins_t* ins = &uart_ins_table[port];
     if( ins->is_sending )
     {
-        return;
-    }
-
-    if( len == 0U )
-    {
-        return;
+        return 0U;
     }
 
     ins->is_sending = 1;
-
-    usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_ENABLE );
+    ins->send_callback = cb;
+    ins->send_callback_ctx = ctx;
+    ins->send_buffer = (uint8_t*)data;
+    ins->send_len = len;
 
     dma_single_data_parameter_struct dma_init_struct;
 
     dma_single_data_para_struct_init( &dma_init_struct );
-    dma_deinit( ins->map->dma_periph , ins->map->dma_channel );
+    dma_deinit( ins->map->dma_periph , ins->map->tx_dma_channel );
     dma_init_struct.direction = DMA_MEMORY_TO_PERIPH;
     dma_init_struct.memory0_addr = (uint32_t)data;
     dma_init_struct.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
@@ -287,12 +296,40 @@ void arch_uart_start_send( arch_uart_port_t port , const uint8_t* data , uint32_
     dma_init_struct.periph_addr = (uint32_t)( &USART_DATA( ins->map->uart_periph ) );
     dma_init_struct.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
     dma_init_struct.priority = ins->map->dma_priority;
-    dma_single_data_mode_init( ins->map->dma_periph , ins->map->dma_channel , &dma_init_struct );
+    dma_single_data_mode_init( ins->map->dma_periph , ins->map->tx_dma_channel , &dma_init_struct );
 
-    dma_circulation_disable( ins->map->dma_periph , ins->map->dma_channel );
-    dma_channel_subperipheral_select( ins->map->dma_periph , ins->map->dma_channel , ins->map->dma_subperiph );
-    dma_interrupt_enable( ins->map->dma_periph , ins->map->dma_channel , DMA_CHXCTL_FTFIE );
-    dma_channel_enable( ins->map->dma_periph , ins->map->dma_channel );
+    dma_circulation_disable( ins->map->dma_periph , ins->map->tx_dma_channel );
+    dma_channel_subperipheral_select( ins->map->dma_periph , ins->map->tx_dma_channel , ins->map->tx_dma_subperiph );
+    dma_interrupt_enable( ins->map->dma_periph , ins->map->tx_dma_channel , DMA_INT_FTF );
+    dma_channel_enable( ins->map->dma_periph , ins->map->tx_dma_channel );
+    usart_dma_transmit_config( ins->map->uart_periph , USART_TRANSMIT_DMA_ENABLE );
+
+    return len;
+}
+
+uint32_t arch_uart_receive_non_block( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len , arch_uart_tranc_non_block_cb_t cb , void* ctx )
+{
+    if( ( port >= sizeof(uart_map_table) / sizeof(uart_map_table[0]) ) || ( buffer == NULL ) || ( buffer_len == 0U ) )
+    {
+        return 0U;
+    }
+
+    arch_uart_ins_t* ins = &uart_ins_table[port];
+    if( ins->is_receiving )
+    {
+        return 0U;
+    }
+
+    ins->is_receiving = 1;
+    ins->receive_callback = cb;
+    ins->receive_callback_ctx = ctx;
+    ins->receive_buffer = buffer;
+    ins->receive_len = buffer_len;
+    ins->receive_pos = 0U;
+
+    usart_interrupt_enable( ins->map->uart_periph , USART_INT_RBNE );
+
+    return buffer_len;
 }
 
 #endif
