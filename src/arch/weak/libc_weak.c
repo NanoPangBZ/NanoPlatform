@@ -1,5 +1,6 @@
+#include <errno.h>
 #include <stdint.h>
-#include <stdint.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 __attribute__((weak)) int _close(int fd) {
@@ -38,6 +39,31 @@ __attribute__((weak)) void _exit(int status) {
 __attribute__((weak)) void* _sbrk(int incr) {
     (void)incr; // Suppress unused parameter warning
     return (void*)-1;
+}
+
+__attribute__((weak)) int _fstat(int fd, struct stat *st) {
+    (void)fd;
+    if (st == NULL) {
+        return -1;
+    }
+    st->st_mode = S_IFCHR;
+    return 0;
+}
+
+__attribute__((weak)) int _isatty(int fd) {
+    (void)fd;
+    return 1;
+}
+
+__attribute__((weak)) int _getpid(void) {
+    return 1;
+}
+
+__attribute__((weak)) int _kill(int pid, int sig) {
+    (void)pid;
+    (void)sig;
+    errno = EINVAL;
+    return -1;
 }
 
 __attribute__((weak)) int* __errno(void) {

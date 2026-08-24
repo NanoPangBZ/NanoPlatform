@@ -1,5 +1,6 @@
+#include <errno.h>
 #include <stdint.h>
-#include <stdint.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 int _close(int fd) {
@@ -39,6 +40,31 @@ void _exit(int status) {
 void* _sbrk(int incr) {
     (void)incr; // Suppress unused parameter warning
     return (void*)-1;
+}
+
+int _fstat(int fd, struct stat *st) {
+    (void)fd;
+    if (st == NULL) {
+        return -1;
+    }
+    st->st_mode = S_IFCHR;
+    return 0;
+}
+
+int _isatty(int fd) {
+    (void)fd;
+    return 1;
+}
+
+int _getpid(void) {
+    return 1;
+}
+
+int _kill(int pid, int sig) {
+    (void)pid;
+    (void)sig;
+    errno = EINVAL;
+    return -1;
 }
 
 int* __errno(void) {
