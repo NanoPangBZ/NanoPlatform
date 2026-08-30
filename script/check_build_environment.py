@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check NanoPlatform build prerequisites on Linux or Windows/WSL."""
+"""Check NanoPlatform build prerequisites on Linux, macOS, or Windows/WSL."""
 
 from __future__ import annotations
 
@@ -76,12 +76,20 @@ def clean_lines(output: str) -> list[str]:
     return [line.replace("\x00", "").strip() for line in output.splitlines() if line.replace("\x00", "").strip()]
 
 
-def check_linux_tools() -> list[Check]:
-    checks = [Check(tr("Operating system"), True, "Linux")]
+def check_host_tools(os_label: str) -> list[Check]:
+    checks = [Check(tr("Operating system"), True, os_label)]
     for tool in TOOLS:
         path = shutil.which(tool)
         checks.append(Check(tool, path is not None, path or tr("not found in PATH")))
     return checks
+
+
+def check_linux_tools() -> list[Check]:
+    return check_host_tools("Linux")
+
+
+def check_macos_tools() -> list[Check]:
+    return check_host_tools("macOS")
 
 
 def list_wsl_distros(wsl: str) -> tuple[list[str], str]:
@@ -167,6 +175,8 @@ def detect_platform() -> str:
         return "windows"
     if sys.platform.startswith("linux"):
         return "linux"
+    if sys.platform == "darwin":
+        return "macos"
     return "unsupported"
 
 
@@ -183,6 +193,8 @@ def main() -> int:
         checks = check_windows_wsl(args.distro)
     elif platform_name == "linux":
         checks = check_linux_tools()
+    elif platform_name == "macos":
+        checks = check_macos_tools()
     else:
         checks = [Check(tr("Operating system"), False, f"unsupported platform: {sys.platform}")]
 
