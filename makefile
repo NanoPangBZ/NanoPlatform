@@ -65,8 +65,11 @@ CFLAGS += -I$(PROJECT_SRC_DIR) $(FRMWK_INC_DIRS) $(TARGET_INC_DIRS)
 CFLAGS += $(TARGET_CFLAGS)
 # 生成 .d 依赖（用户头文件），头文件变更时自动重编对应 .o
 CFLAGS += -MMD -MP
+# 按函数/数据拆段，配合链接器 --gc-sections 回收未引用段
+CFLAGS += -ffunction-sections -fdata-sections
 
 LDFLAGS ?=
+LDFLAGS += -Wl,--gc-sections
 LDLIBS ?=
 
 ifeq ($(OS),Windows_NT)

@@ -96,14 +96,14 @@ SECTIONS
 
     /* 平台心跳函数注册表 */
     __nano_systick_handler_regedit_start = .;
-    *(__nano_systick_handler_regedit)
+    KEEP(*(__nano_systick_handler_regedit))
     __nano_systick_handler_regedit_end = .;
 
     . = ALIGN(4);
 
     /* 平台函数组注册表 */
     __nano_function_regedit_start = .;
-    *(__nano_function_regedit)
+    KEEP(*(__nano_function_regedit))
     __nano_function_regedit_end = .;
     
   } >FLASH
