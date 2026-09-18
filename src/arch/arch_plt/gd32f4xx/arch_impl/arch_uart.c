@@ -9,6 +9,7 @@
 #include "gd32f4xx_usart.h"
 #include "gd32f4xx_dma.h"
 #include "gd32f4xx_misc.h"
+#include "arch_helper.h"
 #include "arch_irq_handler.h"
 
 typedef struct arch_uart_pin_t{
@@ -22,8 +23,10 @@ typedef struct arch_uart_pin_t{
 typedef struct arch_uart_map_t{
     uint32_t uart_periph;
     uint32_t uart_rcu;
+    uint32_t uart_irqn;
     uint32_t dma_periph;
     uint32_t dma_priority;
+    uint32_t dma_irq_priority;
     dma_subperipheral_enum dma_subperiph;
     dma_channel_enum dma_channel;
     arch_uart_pin_t uart_tx_pin;
@@ -125,18 +128,15 @@ static void uart_tx_dma_irq_handler( void* ctx )
 */
 static void uart_tx_dma_init( arch_uart_ins_t* ins )
 {
-    if( ins->map->dma_periph == 0 )
-    {
-        return;
-    }
-
     rcu_periph_clock_enable( ins->map->dma_periph == DMA0 ? RCU_DMA0 : RCU_DMA1 );
 
-    //@todo bad code
-    arch_irq_handler_register( DMA1_Channel7_IRQn , uart_tx_dma_irq_handler , ins );
+    /* 使能DMA中断 */
+    IRQn_Type dma_irqn = arch_helper_get_dma_irqn( ins->map->dma_periph , ins->map->dma_channel );
+    arch_irq_handler_register( dma_irqn , uart_tx_dma_irq_handler , ins );
+    nvic_irq_enable( dma_irqn , ins->map->dma_irq_priority , 0 );
 
-    nvic_irq_enable( DMA1_Channel7_IRQn , 0 , 0 );
-    nvic_irq_enable( USART0_IRQn , 0 , 0 );
+    /* 使能UART中断 */
+    nvic_irq_enable( ins->map->uart_irqn , 0 , 0 );
 }
 
 void arch_uart_init( arch_uart_port_t port , uint32_t baudrate )

@@ -384,9 +384,9 @@ void CopyVectTable(uint32_t SrcAddr, uint32_t DesAddr, uint32_t size)
     {
         pDestVect[i] = pSrcVect[i];
     }
-    #ifndef CORE_CM4
-    pDestVect[15] = pSrcVect[250];
-    #endif
+    // #ifndef CORE_CM4
+    // pDestVect[15] = pSrcVect[250];
+    // #endif
     
     SCB->VTOR = DesAddr;
     __ISB();

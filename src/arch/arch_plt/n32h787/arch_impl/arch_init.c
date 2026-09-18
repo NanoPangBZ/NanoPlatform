@@ -102,22 +102,12 @@ static void clock_init(void)
 **/
 static uint32_t Systick1msInit(void)
 {
-    volatile RCC_ClocksTypeDef RCC_Clocks;
-    volatile uint32_t ticks=SysTick_VAL_CURRENT_Msk;
+    RCC_ClocksTypeDef RCC_Clocks;
 
-    (void)RCC_Clocks;
+    RCC_GetClocksFreqValue(&RCC_Clocks);
 
-    RCC_ConfigM7SystickClkDivider(RCC_STCLK_DIV512);
-    __DSB();
-    
-    if (ticks > SysTick_LOAD_RELOAD_Msk)  return (1);            /* Reload value impossible */
-                                                               
-    SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
-    SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
-    SysTick->CTRL  = SysTick_CTRL_ENABLE_Msk ;                   /* Enable SysTick IRQ and SysTick Timer */
-    SysTick->CTRL  &= (~SysTick_CTRL_TICKINT_Msk);
-
-    return (0);     
+    /* Use the M7 core clock and enable both the counter and its interrupt. */
+    return SysTick_Config(RCC_Clocks.M7ClkFreq / 1000U);
 }
 
 void arch_init(void)
@@ -127,11 +117,6 @@ void arch_init(void)
 
     //时钟初始化
     clock_init();
-
-#ifdef N32H78x
-    /* Enable Cortex-M4 boot*/
-    RCC_EnableCM4(0x15080000);
-#endif
 
     //系统中断优先级设置
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);

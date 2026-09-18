@@ -3,10 +3,10 @@
 /********************************************************************************************************************************************************************/
 //arch init 配置 - arch_init
 
-//中断向量表地址
-#define ARCH_INIT_SRC_VECT_TABLE_ADDR     (0x08000000)
-#define ARCH_INIT_DES_VECT_TABLE_ADDR     (0x20000000)
-#define ARCH_INIT_VECT_TABLE_SIZE         (0x400)
+// CM7 中断向量表：从 Flash Bank1 复制到 AXI SRAM 起始处
+#define ARCH_INIT_SRC_VECT_TABLE_ADDR     (0x15000000U)
+#define ARCH_INIT_DES_VECT_TABLE_ADDR     (0x24000000U)
+#define ARCH_INIT_VECT_TABLE_SIZE         (0x400U)
 
 //系统时钟配置
 #define SYSCLK_SOURCE_HSI         0

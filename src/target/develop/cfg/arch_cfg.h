@@ -18,6 +18,7 @@
 #define ARCH_UART_MAP_TABLE {\
         {\
             .uart_periph = USART0,\
+            .uart_irqn = USART0_IRQn,\
             .uart_rcu = RCU_USART0,\
             .dma_periph = DMA1,\
             .dma_priority = DMA_PRIORITY_HIGH,\

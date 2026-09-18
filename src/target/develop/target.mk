@@ -32,6 +32,11 @@ TARGET_INC_DIRS += -I$(TARGET_DIR)cfg
 TARGET_SRCS += $(TARGET_DIR)src/target_main.c
 TARGET_CFLAGS += -DGD32F427
 
+# OZone/J-Link debug configuration. Keep this explicit when the target name
+# does not identify the exact MCU.
+OZONE_DEVICE := GD32F427VKT6
+OZONE_SVD := $(InstallDir)/Config/CPU/Cortex-M4F.svd
+
 # 链接器选项
 LDFLAGS += $(ARCH_LDFLAGS)
 LDFLAGS += -T$(TARGET_DIR)target.ld

@@ -5,6 +5,12 @@
 /* 显示句柄 */
 typedef struct bsp_display_t* bsp_display_handle_t;
 
+/**
+ * @brief 显示刷新回调函数
+ * @param ctx 上下文指针
+*/
+typedef void (*bsp_display_flush_cb_t)( void* ctx );
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,19 +43,24 @@ void bsp_display_set_brightness( bsp_display_handle_t handle , uint8_t brightnes
 uint8_t bsp_display_get_brightness( bsp_display_handle_t handle );
 
 /**
- * @brief 获取显示缓冲区
- * @param handle 显示句柄
- * @param size 显示缓冲区大小
- * @return 显示缓冲区指针，失败返回NULL
-*/
-uint8_t* bsp_display_get_show_buf( bsp_display_handle_t handle , uint32_t* size );
-
-/**
  * @brief 刷新显示
  * @param handle 显示句柄
+ * @param x 起始x坐标
+ * @param y 起始y坐标
+ * @param width 宽度
+ * @param height 高度
+ * @param data 数据指针
  * @return 0:成功,其他:失败
 */
-uint8_t bsp_display_flush( bsp_display_handle_t handle );
+uint8_t bsp_display_flush( bsp_display_handle_t handle , uint16_t x , uint16_t y , uint16_t width , uint16_t height , uint8_t* data );
+
+/**
+ * @brief 注册显示刷新回调函数
+ * @param handle 显示句柄
+ * @param cb 回调函数
+ * @param ctx 上下文指针
+*/
+void bsp_display_register_flush_cb( bsp_display_handle_t handle , bsp_display_flush_cb_t cb , void* ctx );
 
 #ifdef __cplusplus
 }

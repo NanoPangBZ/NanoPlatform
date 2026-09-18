@@ -19,48 +19,22 @@ __attribute__((weak)) void arch_spi_deinit( arch_spi_port_t port )
     (void)port;
 }
 
-__attribute__((weak)) uint32_t arch_spi_send( arch_spi_port_t port , const uint8_t* data , uint32_t length , uint32_t timeout_ms )
+__attribute__((weak)) uint32_t arch_spi_transfer( arch_spi_port_t port , const uint8_t* send_data , uint8_t* receive_data , uint32_t len )
 {
     (void)port;
-    (void)data;
-    (void)length;
-    (void)timeout_ms;
+    (void)send_data;
+    (void)receive_data;
+    (void)len;
     return 0;
 }
 
-__attribute__((weak)) uint32_t arch_spi_recieve( arch_spi_port_t port , uint8_t* data , uint32_t length , uint32_t timeout_ms )
+__attribute__((weak)) uint32_t arch_spi_transfer_non_blocking( arch_spi_port_t port , const uint8_t* send_data , uint8_t* receive_data , uint32_t len , arch_spi_transfer_cb_t callback , void* ctx )
 {
     (void)port;
-    (void)data;
-    (void)length;
-    (void)timeout_ms;
+    (void)send_data;
+    (void)receive_data;
+    (void)len;
+    (void)callback;
+    (void)ctx;
     return 0;
-}
-
-__attribute__((weak)) void arch_spi_set_send_complete_callback( arch_spi_port_t port , arch_spi_send_callback_t callback , void* ctx )
-{
-    (void)port;
-    (void)callback;
-    (void)ctx;
-}
-
-__attribute__((weak)) void arch_spi_set_receive_callback( arch_spi_port_t port , arch_spi_receive_callback_t callback , void* ctx )
-{
-    (void)port;
-    (void)callback;
-    (void)ctx;
-}
-
-__attribute__((weak)) void arch_spi_start_send( arch_spi_port_t port , const uint8_t* data , uint32_t length )
-{
-    (void)port;
-    (void)data;
-    (void)length;
-}
-
-__attribute__((weak)) void arch_spi_start_receive( arch_spi_port_t port , uint8_t* data , uint32_t length )
-{
-    (void)port;
-    (void)data;
-    (void)length;
 }

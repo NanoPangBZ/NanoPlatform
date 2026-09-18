@@ -312,6 +312,8 @@ ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_BSP_DEINIT , bsp_rgb_light_bar_deini
 
 #else
 
+#include <stddef.h>
+
 bsp_rgb_light_bar_handle_t bsp_rgb_light_bar_open( const char* name )
 {
     (void)name;

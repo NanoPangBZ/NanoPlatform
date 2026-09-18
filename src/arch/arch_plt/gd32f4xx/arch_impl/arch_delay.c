@@ -16,3 +16,15 @@ void arch_delay_ms(uint32_t ms)
         arch_delay_us(1000);
     }
 }
+
+void arch_delay_5ns(void)
+{
+    __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
+    __asm__ __volatile__("nop");
+}

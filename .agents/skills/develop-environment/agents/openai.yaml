@@ -1,0 +1,4 @@
+interface:
+  display_name: "NanoPlatform Develop Environment"
+  short_description: "Check and provision WSL ARM build prerequisites"
+  default_prompt: "Use $develop-environment to check and provision the NanoPlatform build environment."
