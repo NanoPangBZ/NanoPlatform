@@ -17,6 +17,18 @@
 - stm32g0(等待开发)
 - stm32h7xx(等待开发)
 
+# 支持的BSP
+
+- bsp_rgb_light_bar
+  - WS2812B(开发完成，等待验证)
+- bsp_storage
+  - arch_flash(等待开发)
+  - w25qxx系列(等待开发)
+- bsp_keyboard
+  - arch_gpio(等待开发)
+- bsp_encoder
+  - arch_exti(等待开发)
+
 # 验证类产品开发
 
 - develop
