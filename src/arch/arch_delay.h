@@ -20,6 +20,12 @@ void arch_delay_ms(uint32_t ms);
 */
 void arch_delay_us(uint32_t us);
 
+/**
+ * @brief 5纳秒级延时函数
+ * @note 阻塞式延时函数，调用该函数会阻塞当前线程，直到延时结束
+*/
+void arch_delay_5ns(void);
+
 #ifdef __cplusplus
 }
 #endif
