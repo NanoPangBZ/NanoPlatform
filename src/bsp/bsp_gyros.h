@@ -1,5 +1,7 @@
 #pragma once
 
+#include "framework/framework_comm_type.h"
+
 #include <stdint.h>
 
 /* 陀螺仪句柄 */
@@ -7,9 +9,9 @@ typedef struct bsp_gyros_t* bsp_gyros_handle_t;
 
 /* 陀螺仪轴 */
 typedef enum bsp_gyros_axis_e{
-    BSP_GYROS_AXIS_X = 0,
-    BSP_GYROS_AXIS_Y = 1,
-    BSP_GYROS_AXIS_Z = 2,
+    BSP_GYROS_AXIS_X = FRAMEWORK_AXIS_X,
+    BSP_GYROS_AXIS_Y = FRAMEWORK_AXIS_Y,
+    BSP_GYROS_AXIS_Z = FRAMEWORK_AXIS_Z,
 }bsp_gyros_axis_e;
 typedef uint8_t bsp_gyros_axis_t;
 

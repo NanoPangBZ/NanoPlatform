@@ -38,7 +38,7 @@ void bsp_storage_close( bsp_storage_handle_t handle );
 void bsp_storage_get_info( bsp_storage_handle_t handle, bsp_storage_info_t* info );
 
 /**
- * @brief 擦除存储 - 阻塞
+ * @brief 擦除存储
  * @param handle 存储句柄
  * @param addr 地址
  * @param size 大小
@@ -47,7 +47,7 @@ void bsp_storage_get_info( bsp_storage_handle_t handle, bsp_storage_info_t* info
 int bsp_storage_erase( bsp_storage_handle_t handle, uint32_t addr, uint32_t size );
 
 /**
- * @brief 读取存储 - 阻塞
+ * @brief 读取存储
  * @param handle 存储句柄
  * @param addr 地址
  * @param size 大小
@@ -57,7 +57,7 @@ int bsp_storage_erase( bsp_storage_handle_t handle, uint32_t addr, uint32_t size
 uint32_t bsp_storage_read( bsp_storage_handle_t handle , uint32_t addr , uint32_t size , uint8_t* data );
 
 /**
- * @brief 写入存储 - 阻塞
+ * @brief 写入存储
  * @param handle 存储句柄
  * @param addr 地址
  * @param size 大小
@@ -65,6 +65,12 @@ uint32_t bsp_storage_read( bsp_storage_handle_t handle , uint32_t addr , uint32_
  * @return 实际写入的大小
 */
 uint32_t bsp_storage_write( bsp_storage_handle_t handle , uint32_t addr , uint32_t size , const uint8_t* data );
+
+/**
+ * @brief 执行存储器未完成的操作
+ * @param handle 存储句柄
+*/
+void bsp_storage_flush( bsp_storage_handle_t handle );
 
 #ifdef __cplusplus
 }

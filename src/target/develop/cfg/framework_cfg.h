@@ -82,3 +82,16 @@
 #define NANO_NET_LL_STACK_BUFF_SIZE             (4 * 1024)
 #define NANO_NET_LL_STACK_ALIGN                 4
 
+/********************************************************************************************************************************************************************/
+//数据类型配置 - framework_data_type
+
+/**
+ * @param FRAMEWORK_DISTANCE_TYPE 距离类型 - mm
+ * @param FRAMEWORK_ANGLE_TYPE 角度类型 - 0.1°
+ * @param FRAMEWORK_ATTITUDE_QUATERNION_TYPE 姿态四元数类型
+ * @param FRAMEWORK_VELOCITY_TYPE 速度类型 - mm/s
+*/
+#define FRAMEWORK_DISTANCE_TYPE             int32_t
+#define FRAMEWORK_ANGLE_TYPE                float
+#define FRAMEWORK_ATTITUDE_QUATERNION_TYPE  float
+#define FRAMEWORK_VELOCITY_TYPE             float
