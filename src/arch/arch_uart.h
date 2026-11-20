@@ -4,8 +4,13 @@
 
 typedef uint8_t arch_uart_port_t;
 
-typedef void (*arch_uart_send_callback_t)( arch_uart_port_t port , void* ctx );
-typedef void (*arch_uart_receive_callback_t)( arch_uart_port_t port , void* ctx , const uint8_t* data , uint32_t len);
+/**
+ * @brief 非阻塞传输回调函数
+ * @param ctx 上下文指针
+ * @param trans_buf 传输缓冲区
+ * @param trans_len 传输长度
+*/
+typedef void (*arch_uart_tranc_non_block_cb_t)( void* ctx , uint8_t* trans_buf , uint32_t trans_len );
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,38 +52,28 @@ uint32_t arch_uart_send( arch_uart_port_t port , const uint8_t* data , uint32_t 
 uint32_t arch_uart_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len , uint32_t timeout_ms );
 
 /**
- * @brief 设置UART发送完成回调函数
- * @param port UART端口号
- * @param callback 发送完成回调函数
- * @param ctx 回调函数的上下文指针
-*/
-void arch_uart_set_send_complete_callback( arch_uart_port_t port , arch_uart_send_callback_t callback , void* ctx );
-
-/**
- * @brief 设置UART接收回调函数
- * @param port UART端口号
- * @param callback 接收回调函数
- * @param ctx 回调函数的上下文指针
-*/
-void arch_uart_set_receive_callback( arch_uart_port_t port , arch_uart_receive_callback_t callback , void* ctx );
-
-/**
- * @brief 启动UART发送
+ * @brief 非阻塞发送数据到UART端口
  * @param port UART端口号
  * @param data 要发送的数据缓冲区
  * @param len 要发送的数据长度
- * @note 该函数用于启动UART的发送功能，通常在设置发送完成回调函数后调用，以便开始发送数据并触发回调函数
+ * @param cb 非阻塞传输回调函数
+ * @param ctx 回调函数的上下文指针
+ * @return 实际发送的数据长度
+ * @note 该函数为非阻塞式调用，立即返回发送的数据长度，不等待发送完成
 */
-void arch_uart_start_send( arch_uart_port_t port , const uint8_t* data , uint32_t len );
+uint32_t arch_uart_send_non_block( arch_uart_port_t port , const uint8_t* data , uint32_t len , arch_uart_tranc_non_block_cb_t cb , void* ctx );
 
 /**
- * @brief 启动UART接收
+ * @brief 非阻塞接收数据到UART端口
  * @param port UART端口号
  * @param buffer 接收数据的缓冲区
  * @param buffer_len 缓冲区长度
- * @note 该函数用于启动UART的接收功能，通常在设置接收回调函数后调用，以便开始接收数据并触发回调函数
+ * @param cb 非阻塞传输回调函数
+ * @param ctx 回调函数的上下文指针
+ * @return 实际接收到的数据长度
+ * @note 该函数为非阻塞式调用，立即返回接收的数据长度，不等待接收完成
 */
-void arch_uart_start_receive( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len );
+uint32_t arch_uart_receive_non_block( arch_uart_port_t port , uint8_t* buffer , uint32_t buffer_len , arch_uart_tranc_non_block_cb_t cb , void* ctx );
 
 #ifdef __cplusplus
 }

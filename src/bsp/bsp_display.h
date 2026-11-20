@@ -29,6 +29,13 @@ bsp_display_handle_t bsp_display_open( const char* name );
 void bsp_display_close( bsp_display_handle_t handle );
 
 /**
+ * @brief 打开或关闭显示
+ * @param handle 显示句柄
+ * @param on 1:打开,0:关闭
+*/
+void bsp_display_on_off( bsp_display_handle_t handle , uint8_t on );
+
+/**
  * @brief 设置显示亮度
  * @param handle 显示句柄
  * @param brightness 亮度值
