@@ -141,8 +141,9 @@ ADD_NANO_SYSTICK_HANDLER_ITEM(nano_polling_pool_systick_handler);
 #endif
 
 
-static int nano_polling_pool_init(void)
+static int nano_polling_pool_init(void* args)
 {   
+    (void)args;
     //创建基本池
     e_basnano_polling_pool = (nano_polling_pool_handle_t)MALLOC(sizeof(nano_polling_pool_t));
     if( e_basnano_polling_pool == NULL )

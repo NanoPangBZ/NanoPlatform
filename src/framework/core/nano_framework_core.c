@@ -2,6 +2,7 @@
 #include "../nano_function_gruop.h"
 #include "../nano_heap.h"
 #include "./core/nano_core_sched.h"
+#include <stddef.h>
 
 #include "framework_cfg.h"
 #include "arch/arch_init.h"
@@ -44,10 +45,10 @@ void enter_nano_framework( void )
     arch_set_systick_handler(nano_framework_core_tick_handler);
 
     /* 调用目标初始化函数 */
-    nano_function_gruop_call(NANO_FUNCTION_GRUOP_FRAMEWORK_INIT);
-    nano_function_gruop_call(NANO_FUNCTION_GRUOP_BSP_INIT);
-    nano_function_gruop_call(NANO_FUNCTION_GRUOP_SERVICE_INIT);
-    nano_function_gruop_call(NANO_FUNCTION_GRUOP_APP_INIT);
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_FRAMEWORK_INIT,NULL);
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_BSP_INIT,NULL);
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_SERVICE_INIT,NULL);
+    nano_function_gruop_call(NANO_FUNCTION_GRUOP_APP_INIT,NULL);
 
     EXIT_CRITICAL();
 

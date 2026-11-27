@@ -100,8 +100,9 @@ uint8_t led_tick_service_is_enable(void)
  * @brief 初始化Tick LED服务
  * @return 0成功，非0失败
 */
-static int led_tick_service_init(void)
+static int led_tick_service_init(void* args)
 {
+    (void)args;
     memset( &led_tick_service_ctx , 0 , sizeof(led_tick_service_ctx) );
 
     bsp_led_handle_t led_handle = bsp_led_open( "tick" );
@@ -139,8 +140,9 @@ static int led_tick_service_init(void)
  * @brief 反初始化Tick LED服务
  * @return 0成功，非0失败
 */
-static int led_tick_service_deinit(void)
+static int led_tick_service_deinit(void* args)
 {
+    (void)args;
     nano_polling_task_destroy( led_tick_service_ctx.polling_task_handle );
     bsp_led_close( led_tick_service_ctx.led_handle );
     INFO_LOG("led_tick_service_deinit success");

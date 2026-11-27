@@ -30,7 +30,7 @@ typedef uint32_t nano_function_group_t;
 typedef struct nano_function_item_t{
     nano_function_group_t group;
     const char* name;
-    int (*function)(void);
+    int (*function)(void* args);
     uint32_t pri:2;         // 优先级，0-3，数值越小优先级越高
     uint32_t reserved:30;   // Reserved for future use, ensuring 32-bit alignment
 }nano_function_item_t;
@@ -60,9 +60,10 @@ extern "C" {
 /**
  * @brief 调用指定函数组的所有函数
  * @param group 要调用的函数组
+ * @param args 传递给函数的参数
  * @return 0表示成功调用，非0表示调用过程中有函数返回错误
 */
-int nano_function_gruop_call(nano_function_group_t group);
+int nano_function_gruop_call(nano_function_group_t group , void* args );
 
 #ifdef __cplusplus
 }

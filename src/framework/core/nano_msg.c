@@ -246,8 +246,9 @@ void nano_msg_handler(void)
     msg_manager.handing_msg_flag = 0; // 清除正在处理消息标志
 }
 
-static int nano_msg_mamanger_init(void)
+static int nano_msg_mamanger_init(void* args)
 {
+    (void)args;
     msg_manager.subscriber_list = list_create( sizeof(nano_msg_subscriber_t) );
     if( msg_manager.subscriber_list == NULL )
     {

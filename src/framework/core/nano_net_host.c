@@ -75,9 +75,11 @@ static void local_host_run_polling_func(void* ctx)
 
 /**
  * @brief nano通信网络主机模块运行时初始化
+ * @param args 传递给函数的参数
 */
-static int nano_net_host_running_init(void)
+static int nano_net_host_running_init(void* args)
 {
+    (void)args;
     nano_net_host_ctx_t* ctx = g_nano_net_host_ctx;
     if( !ctx->host_handle )
     {
@@ -108,9 +110,12 @@ ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_FRAMEWORK_INIT , nano_net_host_runni
 
 /**
  * @brief nano通信网络主机模块初始化
+ * @param args 传递给函数的参数
 */
-static int nano_net_host_init(void)
+static int nano_net_host_init(void* args)
 {
+    (void)args;
+
     nano_net_ll_depend_t depend = {
         .get_time_ms = nano_framework_time_ms,
         .stack_buff = stack_buff,

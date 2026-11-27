@@ -258,8 +258,9 @@ static void bsp_rgb_light_bar_polling_task( void* args )
     }
 }
 
-static int bsp_rgb_light_bar_init(void)
+static int bsp_rgb_light_bar_init(void* args)
 {
+    (void)args;
     bsp_rgb_light_bar_list = list_create( sizeof(bsp_rgb_light_bar_t) );
 
     if( bsp_rgb_light_bar_list == NULL )
@@ -288,8 +289,9 @@ static int bsp_rgb_light_bar_init(void)
     return 0;
 }
 
-static int bsp_rgb_light_bar_deinit(void)
+static int bsp_rgb_light_bar_deinit(void* args)
 {
+    (void)args;
     if( bsp_rgb_light_bar_polling_task_handle != NULL )
     {
         nano_polling_task_destroy( bsp_rgb_light_bar_polling_task_handle );

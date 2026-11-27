@@ -19,8 +19,9 @@
 #define ERROR_LOG(...)
 
 
-static int target_main(void)
+static int target_main(void* args)
 {
+    (void)args;
     arch_uart_init( 0 , 115200 );
 
     return 0;

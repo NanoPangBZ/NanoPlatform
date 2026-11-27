@@ -112,10 +112,12 @@ uint32_t bsp_led_get_value( bsp_led_handle_t handle )
 
 /**
  * @brief 初始化灯
+ * @param args 传递给函数的参数
  * @return 0表示成功，非0表示失败
 */
-static int bsp_led_init(void)
+static int bsp_led_init(void* args)
 {
+    (void)args;
     bsp_led_list = list_create( sizeof(bsp_led_t) );
     if( bsp_led_list == NULL )
     {
@@ -129,10 +131,12 @@ static int bsp_led_init(void)
 
 /**
  * @brief 反初始化灯
+ * @param args 传递给函数的参数
  * @return 0表示成功，非0表示失败
 */
-static int bsp_led_deinit(void)
+static int bsp_led_deinit(void* args)
 {
+    (void)args;
     list_destroy( bsp_led_list );
     bsp_led_list = NULL;
     INFO_LOG("bsp_led_deinit success");
