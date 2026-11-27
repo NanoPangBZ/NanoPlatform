@@ -1,4 +1,7 @@
 #include "service/led_tick_service.h"
+#include "service_cfg.h"
+
+#if defined(LED_TICK_SERVICE_ENABLE) && LED_TICK_SERVICE_ENABLE == 1
 
 #include <string.h>
 #include "framework/nano_function_gruop.h"
@@ -152,3 +155,17 @@ static int led_tick_service_deinit(void* args)
 
 ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_SERVICE_INIT , led_tick_service_init , 1 );
 ADD_NANO_FUNCTION_ITEM( NANO_FUNCTION_GRUOP_SERVICE_DEINIT , led_tick_service_deinit , 1 );
+
+#else
+
+void led_tick_service_enable( uint8_t enable )
+{
+    (void)enable;
+}
+
+uint8_t led_tick_service_is_enable(void)
+{
+    return 0;
+}
+
+#endif
